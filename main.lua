@@ -1,12 +1,14 @@
-
+io.stdout:setvbuf('no')
 Class = require 'class'
 require 'paddle'
 require 'simpleScale'
 require 'TSerial'
 require 'eball'
 require 'fullScreener'
+require 'superPowerControl'
 require 'mainMenu'
 require 'music'
+require 'animator'
 local serialize = require 'ser'
 local shader_code = [[
 vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
@@ -16,6 +18,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 ]]
 timeIsSlow = false 
 timeIsSlow2 = false 
+debug.shake = false
 originalSpeed = 200
 explosionRange = 0
 blockinput = false
@@ -140,7 +143,7 @@ function love.load()
     configsave = io.open('config.lua', "w")
     shader = love.graphics.newShader(shader_code)
     time_1 = 0
-
+    print("Debug active")
 --load
 
 testwalls = love.filesystem.load('save.lua')() 
@@ -281,7 +284,7 @@ function startShake(duration, magnitude)
     t, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
 end
 function displayFPS()
---love.window.setTitle(maxBalls)
+love.window.setTitle(love.timer.getFPS())
 end
 
 function speedControl()
@@ -291,6 +294,7 @@ function speedControl()
 end
 
 function love.update(dt)
+    staticanimatorcounter(dt)
     displayFPS()
     if areanuclear == 1  then 
         if nuclearanimation > 0 then 
@@ -311,7 +315,7 @@ function love.update(dt)
     dangerChecker()
 	musicController('norm', 1)
 	palleteController()
-        if (gameState == 'animation') then 
+    if (gameState == 'animation') then 
             animator(dt)
     end
 	    if t < shakeDuration then
@@ -564,6 +568,11 @@ end
             --love.window.setTitle('VOID')
             for i = 1, maxBalls do
             if ball[i]:collides(player1) then
+                print(debug.shake)
+                if ((areanuclear == 0 and ((player1striken or player2striken) and (player1score > 9 or player2score > 9))) or debug.shake) then
+                    print("Calling animation")
+                    superanimator('tensehit', 1) 
+                end
                 --gameState = 'quickanim'
                 if gameMode == 'practice' then 
                     player1score = player1score + 1
@@ -682,85 +691,13 @@ end
                 end
             end
             end
-            if ball[i]:collides(player3) then
-                --gameState = 'quickanim'
-                if gameMode == 'practice' then 
-                    player1score = player1score + 1
-                end
-                t = 0
-                if (ballSpeed > 200) then 
-                shakeMagnitude = ballSpeed/200
-            else shakeMagnitude = 0 end
-                shakeDuration = 1
-                randomtext = love.math.random(1, #textphrases)
-                TEXT = textphrases[randomtext]
-                soundtype = love.math.random(1, 1.2)
-
-                
-            
-                if (player1striken == 1) then 
-                    TEXT = 'PLAYER 1 STRIKES'
-                    ballSpeed = ballSpeed + player1nukescore
-                    potentialnuke1 = 0
-                    player1striken = 0
-                    player1nukescore = 0
-                    potentialstrike1 = 0
-                    striken = 1
-                if areanuclear == 0 then 
-                sounds['striking']:setPitch(ballSpeed/250)
-                sounds['striking']:play()
-            else 
-                sounds['nuclearhit']:setPitch(1)
-                sounds['nuclearhit']:play()
-            end
-                else
-                    if areanuclear == 0 then                 
-                sounds['beep']:setPitch(ballSpeed/250)
-                sounds['beep']:play()
-            else 
-                sounds['nuclearhit']:setPitch(1)
-                sounds['nuclearhit']:play()             
-            end
-        end
-                if (striken == 1) then 
-                player1nukescore = player1nukescore * 1.5
-                        if (synctype == 0)
-            then 
-        paddle_SPEED = paddle_SPEED * 1.10
-    elseif (synctype == 1)
-        then 
-            paddle_SPEED = ballSpeed /10 
-        end
-                                if (synctype == 0)
-            then 
-        AI_SPEED = AI_SPEED * 1.10 end
-    if (synctype == 1)
-        then 
-            AI_SPEED = ballSpeed * 1.1 /10
-        end
-                ballSpeed = ballSpeed * 1.10
-                end 
-                player1nukescore = player1nukescore + 10
-                ball[i].dx = -ball[i].dx
-                ball[i].x = player1.x + 30
-                
-                if (love.keyboard.isDown(p1control.up)) then 
-                    ball[i].dy = math.random(-2, -1)
-                elseif love.keyboard.isDown(p1control.down) then 
-                    ball[i].dy = math.random(1, 2)
-                else 
-                if ball[i].dy < 0 then 
-
-                    ball[i].dy = math.random(-2, -1)
-                else
-                    ball[i].dy = math.random(1, 2)
-                end
-            end
-            end
             if ball[i]:collides(player2) then 
                 --ameState = 'quickanim'
                 t = 0
                 shakeDuration = 1
+                if ((areanuclear == 0 and ((player1striken or player2striken) and (player1score > 9 or player2score > 9))) or debug.shake) then
+                    superanimator('tensehit', 2) 
+                end
                                 if (ballSpeed > 200) then 
                 shakeMagnitude = ballSpeed/200
                 else 
@@ -813,126 +750,6 @@ end
             else 
                 sounds['nuclearhit']:setPitch(1)
                 sounds['nuclearhit']:play()            	
-            end
-                end
-                player2nukescore = player2nukescore + 10
-                ball[i].dx = -ball[i].dx
-                ball[i].x = player2.x - 30
-
-                               if (love.keyboard.isDown(p2control.up) or AI_SPEED < 0) then 
-                                select = math.random(1,5)
-                                if select == 1 then 
-                                    ball[i].dy = -1
-                                elseif select == 2 then 
-                                    ball[i].dy = -1.2
-                                elseif select == 3 then 
-                                    ball[i].dy = -1.5 
-                                elseif select == 4 then 
-                                    ball[i].dy = -1.8 
-                                elseif select == 5 then 
-                                    ball[i].dy = -2
-                                end 
-                elseif love.keyboard.isDown(p2control.down) or AI_SPEED > 0 then 
-                    select = math.random(1,5)
-                    if select == 1 then 
-                        ball[i].dy = 1
-                    elseif select == 2 then 
-                        ball[i].dy = 1.2
-                    elseif select == 3 then 
-                        ball[i].dy = 1.5 
-                    elseif select == 4 then 
-                        ball[i].dy = 1.8 
-                    elseif select == 5 then 
-                        ball[i].dy = 2
-                    end 
-                else 
-                if ball[i].dy < 0 then 
-
-                    select = math.random(1,5)
-                    if select == 1 then 
-                        ball[i].dy = -1
-                    elseif select == 2 then 
-                        ball[i].dy = -1.2
-                    elseif select == 3 then 
-                        ball[i].dy = -1.5 
-                    elseif select == 4 then 
-                        ball[i].dy = -1.8 
-                    elseif select == 5 then 
-                        ball[i].dy = -2
-                    end 
-                else
-                    select = math.random(1,5)
-                    if select == 1 then 
-                        ball[i].dy = 1
-                    elseif select == 2 then 
-                        ball[i].dy = 1.2
-                    elseif select == 3 then 
-                        ball[i].dy = 1.5 
-                    elseif select == 4 then 
-                        ball[i].dy = 1.8 
-                    elseif select == 5 then 
-                        ball[i].dy = 2
-                    end 
-                end
-            end
-            end
-            if ball[i]:collides(player4) then 
-                --ameState = 'quickanim'
-                t = 0
-                shakeDuration = 1
-                                if (ballSpeed > 200) then 
-                shakeMagnitude = ballSpeed/200
-                else 
-                    shakeMagnitude = 0 end
-                randomtext = love.math.random(1, #textphrases)
-                TEXT = textphrases[randomtext]
-                soundtype = love.math.random(1, 1.2)
-
-                
-            
-                if (player2striken == 1) then 
-                    TEXT = 'PLAYER 2 STRIKES'
-                    ballSpeed = ballSpeed + player2nukescore
-                    striken=1
-                    player2striken = 0
-                    potentialnuke2 = 0
-                    player2nukescore = 0
-                    potentialstrike2 = 0
-                    
-                                    if areanuclear == 0 then                 
-                sounds['striking']:setPitch(ballSpeed/250)
-                sounds['striking']:play()
-            else 
-                sounds['nuclearhit']:setPitch(1)
-                sounds['nuclearhit']:play()             
-            end
-                elseif (striken == 1) then 
-                player2nukescore = player2nukescore * 1.5
-                        if (synctype == 0) then paddle_SPEED = paddle_SPEED * 1.10 end
-                        if (synctype == 1) then paddle_SPEED = ballSpeed/10 end
-                                                if (synctype == 0)
-            then 
-        AI_SPEED = AI_SPEED * 1.10 end
-    if (synctype == 1)
-        then 
-            AI_SPEED = ballSpeed * 1.1 / 10
-
-        end
-                ballSpeed = ballSpeed * 1.10
-                                                    if areanuclear == 0 then                 
-                sounds['beep']:setPitch(ballSpeed/250)
-                sounds['beep']:play()
-            else 
-                sounds['nuclearhit']:setPitch(1)
-                sounds['nuclearhit']:play()             
-            end
-                else
-                                                        if areanuclear == 0 then                 
-                sounds['beep']:setPitch(ballSpeed/250)
-                sounds['beep']:play()
-            else 
-                sounds['nuclearhit']:setPitch(1)
-                sounds['nuclearhit']:play()             
             end
                 end
                 player2nukescore = player2nukescore + 10
@@ -1509,7 +1326,7 @@ function love.draw()
             player1:render()
             player2:render()
         elseif gameState == 'animation' then 
-            callAnimator()
+            callAnimator() --This calls a fucking 100 year old animator. I dont even remember what it does. This has nothing to do with the new one
         else
             mapChanger()
             if t < shakeDuration then
@@ -1531,6 +1348,7 @@ function love.draw()
                 love.graphics.setShader()
 	            love.graphics.clear(40/255, 40/255, 40/255, 1) --BACKGROUND COLOR
             end
+            staticanimator()
             if (gameMode == 'practice') then 
                 love.graphics.rectangle('fill', VIRTUAL_WIDTH, 0, 10, VIRTUAL_HEIGHT)
             end
@@ -1544,7 +1362,7 @@ function love.draw()
             if gameState == 'play' or gameState == '1serve' or gameState == '2serve' then 
                 love.graphics.setFont(smallfont)
             end
-            
+            love.graphics.setColor(1,1,1,1)
             love.graphics.printf(TEXT,0,20,VIRTUAL_WIDTH,'center')
             love.graphics.setFont(smallfont)
             love.graphics.printf(updateTEXT,0,VIRTUAL_HEIGHT * 0.95,VIRTUAL_WIDTH,'left')
@@ -1592,6 +1410,7 @@ function love.draw()
                     love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
                 end
             end
+            
             if gameState ~= 'assign' then
                 player1:render()
                 player3:render()
