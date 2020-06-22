@@ -1336,7 +1336,7 @@ function love.draw()
                 love.graphics.translate(dx, dy)
             end
             if (gameState == 'menu') then 
-                updateTEXT = '0.7 Chalkboard Update'
+                updateTEXT = '0.7.1 Chalkboard Update'
             end
             serveBot()
             hardmanager()
