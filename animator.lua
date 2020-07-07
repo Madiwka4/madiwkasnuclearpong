@@ -17,6 +17,25 @@ function superanimator(type, param)
     end
 end
 function staticanimatorcounter(dt)
+    if (gameState == 'animation') then
+        time_1 = time_1 + dt
+        light = 255 - time_1 * 85
+        if (light < 0) then 
+            time_1 = 0
+            light = 0
+            gameState = 'start'
+        end
+    end
+    if areanuclear == 1  then 
+        if nuclearanimation > 0 then 
+            gameState = 'nuclearExplosion'
+            nuclearanimation = nuclearanimation - dt
+            explosionRange = explosionRange + dt*24
+        elseif (gameState ~= 'play') then 
+            gameState = 'play'
+            explosionRange = 0
+        end
+    end
     if (player1anim) then 
         print("Effect range: " .. effectRange[0])
         effectRange[0] = effectRange[0] + dt*24

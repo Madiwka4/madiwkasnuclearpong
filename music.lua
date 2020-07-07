@@ -24,16 +24,15 @@ function musicController(orders, toggling)
          else 
             
          end
-        elseif order ~= nil then  
-
-                            sounds[orders]:setPitch(1)
-                            sounds[orders]:setLooping(true)
-                            sounds[orders]:setVolume(0.9)
-                            sounds[orders]:play()
-            if (toggling == 1) then 
-                sounds[orders]:setVolume(0.9)
-            else
-                sounds[orders]:setVolume(0)
-            end
+    elseif orders ~= nil then  
+        sounds[orders]:setPitch(1)
+        sounds[orders]:setLooping(true)
+        sounds[orders]:setVolume(0.9)
+        sounds[orders]:play()
+        if (toggling == 1) then 
+            sounds[orders]:setVolume(0.9)
+        else
+            sounds[orders]:stop()
         end
+    end
 end

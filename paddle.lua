@@ -17,6 +17,15 @@ function paddle:init(x, y, width, height, player)
 end
 
 function paddle:update(dt)
+	if areanuclear == 0 then 
+		self.RED = 1
+		self.GREEN = 1
+		self.BLUE = 1
+	else 
+		self.RED = 0
+		self.GREEN = 0
+		self.BLUE = 0
+	end
 	if ((self.player == 1 and timeIsSlow2) or self.player == 2 and timeIsSlow) then 
 		self.dy = self.dy / 2
 	end
