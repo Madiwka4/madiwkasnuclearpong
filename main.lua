@@ -68,7 +68,7 @@ craz = 0
 AI_LEVEL = 500
 isFullscreen = 0
 prtext = "Easy"
-MAP_TYPE = 2
+MAP_TYPE = 0
 difficultyl = 300
 req = "pp"
 ballSet = 200
@@ -448,15 +448,6 @@ function love.load()
     table.insert(
         modeSelectorButtons,
         newButton(
-            "Nuclear Practice",
-            function()
-                gameState = "prdiff"
-            end
-        )
-    )
-    table.insert(
-        modeSelectorButtons,
-        newButton(
             "Main Menu",
             function()
                 gameState = "menu"
@@ -509,6 +500,7 @@ function love.load()
             function()
                 speedSetter("reset")
                 gameState = "menu"
+        
             end
         )
     )
@@ -528,6 +520,7 @@ function love.load()
             function()
                 AGAINST_AI = 0
                 gameState = "1serve"
+                globalState = "base"
             end
         )
     )
@@ -633,12 +626,13 @@ function startShake(duration, magnitude)
 end
 function displayFPS()
     --love.window.setTitle(love.timer.getFPS())
-    love.window.setTitle(gameState .. " " .. gameMode .. " " .. globalState .. " " .. MAP_TYPE)
+    love.window.setTitle(globalState .. " " .. gameState)
     if love.keyboard.isDown("space") then
         player1nukescore = 200
-        player1score = 9
-        player2score = 9
+        player1score = player1score + 0.2
+        player2nukescore = 200
     end
+    
 end
 
 function speedControl()
@@ -650,6 +644,7 @@ end
 function love.update(dt)
     
     staticanimatorcounter(dt)
+    musicController('norm', 1)
     if debug then
         displayFPS()
     end

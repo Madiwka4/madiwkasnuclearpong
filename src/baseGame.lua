@@ -7,7 +7,7 @@ function basegame(dt)
     end
     speedControl()
     balancer()
-    musicController('norm', 1)
+    
     if t < shakeDuration then
         t = t + dt
     end
@@ -85,7 +85,7 @@ function basegame(dt)
         for i = 1, maxBalls do
             if ball[i]:collides(player1) then
                 
-                if (areanuclear == 0 and striken == 1 and (player1score > 8 or player2score > 8)) then
+                if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
                     print("Calling animation")
                     superanimator("tensehit", 1)
                 end
@@ -118,6 +118,7 @@ function basegame(dt)
                         sounds["nuclearhit"]:setPitch(1)
                         sounds["nuclearhit"]:play()
                     end
+                    superanimator("tensehit", 1)
                 else
                     if areanuclear == 0 then
                         sounds["beep"]:setPitch(ballSpeed / 250)
@@ -128,6 +129,7 @@ function basegame(dt)
                     end
                 end
                 if (striken == 1) then
+                    
                     player1nukescore = player1nukescore * 1.2
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
@@ -208,7 +210,7 @@ function basegame(dt)
                 shakeDuration = 1
                 if
                     (areanuclear == 0 and
-                        (striken == 1 and (player1score > 8 or player2score > 8)))
+                        (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
                  then
                     superanimator("tensehit", 2)
                 end
@@ -229,7 +231,7 @@ function basegame(dt)
                     potentialnuke2 = 0
                     player2nukescore = 0
                     potentialstrike2 = 0
-
+                    superanimator("tensehit", 2)
                     if areanuclear == 0 then
                         sounds["striking"]:setPitch(ballSpeed / 250)
                         sounds["striking"]:play()
@@ -238,6 +240,7 @@ function basegame(dt)
                         sounds["nuclearhit"]:play()
                     end
                 elseif (striken == 1) then
+                    
                     player2nukescore = player2nukescore * 1.5
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
@@ -389,7 +392,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.1 Chalkboard Update"
+        updateTEXT = "0.7.2 Chalkboard Update"
     end
     dangerChecker()
     elapsed = elapsed + dt  
@@ -486,7 +489,7 @@ function powerAvailability()
             player1reverbav = 0
         end
     end
-    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false and maxBalls == 1 and ball[1].x < VIRTUAL_WIDTH / 2 then
+    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false and maxBalls == 1 and ball[1].x < VIRTUAL_WIDTH / 2  and ball[1].dx < 0 then
         player1reverbav = 1
         if love.keyboard.isDown(p1control.counter) then
             powerControl(1, "special")
@@ -529,7 +532,7 @@ function powerAvailability()
             end
         end
     end
-    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and maxBalls == 1 and ball[1].x > VIRTUAL_WIDTH / 2 then
+    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and maxBalls == 1 and ball[1].x > VIRTUAL_WIDTH / 2 and ball[1].dx > 0 then
         player2reverbav = 1
         if love.keyboard.isDown(p2control.counter) then
             sounds["time"]:play()
@@ -803,7 +806,7 @@ function displayPoints()
         else
             love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 60)
         end
-    elseif (player1reverbav == 1 and potentialnuke1 == 0) then
+    elseif (player1reverbav == 1 and potentialnuke1 == 0 and maxBalls == 1) then
         love.graphics.print(
             tostring(
                 math.floor(player1nukescore) .. "[" .. p1control.super .. "]" .. " [" .. p1control.counter .. "]"
@@ -811,11 +814,21 @@ function displayPoints()
             VIRTUAL_WIDTH / 2 - 500,
             VIRTUAL_HEIGHT / 60
         )
-    elseif (potentialnuke1 == 1) then
+    elseif (potentialnuke1 == 1 and maxBalls == 1) then
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.print(
             tostring(
                 math.floor(player1nukescore) .. "[" .. p1control.super .. "]" .. " [" .. p1control.counter .. "]"
+            ),
+            VIRTUAL_WIDTH / 2 - 500,
+            VIRTUAL_HEIGHT / 60
+        )
+        love.graphics.setColor(255, 255, 255, 255)
+    elseif (potentialnuke1 == 1) then
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.print(
+            tostring(
+                math.floor(player1nukescore) .. "[" .. p1control.super .. "]" 
             ),
             VIRTUAL_WIDTH / 2 - 500,
             VIRTUAL_HEIGHT / 60
@@ -834,18 +847,26 @@ function displayPoints()
         else
             love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 + 430, VIRTUAL_HEIGHT / 60)
         end
-    elseif (potentialnuke2 == 1) then
+    elseif (potentialnuke2 == 1 and maxBalls == 1) then
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.print(
+            tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "] [" .. p2control.counter .. "]"),
+            VIRTUAL_WIDTH / 2 + 400,
+            VIRTUAL_HEIGHT / 60
+        )
+        love.graphics.setColor(255, 255, 255, 255)
+    elseif (potentialnuke2 == 1 and maxBalls > 1) then 
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.print(
             tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "]"),
             VIRTUAL_WIDTH / 2 + 430,
             VIRTUAL_HEIGHT / 60
         )
-        love.graphics.setColor(255, 255, 255, 255)
-    elseif (player2reverbav == 1 and potentialnuke2 == 0) then
+        love.graphics.setColor(255, 255, 255, 255)       
+    elseif (player2reverbav == 1 and potentialnuke2 == 0 and maxBalls == 1) then
         love.graphics.print(
             tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "] [" .. p2control.counter .. "]"),
-            VIRTUAL_WIDTH / 2 + 430,
+            VIRTUAL_WIDTH / 2 + 400,
             VIRTUAL_HEIGHT / 60
         )
     else

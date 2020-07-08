@@ -78,8 +78,8 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     ev_bx = -400
                     ev_by = -400
                 else
-            ev_bx = locationx - (ev_button_width * 0.5)
-            ev_by = locationy - (total_height * 0.5) + cursor_y
+                    ev_bx = locationx - (ev_button_width * 0.5)
+                    ev_by = locationy - (total_height * 0.5) + cursor_y
             end
             if (button.text == 'Play') and location == 'playercount' then color = {0/255, 255/255, 0/255, 255} else
                 color = {10, 10, 0, 255}
@@ -110,22 +110,27 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
             local textW = smallfont:getWidth(button.text)
             local textH = smallfont:getHeight(button.text)
             if (location == 'control') then 
+                if danger == button.text or danger2 == button.text then
+                    love.graphics.setColor(1,0,0,1)
+                else 
+                    love.graphics.setColor(0,0,0,1)
+                end 
                 if (button.text == "1up") then 
-                    love.graphics.print("Player 1 UP: " .. string.upper(p1control.up), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P1 UP: " .. string.upper(p1control.up), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                 elseif button.text == '2up' then 
-                    love.graphics.print("Player 2 UP: " .. string.upper(p2control.up), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P2 UP: " .. string.upper(p2control.up), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                 elseif button.text == '1down' then 
-                    love.graphics.print("Player 1 DOWN: " .. string.upper(p1control.down), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P1 DOWN: " .. string.upper(p1control.down), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                     elseif button.text == '2down' then 
-                    love.graphics.print("Player 2 DOWN: " .. string.upper(p2control.down), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P2 DOWN: " .. string.upper(p2control.down), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                     elseif button.text == '1special' then 
-                    love.graphics.print("Player 1 SPECIAL: " .. string.upper(p1control.super), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P1 SPECIAL: " .. string.upper(p1control.super), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                     elseif button.text == '2special' then 
-                    love.graphics.print("Player 2 SPECIAL: " .. string.upper(p2control.super), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P2 SPECIAL: " .. string.upper(p2control.super), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                     elseif button.text == '1ct' then 
-                    love.graphics.print("Player 1 COUNTER: " .. string.upper(p1control.counter), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P1 COUNTER: " .. string.upper(p1control.counter), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                 elseif button.text == '2ct' then 
-                    love.graphics.print("Player 2 COUNTER: " .. string.upper(p2control.counter), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
+                    love.graphics.print("P2 COUNTER: " .. string.upper(p2control.counter), smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                 else
                 love.graphics.print(button.text, smallfont, ev_bx + (ev_button_width * 0.1), ev_by+textH*0.5)
                
@@ -137,15 +142,15 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     elseif button.text == 'snc' then 
                         if (nuckemodactive == 1) then
                             love.graphics.setColor(1,0,0,1)
-                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
                             love.graphics.setColor(1,1,1,1)
-                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
                             love.graphics.setColor(0,0,0,1) 
                         else
                             love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.45 - textW*0.5, ev_by+textH*0.5)
                         end
                     elseif (button.text == 'ballCount') then 
-                        love.graphics.print("Ball Count: " .. maxBalls, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                        love.graphics.print("Ball Count: " .. maxBalls, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
                     elseif (button.text == "Ball Speed: ") then 
                         if (nuckemodactive == 1) then 
 
@@ -156,10 +161,10 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                             love.graphics.setColor(0,0,0,1) 
 
                         else
-                            love.graphics.print(button.text .. ballSet, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print(button.text .. ballSet, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.6, ev_by+textH*0.5)
                         end
                     elseif button.text == 'ptw' then 
-                        love.graphics.print("Points to Win: " .. ptw, smallfont,VIRTUAL_WIDTH*0.5 - textW * 1.5, ev_by+textH*0.5)
+                        love.graphics.print("Points to Win: " .. ptw, smallfont,VIRTUAL_WIDTH*0.5 - textW * 2.8, ev_by+textH*0.5)
                     elseif (button.text ==  'Silverblade') then 
                         love.graphics.print("Difficulty: " .. prtext, smallfont, VIRTUAL_WIDTH*0.5 - textW , ev_by+textH*0.5) 
                     else
