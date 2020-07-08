@@ -11,6 +11,8 @@ function basegame(dt)
     if t < shakeDuration then
         t = t + dt
     end
+    print("T = " .. tostring(t))
+    serveBot()
     if gameState == 'play' then 
         if (AGAINST_AI == 1) then
             for i = 1, maxBalls do
@@ -79,9 +81,11 @@ function basegame(dt)
                 player2.dy = 0
             end
         end
+        print(areanuclear .. striken .. player1score .. player2score)
         for i = 1, maxBalls do
             if ball[i]:collides(player1) then
-                if (areanuclear == 0 and ((player1striken or player2striken) and (player1score > 9 or player2score > 9))) then
+                
+                if (areanuclear == 0 and striken == 1 and (player1score > 8 or player2score > 8)) then
                     print("Calling animation")
                     superanimator("tensehit", 1)
                 end
@@ -204,7 +208,7 @@ function basegame(dt)
                 shakeDuration = 1
                 if
                     (areanuclear == 0 and
-                        ((player1striken or player2striken) and (player1score > 9 or player2score > 9)))
+                        (striken == 1 and (player1score > 8 or player2score > 8)))
                  then
                     superanimator("tensehit", 2)
                 end
@@ -324,6 +328,7 @@ function basegame(dt)
                     end
                 end
             end
+            hitIdentifier()
             if ball[i].y <= 0 then
                 soundtype = love.math.random(1, 5)
                 sounds["wallhit"]:setPitch(ballSpeed / 250)
@@ -377,7 +382,12 @@ function basegame(dt)
     player1:update(dt)
     player2:update(dt)
 end
-function menumode(dt) 
+
+
+
+
+function debugCheck(dt)
+    
     if (gameState == "menu") then
         updateTEXT = "0.7.1 Chalkboard Update"
     end
@@ -389,7 +399,8 @@ function menumode(dt)
     end
     editor()
     mapChanger()
-end
+end 
+
 function goalManager()
     for i = 1, maxBalls do
         if (ball[i].x < 0 - ballSpeed * 0.5) then
@@ -559,26 +570,367 @@ function powerAvailability()
         end
     end
 end
+
 function editor()
     if (gameState == "editor") then
+        if debug then 
+            --print("Editor is active!")
+        end 
         local mx, my = love.mouse.getPosition()
         mx = mx * DIFFERENCE_X
         my = my * DIFFERENCE_Y
-        if not blockinput then
-            love.graphics.setColor(1, 0, 0, 1)
-            love.graphics.rectangle("fill", mx, my, 10, wall1width)
-            love.graphics.setColor(1, 1, 1, 1)
-        end
         if (love.mouse.isDown(2)) then
             wallbreaker(mx, my)
         end
         if (love.mouse.isDown(3)) then
             table.insert(walls, newWall(mx, my, 10, wall1width))
         end
+    end
+end
 
+function nuclearDraw()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.circle("fill", ball[1].x, ball[1].y, explosionRange * 100, 100)
+    player1.RED, player1.GREEN, player1.BLUE, player2.RED, player2.GREEN, player2.BLUE =
+        nuclearanimation / 3,
+        nuclearanimation / 3,
+        nuclearanimation / 3,
+        nuclearanimation / 3,
+        nuclearanimation / 3,
+        nuclearanimation / 3
+    for i = 1, maxBalls do
+        love.graphics.setColor(nuclearanimation / 3, nuclearanimation / 3, nuclearanimation / 3, 1)
+        ball[i]:render("controlled")
+    end
+    player1:render()
+    player2:render()
+end 
+
+function normalDraw()
+    if (areanuclear == 1) then
+        love.graphics.clear(1, 1, 1, 1)
+    else
+        love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1) 
+    end
+    staticanimator()
+
+    if MAP_TYPE == 1 then 
+        love.graphics.setColor(1, 0, 0.20, 1)
+        love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, 0, 10, VIRTUAL_HEIGHT * 0.3)
+        love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, VIRTUAL_HEIGHT * 0.7, 10, VIRTUAL_HEIGHT * 0.3)
+        love.graphics.setColor(1, 1, 1, 1)
+    end 
+    if MAP_TYPE == 2 then 
         for i, wall in ipairs(walls) do
             love.graphics.setColor(1, 1, 1, 1)
             love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
         end
     end
+
+    if gameMode == 'practice' then 
+        practiceDraw()
+    end
+    if gameMode == 'normal' then 
+        pongDraw()
+    end
+    love.graphics.setFont(smallfont)
+    for i = 1, maxBalls do
+        if areanuclear == 1 then
+            --love.window.setTitle('rendering black')
+            ball[i]:render("black")
+        else
+            --love.window.setTitle('rendering white')
+            ball[i]:render(" ")
+        end
+    end
+    
+end 
+function pongDraw()
+    --print("Drawing classic pong")
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")
+    love.graphics.setFont(smallfont)
+    love.graphics.setFont(scorefont)
+    if (areanuclear == 1) then 
+        love.graphics.setColor(0, 0, 0, 1)
+    end
+    love.graphics.print(tostring(math.floor(player1score)), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 12)
+    love.graphics.print(tostring(math.floor(player2score)), VIRTUAL_WIDTH / 2 + 400, VIRTUAL_HEIGHT / 12)
+    love.graphics.setColor(1, 1, 1, 1)
+    displayPoints()
+    player1:render()
+    player2:render()
+
 end
+function practiceDraw()
+    player1:render()
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH-10, 0, 10, VIRTUAL_HEIGHT)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")
+    love.graphics.setFont(smallfont)
+    love.graphics.setFont(scorefont)
+    love.graphics.print(tostring(math.floor(player1score)), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 12)
+end
+function menuDraw()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")
+    love.graphics.setFont(smallfont)
+    love.graphics.printf(updateTEXT, 0, VIRTUAL_HEIGHT * 0.95, VIRTUAL_WIDTH, "left")
+    if MAP_TYPE == 1 then 
+        love.graphics.setColor(1, 0, 0.20, 1)
+        love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, 0, 10, VIRTUAL_HEIGHT * 0.3)
+        love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, VIRTUAL_HEIGHT * 0.7, 10, VIRTUAL_HEIGHT * 0.3)
+        love.graphics.setColor(1, 1, 1, 1)
+    end 
+    if MAP_TYPE == 2 then 
+        for i, wall in ipairs(walls) do
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
+        end
+    end
+    if gameState == "windowsettings" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, settings, sounds, "right")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "editor" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, editorpicks, sounds, "right")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "speedSettings" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, speedParameters, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "controlSettings" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, controlSettings, sounds, "control")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "gameMode" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, modeSelectorButtons, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "menu" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "difficulty" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, difbuttons, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "multiMode" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, playerCountButtons, sounds, "playercount")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "prdiff" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, pracdiff, sounds, "playercount")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == 'start' then 
+        love.graphics.push()
+        love.graphics.translate(VIRTUAL_WIDTH * 0.4, VIRTUAL_HEIGHT * 0.5)
+        love.graphics.rotate(rotation)
+        love.graphics.setFont(smallfont)
+        love.graphics.print("Press Enter to Start", WINDOW_WIDTH / -10, VIRTUAL_HEIGHT / 8)
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.pop()
+    end
+end
+function baseDraw()
+    love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1) 
+    if shakeDuration > t then 
+            
+        local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
+        local dy = love.math.random(-shakeMagnitude, shakeMagnitude)
+        love.graphics.translate(dx, dy)
+    end
+    if globalState == 'menu' then 
+        print("Drawing menuDraw")
+        if gameState == 'animation' then 
+            
+            print("Drawing animation")
+            intro()
+        end
+        if gameState ~= 'animation' then
+            print("Drawing notanimtaion") 
+            love.graphics.setFont(scorefont)
+            menuDraw()
+        end
+    end
+    if globalState == 'base' then 
+        love.graphics.setFont(smallfont)
+        if gameState == 'nuclearExplosion' then 
+            nuclearDraw()
+        end 
+        if gameState == 'play' or gameState == '1serve' or gameState == '2serve' or gameState == 'done' then 
+            print("Drawing normally")
+            normalDraw()
+        end 
+
+    end 
+
+
+end 
+
+function renderEditor()
+    if not blockinput then
+        love.graphics.setColor(1, 0, 0, 1)
+        love.graphics.rectangle("fill", mx, my, 10, wall1width)
+        love.graphics.setColor(1, 1, 1, 1)
+    end
+    for i, wall in ipairs(walls) do
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
+    end
+end
+
+function intro()
+    love.graphics.setColor(255, 255, 255, light / 255)
+    love.graphics.draw(image, 0, 0)
+end
+
+
+function displayPoints()
+    love.graphics.setFont(smallfont)
+    if areanuclear == 1 then 
+        love.graphics.setColor(0,0,0,1)
+    end
+    if (potentialstrike1 == 1 and potentialnuke1 == 0 and player1reverbav == 0) then --FLAG: AVAILABLE SUPER
+        if (player1striken == 0) then
+            love.graphics.print(
+                tostring(math.floor(player1nukescore) .. "[" .. p1control.super .. "]"),
+                VIRTUAL_WIDTH / 2 - 500,
+                VIRTUAL_HEIGHT / 60
+            )
+        else
+            love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 60)
+        end
+    elseif (player1reverbav == 1 and potentialnuke1 == 0) then
+        love.graphics.print(
+            tostring(
+                math.floor(player1nukescore) .. "[" .. p1control.super .. "]" .. " [" .. p1control.counter .. "]"
+            ),
+            VIRTUAL_WIDTH / 2 - 500,
+            VIRTUAL_HEIGHT / 60
+        )
+    elseif (potentialnuke1 == 1) then
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.print(
+            tostring(
+                math.floor(player1nukescore) .. "[" .. p1control.super .. "]" .. " [" .. p1control.counter .. "]"
+            ),
+            VIRTUAL_WIDTH / 2 - 500,
+            VIRTUAL_HEIGHT / 60
+        )
+        love.graphics.setColor(255, 255, 255, 255)
+    else
+        love.graphics.print(tostring(math.floor(player1nukescore)), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 60)
+    end
+    if (potentialstrike2 == 1 and player2reverbav == 0) then
+        if (player2striken == 0) then
+            love.graphics.print(
+                tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "]"),
+                VIRTUAL_WIDTH / 2 + 430,
+                VIRTUAL_HEIGHT / 60
+            )
+        else
+            love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 + 430, VIRTUAL_HEIGHT / 60)
+        end
+    elseif (potentialnuke2 == 1) then
+        love.graphics.setColor(255, 0, 0, 255)
+        love.graphics.print(
+            tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "]"),
+            VIRTUAL_WIDTH / 2 + 430,
+            VIRTUAL_HEIGHT / 60
+        )
+        love.graphics.setColor(255, 255, 255, 255)
+    elseif (player2reverbav == 1 and potentialnuke2 == 0) then
+        love.graphics.print(
+            tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "] [" .. p2control.counter .. "]"),
+            VIRTUAL_WIDTH / 2 + 430,
+            VIRTUAL_HEIGHT / 60
+        )
+    else
+        love.graphics.print(tostring(math.floor(player2nukescore)), VIRTUAL_WIDTH / 2 + 430, VIRTUAL_HEIGHT / 60)
+    end
+end
+
+function hitIdentifier()
+        if (gameMode == "practice") then
+            MAP_TYPE = 0
+            if ball[i].x > VIRTUAL_WIDTH * 0.99 then
+                soundtype = love.math.random(1, 5)
+                sounds["wallhit"]:setPitch(ballSpeed / 250)
+                sounds["wallhit"]:play()
+                if (ball[i].dx > 0) then
+                    ball[i].x = ball[i].x - 20
+                else
+                    ball[i].x = ball[i].x + 20
+                end
+                ball[i].dx = -ball[i].dx
+            end
+        end
+        if (MAP_TYPE == 1) then
+            if
+                ball[i].y < VIRTUAL_HEIGHT * 0.3 and ball[i].x > VIRTUAL_WIDTH * 0.5 and
+                    ball[i].x < VIRTUAL_WIDTH * 0.5 + 5
+                then
+                soundtype = love.math.random(1, 5)
+                sounds["wallhit"]:setPitch(ballSpeed / 250)
+                sounds["wallhit"]:play()
+                if (ball[i].dx > 0) then
+                    ball[i].x = ball[i].x - 20
+                else
+                    ball[i].x = ball[i].x + 20
+                end
+                ball[i].dx = -ball[i].dx
+            end
+            if
+                ball[i].y > VIRTUAL_HEIGHT * 0.7 and ball[i].x > VIRTUAL_WIDTH * 0.5 and
+                    ball[i].x < VIRTUAL_WIDTH * 0.5 + 5
+                then
+                soundtype = love.math.random(1, 5)
+                sounds["wallhit"]:setPitch(ballSpeed / 250)
+                sounds["wallhit"]:play()
+                if (ball[i].dx > 0) then
+                    ball[i].x = ball[i].x - 20
+                else
+                    ball[i].x = ball[i].x + 20
+                end
+                ball[i].dx = -ball[i].dx
+            end
+        end
+        if (MAP_TYPE == 2) then 
+            for i, wall in ipairs(walls) do
+                if
+                    (ball[1].y > wall.wally and ball[1].y < wall.wally + wall.wallheight and
+                        ball[1].x > wall.wallx - ballSpeed / 200 and
+                        ball[1].x < wall.wallx + 10 + ballSpeed / 200)
+                then
+                    controllerSer()
+                    soundtype = love.math.random(1, 5)
+                    sounds["wallhit"]:setPitch(ballSpeed / 250)
+                    sounds["wallhit"]:play()
+                    if (ball[1].dx > 0) then
+                        ball[1].x = ball[1].x - 1
+                    else
+                        ball[1].x = ball[1].x + 1
+                    end
+                    ball[1].dx = -ball[1].dx
+                elseif
+                    (ball[1].y > wall.wally - 15 and ball[1].y < wall.wally + wall.wallheight + 10 and
+                        ball[1].x > wall.wallx and
+                        ball[1].x < wall.wallx + 10)
+                then
+                    controllerSer()
+                    soundtype = love.math.random(1, 5)
+                    sounds["wallhit"]:setPitch(ballSpeed / 250)
+                    sounds["wallhit"]:play()
+                    if (ball[1].dy > 0) then
+                        ball[1].y = ball[1].y - 1
+                    else
+                        ball[1].y = ball[1].y + 1
+                    end
+                    ball[1].dy = -ball[1].dy
+                end
+            end
+        end
+end 
