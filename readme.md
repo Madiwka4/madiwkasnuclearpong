@@ -22,5 +22,6 @@ Pong reimagined. Poorly reimagined.
                         <li><b>[L] while your counter says [L] and is red to drop a NUKE</b></li>
                         <li><b>[,] while your counter says [,] to slow down time</b></li>
                     </ul>
-                    
-                </div>
+
+<h2>Changes: </h2>
+<p>0.7.2 is here! With this update, I successfully split my game into multiple modules in order to make room for more code for the future, increased performance, and a lot of fixed bugs! Added colorful animations and new music. Did I mention fixing a heck ton of bugs?</p>
