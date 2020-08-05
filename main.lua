@@ -10,7 +10,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 }
 ]]
 
-debug = false
+debug = true
 --GLOBAL VARIABLES
 gameMode = "normal"
 globalState = "menu"
@@ -524,6 +524,16 @@ function love.load()
             end
         )
     )
+    table.insert(
+        playerCountButtons,
+        newButton(
+            "Reverse Play",
+            function()
+                gameState = "1serve"
+                globalState = "reverse"
+            end
+        )
+    )
 
     --table.insert(speedParameters, newButton("Ball Speed: ", function() speedSetter() end))
 
@@ -651,6 +661,9 @@ function love.update(dt)
     if globalState == "base" then
         basegame(dt)
     end
+    if globalState == "reverse" then 
+        reversegame(dt)
+    end 
     if globalState == "menu" then
         
         debugCheck(dt)
@@ -1175,9 +1188,8 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             for i = 1, maxBalls do
                 ball[i]:reset(i)
             end
-
             gameState = "play"
-            globalState = "base"
+            
         end
     end
     if (gameState == "2serve") then
@@ -1190,7 +1202,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             end
 
             gameState = "play"
-            globalState = "base"
+            
         end
         if (love.keyboard.isDown("p") and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
@@ -1200,7 +1212,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             end
             --love.window.setTitle("An atttttttt")
             gameState = "play"
-            globalState = "base"
+            
         end
     end
 end
@@ -1249,6 +1261,8 @@ function resettinggenius()
     gameState = "menu"
     globalState = "menu"
     gameMode = "normal"
+    player1.height = 100
+    player2.height = 100
     ballSet = 200
     ballSpeed = ballSet
     player2.GREEN = 255

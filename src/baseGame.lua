@@ -758,7 +758,7 @@ function baseDraw()
             menuDraw()
         end
     end
-    if globalState == 'base' then 
+    if globalState == 'base' or globalState == 'reverse' then 
         love.graphics.setFont(smallfont)
         if gameState == 'nuclearExplosion' then 
             nuclearDraw()
