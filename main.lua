@@ -244,6 +244,15 @@ function love.load()
         )
     )
     table.insert(
+        difbuttons,
+        newButton(
+            "Smart",
+            function()
+                hardmanager("smart")
+            end
+        )
+    )
+    table.insert(
         settings,
         newButton(
             "Change Map",
@@ -494,6 +503,15 @@ function love.load()
         )
     )
     table.insert(
+        difbuttons,
+        newButton(
+            "ballCount",
+            function()
+                speedSetter("ballz")
+            end
+        )
+    )
+    table.insert(
         playerCountButtons,
         newButton(
             "Return",
@@ -687,6 +705,7 @@ function hardmanager(diff)
         AI_SPEED = ballSet / 10
         AI_STRIKEMOD = 100
         AI_NUKEMOD = 1000
+        AI_LEVEL = 350
         difficultyl = 200
         selecting = 0
         gameState = "1serve"
@@ -709,6 +728,19 @@ function hardmanager(diff)
         AI_SPEED = ballSpeed * 1.1 + 50
         AI_SPEED = AI_SPEED / 10
         AI_LEVEL = 700
+        AI_NUKEMOD = 200
+        AI_STRIKEMOD = 20
+        selecting = 0
+        difficultyl = 350
+        AGAINST_AI = 1
+        gameState = "1serve"
+        globalState = "base"
+    end
+    if (diff == "smart") then
+        INDIC[3] = ">"
+        AI_SPEED = ballSpeed * 1.1 + 50
+        AI_SPEED = AI_SPEED / 10
+        AI_LEVEL = 1500
         AI_NUKEMOD = 200
         AI_STRIKEMOD = 20
         selecting = 0

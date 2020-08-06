@@ -15,55 +15,7 @@ function basegame(dt)
     serveBot()
     if gameState == 'play' then 
         if (AGAINST_AI == 1) then
-            for i = 1, maxBalls do
-                if (ball[i].y - player2.y >= 50 and player2.x - ball[i].x < AI_LEVEL) then
-                    player2.dy = AI_SPEED
-                elseif (player2.y - ball[i].y >= -20 and player2.x - ball[i].x < AI_LEVEL) then
-                    player2.dy = -AI_SPEED
-                else
-                    player2.dy = 0
-                end
-                if
-                    difficultyl == 350 and player2reverbav == true and VIRTUAL_WIDTH - ball[i].x < 90 and
-                        math.abs(ball[i].y - player2.y) > 150
-                 then
-                    sounds["time"]:play()
-                    player2reverbav = false
-                    timeIsSlow2 = true
-                    originalPaddle = paddle_SPEED
-                    originalSpeed = ballSpeed
-                    player2reverbav = 0
-                    potentialnuke2 = 0
-                    potentialstrike2 = 0
-                end
-    
-                if (player2nukescore > AI_STRIKEMOD and striken == 0) then
-                    player2striken = 1
-                elseif (player2nukescore > AI_NUKEMOD and striken == 1) then
-                    if (areanuclear == 1) then
-                        maxspeed = maxspeed + 50
-                    end
-                    sounds["nuke"]:play()
-                    potentialstrike2 = 0
-                    areanuclear = 1
-                    ballSpeed = ballSpeed * 2
-                    if (synctype == 0) then
-                        paddle_SPEED = paddle_SPEED * 2
-                    end
-                    if (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
-                    end
-                    if (synctype == 0) then
-                        AI_SPEED = AI_SPEED * 2.2
-                    end
-                    if (synctype == 1) then
-                        AI_SPEED = ballSpeed * 1.1 / 10
-                    end
-                    player2nukescore = 0
-                    player2reverbav = 0
-                    potentialnuke2 = 0
-                end
-            end
+            AI(player2, maxBalls, AI_LEVEL)
         end
         if (love.keyboard.isDown(p1control.up)) then
             player1.dy = (paddle_SPEED + p1bonus) * -1
@@ -392,7 +344,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.2 Chalkboard Update"
+        updateTEXT = "0.7.4 Chalkboard Update"
     end
     dangerChecker()
     elapsed = elapsed + dt  

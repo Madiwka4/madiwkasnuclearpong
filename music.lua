@@ -26,7 +26,7 @@ function musicController(orders, toggling)
             sounds['gayTheme2']:setLooping(true)
             sounds['gayTheme2']:setVolume(0.5)
             sounds['gayTheme2']:play()          
-        elseif gameState == 'play' and player1score > ptw-4 or player2score > ptw-4 and areanuclear == 0 then 
+        elseif gameState == 'play' and player1score > ptw-5 or player2score > ptw-5 and areanuclear == 0 then 
             print(ptw-4)
             sounds['gayTheme']:stop()
             sounds['gayTheme2']:stop()
