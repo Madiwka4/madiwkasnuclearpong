@@ -13,6 +13,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 debug = true
 --GLOBAL VARIABLES
 gameMode = "normal"
+ts = 0
 globalState = "menu"
 timeIsSlow = false
 timeIsSlow2 = false
@@ -23,6 +24,7 @@ wall1width = 30
 nuclearanimation = 3
 easternum = 0
 ball_DIR = 0
+updaterate = 0.03
 RED = 255
 hitNum = {}
 hitNum[1] = 0
@@ -695,9 +697,10 @@ function speedControl()
 end
 
 function love.update(dt)
-    
+    print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
+    ts = ts + dt 
     if debug then
         displayFPS()
     end
@@ -707,65 +710,76 @@ function love.update(dt)
     if globalState == "menu" then
         debugCheck(dt)
     end
+    
     if globalState == "nettest" then 
         basegame(dt)
-        nettest(dt)
+        if ts > updaterate then 
+            nettest(dt)
+            ts = ts - updaterate
+        end 
+        
     end
     if globalState == "clienttest" then
         if confirmation ~= "disconnected" then 
-            if confirmation == "up1" then lastSentKeyP2 = lastSentKeyClient lastSentKeyP1 = lastSentKey else 
-                lastSentKeyP1 = lastSentKeyClient lastSentKeyP2 = lastSentKey end 
+            lastSentKeyP1 = lastSentKeyClient
         clientsBaseGame(dt) 
         end
+        if ts > updaterate then 
         clienttest(dt)
+        ts = ts - updaterate
+    end 
     end
+   
+
 end
 serverinit = false 
 clientinit = false 
 function nettest(dt)
     if serverinit == false then 
-        local socket = require('socket')
+        local socket = require "socket"
+        local address, port = '45.76.95.31', 12345
         udp = socket.udp()
-        udp:setsockname('localhost', 142)
+        udp:setpeername(address, port)
         udp:settimeout(0)
         serverinit = true 
     end 
-    data, msg_or_ip, port_or_nil = udp:receivefrom()
-    if data then 
-    print(data .. "FROM " .. msg_or_ip)
+    for i = 1, maxBalls do 
+        print (tostring(ball[i].dy))
+    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y) .. '|' .. gameState .. '|' .. tostring(ball[i].dx))
+    print("SENT: " .. lastSentKey)
     end 
+    data = udp:receive() 
 	if data then
 		local p = split(data, '|')
         lastSentKeyClient = p[1]
-        for i = 1, maxBalls do 
-            print (tostring(ball[i].dy))
-        udp:sendto(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore), msg_or_ip, port_or_nil)
-        print("SENT: " .. lastSentKey)
-        end 
 	end
 end
 function clienttest(dt) 
     if clientinit == false then 
         local socket = require "socket"
-        local address, port = "45.76.95.31", 12345
+        local address, port = '45.76.95.31', 12345
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
         clientinit = true 
     end
     udp:send(tostring(lastSentKey))
-    print(lastSentKey)
+    print("SENT TO SERVER:" ..  lastSentKey)
     data = udp:receive()
-    print(data)
+    --print(data)
 	if data then
         local p = split(data, '|')
         for i = 1, maxBalls do 
         local die = tonumber(p[2])
         print(p[2])
         print(p[2] + 0)
-        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9] 
+        print(tonumber(p[11]))
+        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation, ball[i].x, ball[i].y, gameState, ball[i].dx = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9], tonumber(p[10]), tonumber(p[11]), p[12], tonumber(p[13])
         end 
-	end
+    else 
+        confirmation = "disconnected"
+    end
+    print(confirmation .. " recieved " .. lastSentKeyClient .. " AND ")
 
 end
 function wallbreaker(x, y)
@@ -1299,7 +1313,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         if (gameMode ~= "practice") then
             TEXT = "PLAYER 1, serve!(q)"
         end
-        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or gameMode == "practice" or (confirmation == "up1" and love.keyboard.isDown("q")) or (confirmation == "up2" and lastSentKeyP1 == "q") == "q" and globalState == "clienttest")) then
+        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or (globalState == "clienttest" and lastSentKeyP1 == "q")) then
             TEXT = "Lets Begin!"
             ball_DIR = 1
             for i = 1, maxBalls do
@@ -1321,7 +1335,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             gameState = "play"
             
         end
-        if (((confirmation == "up1" and lastSentKeyP2 == "p") or ((globalState ~= "clienttest" or confirmation == "up2") and love.keyboard.isDown("p")))and AGAINST_AI == 0) then
+        if (((globalState == "nettest" and lastSentKeyClient == "p") or ((globalState ~= "nettest") and love.keyboard.isDown("p")))and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
             ball_DIR = -1
             for i = 1, maxBalls do
