@@ -28,9 +28,9 @@ function basegame(dt)
             player1.dy = 0
         end
         if (AGAINST_AI == 0) then
-            if ((confirmation == "up2" and love.keyboard.isDown(p2control.up)) or lastSentKeyP2 == p2control.up) then
+            if (love.keyboard.isDown(p2control.up)) then
                 player2.dy = (paddle_SPEED + p2bonus) * -1
-            elseif ((confirmation == "up2" and love.keyboard.isDown(p2control.down)) or lastSentKeyP2 == p2control.down) then
+            elseif (love.keyboard.isDown(p2control.down)) then
                 player2.dy = paddle_SPEED + p2bonus
             else
                 player2.dy = 0
@@ -959,7 +959,12 @@ function rules(query, i)
         end
     end 
 end 
-function clientsBaseGame(dt) 
+function clientsBaseGame(dt)
+    if confirmation == "up1" then 
+        player1.RED = 1 
+    elseif confirmation == "up2" then 
+        player2.RED = 1
+    end 
     if gameMode == "reverse" then 
         reversegame(dt)
     end 
@@ -975,12 +980,19 @@ function clientsBaseGame(dt)
     if t < shakeDuration then
         t = t + dt
     end
-    if (lastSentKeyClient == p1control.up) then
-        player1.dy = (paddle_SPEED + p1bonus) * -1
-    elseif (lastSentKeyClient == p1control.down) then
-        player1.dy = paddle_SPEED + p1bonus
+    if ((confirmation == "up1" and love.keyboard.isDown(p1control.up)) or lastSentKeyP1 == p1control.up) then
+        player1.dy = (paddle_SPEED + p2bonus) * -1
+    elseif ((confirmation == "up1" and love.keyboard.isDown(p1control.down)) or lastSentKeyP1 == p1control.down) then
+        player1.dy = paddle_SPEED + p2bonus
     else
         player1.dy = 0
+    end
+    if ((confirmation == "up2" and love.keyboard.isDown(p2control.up)) or lastSentKeyP2 == p2control.up) then
+        player2.dy = (paddle_SPEED + p2bonus) * -1
+    elseif ((confirmation == "up2" and love.keyboard.isDown(p2control.down)) or lastSentKeyP2 == p2control.down) then
+        player2.dy = paddle_SPEED + p2bonus
+    else
+        player2.dy = 0
     end
    --print("T = " .. tostring(t))
     serveBot()

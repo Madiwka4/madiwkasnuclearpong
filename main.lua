@@ -695,7 +695,7 @@ function speedControl()
 end
 
 function love.update(dt)
-    
+    print(globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
     if debug then
