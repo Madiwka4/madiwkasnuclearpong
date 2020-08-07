@@ -42,6 +42,7 @@ function basegame(dt)
                 
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
                    --print("Calling animation")
+                   print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 1)
                 end
                 if gameMode == "practice" then
@@ -73,7 +74,10 @@ function basegame(dt)
                         sounds["nuclearhit"]:setPitch(1)
                         sounds["nuclearhit"]:play()
                     end
+                    print("AREA NUCLEAR?" .. areanuclear)
+                    if areanuclear == 0 then 
                     superanimator("tensehit", 1)
+                    end
                 else
                     if areanuclear == 0 then
                         sounds["beep"]:setPitch(ballSpeed / 250)
@@ -167,6 +171,7 @@ function basegame(dt)
                     (areanuclear == 0 and
                         (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
                  then
+                    print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
                 end
                 if (ballSpeed > 200) then
@@ -186,7 +191,10 @@ function basegame(dt)
                     potentialnuke2 = 0
                     player2nukescore = 0
                     potentialstrike2 = 0
+                    print("AREA NUCLEAR?" .. areanuclear)
+                    if areanuclear == 0 then 
                     superanimator("tensehit", 2)
+                    end
                     if areanuclear == 0 then
                         sounds["striking"]:setPitch(ballSpeed / 250)
                         sounds["striking"]:play()
@@ -448,20 +456,20 @@ end
 function powerAvailability()
     if (player1nukescore >= 20 and player1nukescore < 140) then
         potentialstrike1 = 1
-        if ((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)) then
+        if (((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             player1striken = 1
             player1reverbav = 0
         end
     end
-    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false and maxBalls == 1 and ball[1].x < VIRTUAL_WIDTH / 2  and ball[1].dx < 0 then
+    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false then
         player1reverbav = 1
-        if ((confirmation == "up1" and love.keyboard.isDown(p1control.counter)) or (confirmation == "up2" and lastSentKeyP1 == p1control.counter)) then
+        if ((confirmation == "up1" and love.keyboard.isDown(p1control.counter)) or (confirmation == "up2" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
             powerControl(1, "special")
         end
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)) then
+        if ((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -490,15 +498,15 @@ function powerAvailability()
     if (player2nukescore >= 20 and player2nukescore <= 140) then
         potentialstrike2 = 1
         if (AGAINST_AI == 0) then
-            if ((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super) then
+            if ((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.super))) then
                 player2striken = 1
                 player2reverbav = 0
             end
         end
     end
-    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and maxBalls == 1 and ball[1].x > VIRTUAL_WIDTH / 2 and ball[1].dx > 0 then
+    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false  then
         player2reverbav = 1
-        if (confirmation == "up2" and love.keyboard.isDown(p2control.counter)) or lastSentKeyP2 == p2control.counter then
+        if (confirmation == "up2" and love.keyboard.isDown(p2control.counter)) or lastSentKeyP2 == p2control.counter or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.counter)) then
             sounds["time"]:play()
             player2reverbav = false
             timeIsSlow2 = true
@@ -511,7 +519,7 @@ function powerAvailability()
     end
     if (player2nukescore >= 200) then
         potentialnuke2 = 1
-        if (((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super) and AGAINST_AI == 0) then
+        if (((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.super))) and AGAINST_AI == 0) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -557,7 +565,9 @@ end
 
 function nuclearDraw()
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.circle("fill", ball[1].x, ball[1].y, explosionRange * 100, 100)
+    for i = 1, maxBalls do 
+    love.graphics.circle("fill", ball[i].x, ball[i].y, explosionRange * 100, 100)
+    end 
     player1.RED, player1.GREEN, player1.BLUE, player2.RED, player2.GREEN, player2.BLUE =
         nuclearanimation / 3,
         nuclearanimation / 3,
@@ -770,7 +780,7 @@ function displayPoints()
         else
             love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 60)
         end
-    elseif (player1reverbav == 1 and potentialnuke1 == 0 and maxBalls == 1) then
+    elseif (player1reverbav == 1 and potentialnuke1 == 0 ) then
         love.graphics.print(
             tostring(
                 math.floor(player1nukescore) .. "[" .. p1control.super .. "]" .. " [" .. p1control.counter .. "]"
@@ -778,7 +788,7 @@ function displayPoints()
             VIRTUAL_WIDTH / 2 - 500,
             VIRTUAL_HEIGHT / 60
         )
-    elseif (potentialnuke1 == 1 and maxBalls == 1) then
+    elseif (potentialnuke1 == 1) then
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.print(
             tostring(
@@ -811,7 +821,7 @@ function displayPoints()
         else
             love.graphics.print(tostring("READY"), VIRTUAL_WIDTH / 2 + 430, VIRTUAL_HEIGHT / 60)
         end
-    elseif (potentialnuke2 == 1 and maxBalls == 1) then
+    elseif (potentialnuke2 == 1) then
         love.graphics.setColor(255, 0, 0, 255)
         love.graphics.print(
             tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "] [" .. p2control.counter .. "]"),
@@ -827,7 +837,7 @@ function displayPoints()
             VIRTUAL_HEIGHT / 60
         )
         love.graphics.setColor(255, 255, 255, 255)       
-    elseif (player2reverbav == 1 and potentialnuke2 == 0 and maxBalls == 1) then
+    elseif (player2reverbav == 1 and potentialnuke2 == 0 ) then
         love.graphics.print(
             tostring(math.floor(player2nukescore) .. "[" .. p2control.super .. "] [" .. p2control.counter .. "]"),
             VIRTUAL_WIDTH / 2 + 400,
@@ -985,6 +995,7 @@ function clientsBaseGame(dt)
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
                    --print("Calling animation")
                     superanimator("tensehit", 1)
+                    print("AREA NUCLEAR?" .. areanuclear)
                 end
                 if gameMode == "practice" then
                     player1score = player1score + 1
@@ -1015,7 +1026,9 @@ function clientsBaseGame(dt)
                         sounds["nuclearhit"]:setPitch(1)
                         sounds["nuclearhit"]:play()
                     end
+                    if areanuclear == 0 then 
                     superanimator("tensehit", 1)
+                    end 
                 else
                     if areanuclear == 0 then
                         sounds["beep"]:setPitch(ballSpeed / 250)
@@ -1053,6 +1066,7 @@ function clientsBaseGame(dt)
                     (areanuclear == 0 and
                         (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
                  then
+                    print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
                 end
                 if (ballSpeed > 200) then
@@ -1072,7 +1086,10 @@ function clientsBaseGame(dt)
                     potentialnuke2 = 0
                     player2nukescore = 0
                     potentialstrike2 = 0
+                    print("AREA NUCLEAR?" .. areanuclear)
+                    if areanuclear == 0 then 
                     superanimator("tensehit", 2)
+                    end
                     if areanuclear == 0 then
                         sounds["striking"]:setPitch(ballSpeed / 250)
                         sounds["striking"]:play()
