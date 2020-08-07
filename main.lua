@@ -1299,7 +1299,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         if (gameMode ~= "practice") then
             TEXT = "PLAYER 1, serve!(q)"
         end
-        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or gameMode == "practice" or (lastSentKeyClient == "q" and globalState == "clienttest")) then
+        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or gameMode == "practice" or (confirmation == "up1" and love.keyboard.isDown("q")) or (confirmation == "up2" and lastSentKeyP1 == "q") == "q" and globalState == "clienttest")) then
             TEXT = "Lets Begin!"
             ball_DIR = 1
             for i = 1, maxBalls do
@@ -1321,7 +1321,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             gameState = "play"
             
         end
-        if ((lastSentKeyClient == "p" or love.keyboard.isDown("p"))and AGAINST_AI == 0) then
+        if (((confirmation == "up1" and lastSentKeyP2 == "p") or ((globalState ~= "clienttest" or confirmation == "up2") and love.keyboard.isDown("p")))and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
             ball_DIR = -1
             for i = 1, maxBalls do
