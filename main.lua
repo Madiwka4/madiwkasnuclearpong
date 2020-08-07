@@ -28,6 +28,7 @@ hitNum = {}
 hitNum[1] = 0
 hitNum[2] = 0
 hitNum[3] = 0
+confirmation = "disconnected"
 hitNum[4] = 0
 p1bonus = 0
 p2bonus = 0
@@ -68,7 +69,9 @@ craz = 0
 AI_LEVEL = 500
 isFullscreen = 0
 prtext = "Easy"
+lastSentKey = "c"
 MAP_TYPE = 0
+lastSentKeyClient = "c"
 difficultyl = 300
 req = "pp"
 ballSet = 200
@@ -95,7 +98,7 @@ function balancer()
     if (player2score == 9 or player1score == 9) then
         shakeDuration = 5
         if debug then
-            print("Shaking set to match almost over")
+           --print("Shaking set to match almost over")
         end
     end
     if (player1score < player2score) then
@@ -140,7 +143,7 @@ function love.load()
     configsave = io.open("config.lua", "w")
     shader = love.graphics.newShader(shader_code)
     time_1 = 0
-    print("Debug active")
+   --print("Debug active")
     --load
 
     testwalls = love.filesystem.load("save.lua")()
@@ -185,6 +188,28 @@ function love.load()
             "Singleplayer",
             function()
                 gameState = "gameMode"
+            end
+        )
+    )
+    table.insert(
+        buttons,
+        newButton(
+            "Online Test",
+            function()
+                globalState = "nettest"
+                AGAINST_AI = 0 
+                gameState = "1serve"
+            end
+        )
+    )
+    table.insert(
+        buttons,
+        newButton(
+            "Client Test",
+            function()
+                globalState = "clienttest"
+                AGAINST_AI = 0 
+                gameState = "1serve"
             end
         )
     )
@@ -548,7 +573,7 @@ function love.load()
             "Reverse Play",
             function()
                 gameState = "1serve"
-                globalState = "reverse"
+                gameMode = "reversegame"
             end
         )
     )
@@ -679,13 +704,67 @@ function love.update(dt)
     if globalState == "base" then
         basegame(dt)
     end
-    if globalState == "reverse" then 
-        reversegame(dt)
-    end 
     if globalState == "menu" then
-        
         debugCheck(dt)
     end
+    if globalState == "nettest" then 
+        basegame(dt)
+        nettest(dt)
+    end
+    if globalState == "clienttest" then
+        if confirmation ~= "disconnected" then 
+        clientsBaseGame(dt) 
+        end
+        clienttest(dt)
+    end
+end
+serverinit = false 
+clientinit = false 
+function nettest(dt)
+    if serverinit == false then 
+        local socket = require('socket')
+        udp = socket.udp()
+        udp:setsockname('localhost', 142)
+        udp:settimeout(0)
+        serverinit = true 
+    end 
+    data, msg_or_ip, port_or_nil = udp:receivefrom()
+    if data then 
+    print(data .. "FROM " .. msg_or_ip)
+    end 
+	if data then
+		local p = split(data, '|')
+        lastSentKeyClient = p[1]
+        for i = 1, maxBalls do 
+            print (tostring(ball[i].dy))
+        udp:sendto(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore), msg_or_ip, port_or_nil)
+        print("SENT: " .. lastSentKey)
+        end 
+	end
+end
+function clienttest(dt) 
+    if clientinit == false then 
+        local socket = require "socket"
+        local address, port = "45.76.95.31", 12345
+        udp = socket.udp()
+        udp:setpeername(address, port)
+        udp:settimeout(0)
+        clientinit = true 
+    end
+    udp:send(tostring(lastSentKey))
+    print(lastSentKey)
+    data = udp:receive()
+    print(data)
+	if data then
+        local p = split(data, '|')
+        for i = 1, maxBalls do 
+        local die = tonumber(p[2])
+        print(p[2])
+        print(p[2] + 0)
+        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9] 
+        end 
+	end
+
 end
 function wallbreaker(x, y)
     if (gameState == "editor") then
@@ -806,6 +885,7 @@ function dangerChecker() --CHECK IF CONTROLS ARE DUPLICATING
     end
 end
 function love.keypressed(key)
+    lastSentKey = key 
     if gameState == "assign" then
         if (req == "p1up") then
             p1control.up = key
@@ -904,6 +984,9 @@ end
 
 function love.keyreleased(key)
     currentKey = " "
+        if lastSentKey == key then
+            lastSentKey = "g"
+        end
 end
 function speedSetter(requesttype)
     if (requesttype == "ball") then
@@ -1208,13 +1291,13 @@ function love.wheelmoved(x, y)
 end
 
 function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SERVES
-    print("servebot called")
+   --print("servebot called")
     if (gameState == "1serve") then
         updateTEXT = ""
         if (gameMode ~= "practice") then
             TEXT = "PLAYER 1, serve!(q)"
         end
-        if (love.keyboard.isDown("q") or gameMode == "practice") then
+        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or gameMode == "practice" or (lastSentKeyClient == "q" and globalState == "clienttest")) then
             TEXT = "Lets Begin!"
             ball_DIR = 1
             for i = 1, maxBalls do
@@ -1236,7 +1319,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             gameState = "play"
             
         end
-        if (love.keyboard.isDown("p") and AGAINST_AI == 0) then
+        if ((lastSentKeyClient == "p" or love.keyboard.isDown("p"))and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
             ball_DIR = -1
             for i = 1, maxBalls do
@@ -1324,4 +1407,21 @@ function love.mousereleased(x, y, button)
             table.insert(walls, newWall(x * DIFFERENCE_X, y * DIFFERENCE_Y, 10, wall1width))
         end
     end
+end
+
+function ballsAlive()
+    for i = 1, maxBalls do 
+        if ball[i].disabled == false then 
+            print("Ball " .. i .. " is not disabled")
+        return true 
+        end
+    end 
+    return false 
+end 
+function split(s, delimiter)
+	result = {}
+	for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+		table.insert(result, match)
+	end
+	return result
 end

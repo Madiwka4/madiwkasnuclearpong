@@ -9,6 +9,7 @@ function eball:init(x, y, width, height)
 
 		self.dy = math.random(-1, 1)
 		self.dx = 1
+		self.disabled = false
 end
 	
 function eball:collides(paddle)
@@ -39,6 +40,7 @@ else
 	else
 		self.dx = ball_DIR
 	end
+	self.disabled = false 
 self.x = VIRTUAL_WIDTH /2 - 2
 	self.y = VIRTUAL_HEIGHT /2 - 2
 	self.dy = math.random(-1, 1)
@@ -79,8 +81,10 @@ function eball:update(dt)
 	else 
 		potentialnuke2 = 0
 	end
+	if self.disabled == false then 
     self.x = self.x + ballSpeed * self.dx * dt 
-    self.y = self.y + ballSpeed * self.dy * dt
+	self.y = self.y + ballSpeed * self.dy * dt
+	end
 end
 
 function eball:render(color)
