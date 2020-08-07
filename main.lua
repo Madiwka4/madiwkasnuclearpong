@@ -754,9 +754,9 @@ function clienttest(dt)
         clientinit = true 
     end
     udp:send(tostring(lastSentKey))
-    print(lastSentKey)
+    print("SENT TO SERVER:" ..  lastSentKey)
     data = udp:receive()
-    print(data)
+    --print(data)
 	if data then
         local p = split(data, '|')
         for i = 1, maxBalls do 
@@ -765,7 +765,8 @@ function clienttest(dt)
         print(p[2] + 0)
         lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9] 
         end 
-	end
+    end
+    print(confirmation .. " recieved " .. lastSentKeyClient)
 
 end
 function wallbreaker(x, y)

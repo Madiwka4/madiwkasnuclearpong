@@ -961,9 +961,11 @@ function rules(query, i)
 end 
 function clientsBaseGame(dt)
     if confirmation == "up1" then 
-        player1.RED = 1 
+        player1.RED = 0
+        print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP2)
     elseif confirmation == "up2" then 
-        player2.RED = 1
+        player2.RED = 0
+        print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP1)
     end 
     if gameMode == "reverse" then 
         reversegame(dt)
@@ -980,8 +982,10 @@ function clientsBaseGame(dt)
     if t < shakeDuration then
         t = t + dt
     end
+    
     if ((confirmation == "up1" and love.keyboard.isDown(p1control.up)) or lastSentKeyP1 == p1control.up) then
         player1.dy = (paddle_SPEED + p2bonus) * -1
+        
     elseif ((confirmation == "up1" and love.keyboard.isDown(p1control.down)) or lastSentKeyP1 == p1control.down) then
         player1.dy = paddle_SPEED + p2bonus
     else
