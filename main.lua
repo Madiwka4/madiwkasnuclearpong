@@ -713,6 +713,8 @@ function love.update(dt)
     end
     if globalState == "clienttest" then
         if confirmation ~= "disconnected" then 
+            if confirmation == "up1" then lastSentKeyP2 = lastSentKeyClient lastSentKeyP1 = lastSentKey else 
+                lastSentKeyP1 = lastSentKeyClient lastSentKeyP2 = lastSentKey end 
         clientsBaseGame(dt) 
         end
         clienttest(dt)
