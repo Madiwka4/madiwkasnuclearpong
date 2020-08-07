@@ -985,11 +985,13 @@ function clientsBaseGame(dt)
     
     if ((confirmation == "up1" and love.keyboard.isDown(p1control.up)) or lastSentKeyP1 == p1control.up) then
         player1.dy = (paddle_SPEED + p2bonus) * -1
-        
+        print("moving player1 up")
     elseif ((confirmation == "up1" and love.keyboard.isDown(p1control.down)) or lastSentKeyP1 == p1control.down) then
         player1.dy = paddle_SPEED + p2bonus
+        print("moving player1 down")
     else
         player1.dy = 0
+        print("stopping player")
     end
     if ((confirmation == "up2" and love.keyboard.isDown(p2control.up)) or lastSentKeyP2 == p2control.up) then
         player2.dy = (paddle_SPEED + p2bonus) * -1

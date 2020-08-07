@@ -695,7 +695,7 @@ function speedControl()
 end
 
 function love.update(dt)
-    print(globalState .. gameState)
+    print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
     if debug then
@@ -763,7 +763,7 @@ function clienttest(dt)
         local die = tonumber(p[2])
         print(p[2])
         print(p[2] + 0)
-        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9] 
+        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation, gameState = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9], p[10] 
         end 
     end
     print(confirmation .. " recieved " .. lastSentKeyClient)
