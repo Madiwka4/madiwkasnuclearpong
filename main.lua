@@ -24,7 +24,7 @@ wall1width = 30
 nuclearanimation = 3
 easternum = 0
 ball_DIR = 0
-updaterate = 0.1
+updaterate = 0.03
 RED = 255
 hitNum = {}
 hitNum[1] = 0
@@ -710,20 +710,27 @@ function love.update(dt)
     if globalState == "menu" then
         debugCheck(dt)
     end
-    if ts > updaterate then 
+    
     if globalState == "nettest" then 
         basegame(dt)
-        nettest(dt)
+        if ts > updaterate then 
+            nettest(dt)
+            ts = ts - updaterate
+        end 
+        
     end
     if globalState == "clienttest" then
         if confirmation ~= "disconnected" then 
             lastSentKeyP1 = lastSentKeyClient
         clientsBaseGame(dt) 
         end
+        if ts > updaterate then 
         clienttest(dt)
+        ts = ts - updaterate
+    end 
     end
-    ts = ts - updaterate
-end 
+   
+
 end
 serverinit = false 
 clientinit = false 
