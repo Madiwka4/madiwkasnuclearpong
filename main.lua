@@ -13,6 +13,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 debug = true
 --GLOBAL VARIABLES
 gameMode = "normal"
+ts = 0
 globalState = "menu"
 timeIsSlow = false
 timeIsSlow2 = false
@@ -23,6 +24,7 @@ wall1width = 30
 nuclearanimation = 3
 easternum = 0
 ball_DIR = 0
+updaterate = 0.1
 RED = 255
 hitNum = {}
 hitNum[1] = 0
@@ -698,6 +700,7 @@ function love.update(dt)
     print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
+    ts = ts + dt 
     if debug then
         displayFPS()
     end
@@ -707,6 +710,7 @@ function love.update(dt)
     if globalState == "menu" then
         debugCheck(dt)
     end
+    if ts > updaterate then 
     if globalState == "nettest" then 
         basegame(dt)
         nettest(dt)
@@ -718,6 +722,8 @@ function love.update(dt)
         end
         clienttest(dt)
     end
+    ts = ts - updaterate
+end 
 end
 serverinit = false 
 clientinit = false 
