@@ -28,9 +28,9 @@ function basegame(dt)
             player1.dy = 0
         end
         if (AGAINST_AI == 0) then
-            if (love.keyboard.isDown(p2control.up)) then
+            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) or lastSentKeyClient == p2control.up) then
                 player2.dy = (paddle_SPEED + p2bonus) * -1
-            elseif (love.keyboard.isDown(p2control.down)) then
+            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down)) or lastSentKeyClient == p2control.down) then
                 player2.dy = paddle_SPEED + p2bonus
             else
                 player2.dy = 0
@@ -238,7 +238,7 @@ function basegame(dt)
                 ball[i].dx = -ball[i].dx
                 ball[i].x = player2.x - 30
 
-                if ((confirmation == "up2" and love.keyboard.isDown(p2control.up) ) or AI_SPEED < 0 or lastSentKeyP2 == p2control.up) then
+                if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up) ) or AI_SPEED < 0 or lastSentKeyClient == p2control.up) then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = -1
@@ -251,7 +251,7 @@ function basegame(dt)
                     elseif select == 5 then
                         ball[i].dy = -2
                     end
-                elseif (confirmation == "up2" and love.keyboard.isDown(p2control.down)) or AI_SPEED > 0 or lastSentKeyP2 == p2control.down then
+                elseif (globalState ~= "nettest" and love.keyboard.isDown(p2control.down)) or AI_SPEED > 0 or lastSentKeyClient == p2control.down then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = 1
@@ -456,20 +456,20 @@ end
 function powerAvailability()
     if (player1nukescore >= 20 and player1nukescore < 140) then
         potentialstrike1 = 1
-        if (((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (confirmation == "confirmed" and lastSentKeyP1 == p1control.super)) ) then
             player1striken = 1
             player1reverbav = 0
         end
     end
     if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false then
         player1reverbav = 1
-        if ((confirmation == "up1" and love.keyboard.isDown(p1control.counter)) or (confirmation == "up2" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
+        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
             powerControl(1, "special")
         end
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((confirmation == "up1" and love.keyboard.isDown(p1control.super)) or (confirmation == "up2" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -498,7 +498,7 @@ function powerAvailability()
     if (player2nukescore >= 20 and player2nukescore <= 140) then
         potentialstrike2 = 1
         if (AGAINST_AI == 0) then
-            if ((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.super))) then
+            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.super)) or lastSentKeyClient == p2control.super ) then
                 player2striken = 1
                 player2reverbav = 0
             end
@@ -506,7 +506,7 @@ function powerAvailability()
     end
     if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false  then
         player2reverbav = 1
-        if (confirmation == "up2" and love.keyboard.isDown(p2control.counter)) or lastSentKeyP2 == p2control.counter or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.counter)) then
+        if (globalState ~= "nettest" and love.keyboard.isDown(p2control.counter)) or lastSentKeyClient == p2control.counter then
             sounds["time"]:play()
             player2reverbav = false
             timeIsSlow2 = true
@@ -519,7 +519,7 @@ function powerAvailability()
     end
     if (player2nukescore >= 200) then
         potentialnuke2 = 1
-        if (((confirmation == "up2" and love.keyboard.isDown(p2control.super)) or lastSentKeyP2 == p2control.super or (globalState ~= "clienttest" and love.keyboard.isDown(p2control.super))) and AGAINST_AI == 0) then
+        if (((globalState ~= "nettest" and love.keyboard.isDown(p2control.super)) or lastSentKeyClient == p2control.super)) and AGAINST_AI == 0 then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -960,13 +960,12 @@ function rules(query, i)
     end 
 end 
 function clientsBaseGame(dt)
-    if confirmation == "up1" then 
-        player1.RED = 0
-        print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP2)
-    elseif confirmation == "up2" then 
+    if confirmation == "confirmed" then 
         player2.RED = 0
         print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP1)
-    end 
+    else 
+        TEXT = "DISCONNECTED"
+    end
     if gameMode == "reverse" then 
         reversegame(dt)
     end 
@@ -983,19 +982,19 @@ function clientsBaseGame(dt)
         t = t + dt
     end
     
-    if ((confirmation == "up1" and love.keyboard.isDown(p1control.up)) or lastSentKeyP1 == p1control.up) then
+    if (lastSentKeyP1 == p1control.up) then
         player1.dy = (paddle_SPEED + p2bonus) * -1
         print("moving player1 up")
-    elseif ((confirmation == "up1" and love.keyboard.isDown(p1control.down)) or lastSentKeyP1 == p1control.down) then
+    elseif (lastSentKeyP1 == p1control.down) then
         player1.dy = paddle_SPEED + p2bonus
         print("moving player1 down")
     else
         player1.dy = 0
         print("stopping player")
     end
-    if ((confirmation == "up2" and love.keyboard.isDown(p2control.up)) or lastSentKeyP2 == p2control.up) then
+    if ((love.keyboard.isDown(p2control.up))) then
         player2.dy = (paddle_SPEED + p2bonus) * -1
-    elseif ((confirmation == "up2" and love.keyboard.isDown(p2control.down)) or lastSentKeyP2 == p2control.down) then
+    elseif ((love.keyboard.isDown(p2control.down))) then
         player2.dy = paddle_SPEED + p2bonus
     else
         player2.dy = 0
