@@ -730,15 +730,15 @@ function nettest(dt)
         udp:settimeout(0)
         serverinit = true 
     end 
+    for i = 1, maxBalls do 
+        print (tostring(ball[i].dy))
+    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y))
+    print("SENT: " .. lastSentKey)
+    end 
     data = udp:receive() 
 	if data then
 		local p = split(data, '|')
         lastSentKeyClient = p[1]
-        for i = 1, maxBalls do 
-            print (tostring(ball[i].dy))
-        udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y))
-        print("SENT: " .. lastSentKey)
-        end 
 	end
 end
 function clienttest(dt) 
