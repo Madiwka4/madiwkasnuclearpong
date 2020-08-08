@@ -724,7 +724,7 @@ clientinit = false
 function nettest(dt)
     if serverinit == false then 
         local socket = require "socket"
-        local address, port = "45.76.95.31", 12345
+        local address, port = '45.76.95.31', 12345
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
@@ -732,7 +732,7 @@ function nettest(dt)
     end 
     for i = 1, maxBalls do 
         print (tostring(ball[i].dy))
-    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y))
+    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y) .. '|' .. gameState .. '|' .. tostring(ball[i].dx))
     print("SENT: " .. lastSentKey)
     end 
     data = udp:receive() 
@@ -744,7 +744,7 @@ end
 function clienttest(dt) 
     if clientinit == false then 
         local socket = require "socket"
-        local address, port = "45.76.95.31", 12345
+        local address, port = '45.76.95.31', 12345
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
@@ -761,7 +761,7 @@ function clienttest(dt)
         print(p[2])
         print(p[2] + 0)
         print(tonumber(p[11]))
-        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation, ball[i].x, ball[i].y = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9], tonumber(p[10]), tonumber(p[11])
+        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation, ball[i].x, ball[i].y, gameState, ball[i].dx = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9], tonumber(p[10]), tonumber(p[11]), p[12], tonumber(p[13])
         end 
     else 
         confirmation = "disconnected"
