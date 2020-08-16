@@ -1,0 +1,1 @@
+First, install Lua and Lua-Socket. Then, launch the server with "lua server.lua". Afterwards, launch your game, enter "127.0.0.1" as IP on this PC, and your local address on your friends PC (e.g 192.168.1.110). One player picks Host, the other Picks Client!

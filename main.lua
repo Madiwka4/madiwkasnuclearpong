@@ -30,13 +30,14 @@ hitNum = {}
 hitNum[1] = 0
 hitNum[2] = 0
 hitNum[3] = 0
-confirmation = "disconnected"
+confirmation = "N"
 hitNum[4] = 0
 p1bonus = 0
 p2bonus = 0
 hitNum[5] = 0
 hitNum[6] = 0
 GREEN = 255
+IP = '45.76.95.31'
 BLUE = 255
 updateTEXT = "Chalkboard Update"
 maxBalls = 1
@@ -125,6 +126,7 @@ function newWall(wallx, wally, wallwidth, wallheight)
 end
 speedParameters = {}
 buttons = {}
+IPselect = {}
 difbuttons = {}
 settings = {}
 walls = {}
@@ -140,6 +142,7 @@ function controlChanger()
     end
 end
 function love.load()
+    love.keyboard.setKeyRepeat(true)
     simpleScale.setWindow(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
     configfile = io.open("config.lua", "r")
     configsave = io.open("config.lua", "w")
@@ -196,7 +199,16 @@ function love.load()
     table.insert(
         buttons,
         newButton(
-            "Online Test",
+            "Online",
+            function()
+                gameState = "chooseIP"
+            end
+        )
+    )
+    table.insert(
+        IPselect,
+        newButton(
+            "Host",
             function()
                 globalState = "nettest"
                 AGAINST_AI = 0 
@@ -205,9 +217,9 @@ function love.load()
         )
     )
     table.insert(
-        buttons,
+        IPselect,
         newButton(
-            "Client Test",
+            "Guest",
             function()
                 globalState = "clienttest"
                 AGAINST_AI = 0 
@@ -697,10 +709,10 @@ function speedControl()
 end
 
 function love.update(dt)
-    print("IMPORTANT!!!!!" .. globalState .. gameState)
+    --print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
-    ts = ts + dt 
+    
     if debug then
         displayFPS()
     end
@@ -712,75 +724,152 @@ function love.update(dt)
     end
     
     if globalState == "nettest" then 
-        basegame(dt)
-        if ts > updaterate then 
+        --print("Confcode: " .. confirmation)
+        if confirmation == "N" then 
+            basegame(dt)
+        end
             nettest(dt)
-            ts = ts - updaterate
-        end 
         
     end
     if globalState == "clienttest" then
-        if confirmation ~= "disconnected" then 
+        ts = ts + dt 
+        if confirmation == "N" then 
             lastSentKeyP1 = lastSentKeyClient
         clientsBaseGame(dt) 
-        end
-        if ts > updaterate then 
+        end 
         clienttest(dt)
-        ts = ts - updaterate
-    end 
     end
    
 
 end
 serverinit = false 
+datawaspassedtimer = 0
 clientinit = false 
+function love.textinput(t)
+    if gameState == "chooseIP" then 
+    IP = IP .. t 
+    end 
+end
 function nettest(dt)
     if serverinit == false then 
         local socket = require "socket"
-        local address, port = '45.76.95.31', 12345
+        local address, port = IP, 12345
+        print(address)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
         serverinit = true 
     end 
     for i = 1, maxBalls do 
-        print (tostring(ball[i].dy))
-    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. "|confirmed|" .. tostring(ball[i].x) .. '|' .. tostring(ball[i].y) .. '|' .. gameState .. '|' .. tostring(ball[i].dx))
+        ts = ts + dt 
+        if ts > updaterate then 
+        --print (tostring(ball[i].dy))
+    udp:send(tostring(lastSentKey) .. 
+    '|' .. tostring(ball[i].dy) .. 
+    '|' .. tostring(player2.y) .. 
+    '|' .. tostring(player1.y) .. 
+    '|' .. tostring(player1score) .. 
+    '|' .. tostring(player2score) .. 
+    '|' .. tostring(player1nukescore) .. 
+    '|' .. tostring(player2nukescore) .. 
+    '|' .. tostring(ball[i].x) .. 
+    '|' .. tostring(ball[i].y) .. 
+    '|' .. gameState .. 
+    '|' .. tostring(ball[i].dx) .. 
+    '|' .. tostring(ballSpeed) .. 
+    "|HOST")
     print("SENT: " .. lastSentKey)
+            ts = 0
+        end 
     end 
-    data = udp:receive() 
-	if data then
-		local p = split(data, '|')
+
+    local data
+    local datanumtest = 0
+    local datawaspassed = false 
+    repeat 
+        datanumtest = datanumtest + 1
+        print("LATENCY: " .. tostring(datanumtest))
+    data = udp:receive()
+    if data then
+        datawaspassed = true 
+        print("ReceivedINFO: " .. data)
+        confirmation = "N"
+        local p = split(data, '|')
+        if p[3] ~= "CLIENT" then 
+            confirmation = "U"
+        end
+        if tonumber(p[4]) > 90 then 
+            confirmation = "L"
+        end
         lastSentKeyClient = p[1]
-	end
+        player2.y = tonumber(p[2])
+        
+    end 
+until not data
+    if not datawaspassed then  
+        datawaspassedtimer = datawaspassedtimer + 1 
+        if datawaspassedtimer > 5 then 
+        confirmation = "D"
+        datawaspassedtimer = 0
+        end 
+    else 
+        datawaspassedtimer = 0 
+    end
 end
 function clienttest(dt) 
     if clientinit == false then 
         local socket = require "socket"
-        local address, port = '45.76.95.31', 12345
+        local address, port = IP, 12345
+        
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
+        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         clientinit = true 
     end
-    udp:send(tostring(lastSentKey))
-    print("SENT TO SERVER:" ..  lastSentKey)
-    data = udp:receive()
-    --print(data)
-	if data then
+    ts = ts + dt 
+    if ts > updaterate then 
+        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
+        ts = 0 
+    end
+    local data
+    local datanumtest = 0
+    local datawaspassed = false 
+    repeat 
+        datanumtest = datanumtest + 1
+        print("LATENCY: " .. tostring(datanumtest))
+        data = udp:receive()
+        
+    if data then
+        print("RECEIVED DATA: " .. data)
+        datawaspassed = true 
+        print("SENT TO SERVER:" ..  lastSentKey)
+        confirmation = "N"
         local p = split(data, '|')
-        for i = 1, maxBalls do 
-        local die = tonumber(p[2])
-        print(p[2])
-        print(p[2] + 0)
-        print(tonumber(p[11]))
-        lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, confirmation, ball[i].x, ball[i].y, gameState, ball[i].dx = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), p[9], tonumber(p[10]), tonumber(p[11]), p[12], tonumber(p[13])
+        if p[14] then 
+            if p[14] ~= "HOST" then 
+                confirmation = "U"
+            end
+            if tonumber(p[15]) > 90 then 
+                confirmation = "L"
+            end 
+            for i = 1, maxBalls do 
+            local die = tonumber(p[2])
+            lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13])
+            end 
+        end 
+    end
+    print("GOT: " .. lastSentKeyClient)
+    until not data 
+    if not datawaspassed then  
+        datawaspassedtimer = datawaspassedtimer + 1 
+        if datawaspassedtimer > 5 then 
+        confirmation = "D"
+        datawaspassedtimer = 0
         end 
     else 
-        confirmation = "disconnected"
+        datawaspassedtimer = 0 
     end
-    print(confirmation .. " recieved " .. lastSentKeyClient .. " AND ")
-
 end
 function wallbreaker(x, y)
     if (gameState == "editor") then
@@ -902,6 +991,18 @@ function dangerChecker() --CHECK IF CONTROLS ARE DUPLICATING
 end
 function love.keypressed(key)
     lastSentKey = key 
+    if gameState == "chooseIP" then 
+        if key == "backspace" then
+            -- get the byte offset to the last UTF-8 character in the string.
+            local byteoffset = utf8.offset(IP, -1)
+     
+            if byteoffset then
+                -- remove the last UTF-8 character.
+                -- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
+                IP = string.sub(IP, 1, byteoffset - 1)
+            end
+        end
+    end
     if gameState == "assign" then
         if (req == "p1up") then
             p1control.up = key
@@ -1254,8 +1355,21 @@ end
 
 function love.draw()
     simpleScale.set()
-   
+
+    
         baseDraw()
+        if (globalState == "nettest" or globalState == "clienttest") and confirmation == "D" then 
+            love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
+            love.graphics.printf("WAIT FOR PLAYER 2", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        end
+        if (globalState == "nettest" or globalState == "clienttest") and confirmation == "U" then 
+            love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
+            love.graphics.printf("LOBBY FULL OR WRONG MODE CHOSEN", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        end
+        if (globalState == "nettest" or globalState == "clienttest") and confirmation == "L" then 
+            love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
+            love.graphics.printf("POOR CONNECTION TO SERVER", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        end
         
     simpleScale.unSet()
 end

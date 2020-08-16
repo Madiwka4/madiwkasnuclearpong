@@ -13,4 +13,5 @@ require 'src/constantvars'
 require 'src/menus'
 require 'src/AI'
 require 'src/reverseGame'
+utf8 = require("utf8")
 serialize = require 'ser'

@@ -28,11 +28,11 @@ function basegame(dt)
             player1.dy = 0
         end
         if (AGAINST_AI == 0) then
-            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) or lastSentKeyClient == p2control.up) then
+            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) ) then
                 player2.dy = (paddle_SPEED + p2bonus) * -1
-            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down)) or lastSentKeyClient == p2control.down) then
+            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down))) then
                 player2.dy = paddle_SPEED + p2bonus
-            else
+            elseif (globalState ~= "nettest") then 
                 player2.dy = 0
             end
         end
@@ -456,20 +456,20 @@ end
 function powerAvailability()
     if (player1nukescore >= 20 and player1nukescore < 140) then
         potentialstrike1 = 1
-        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (confirmation == "confirmed" and lastSentKeyP1 == p1control.super)) ) then
+        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (globalState == "clienttest" and lastSentKeyP1 == p1control.super)) ) then
             player1striken = 1
             player1reverbav = 0
         end
     end
     if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false then
         player1reverbav = 1
-        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
+        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
             powerControl(1, "special")
         end
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -683,6 +683,11 @@ function menuDraw()
     end
     if gameState == "gameMode" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, modeSelectorButtons, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
+    if gameState == "chooseIP" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, IPselect, sounds, "middle")
+        love.graphics.printf(IP, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
         love.keyboard.mouseisReleased = false
     end
     if gameState == "menu" then
@@ -960,12 +965,6 @@ function rules(query, i)
     end 
 end 
 function clientsBaseGame(dt)
-    if confirmation == "confirmed" then 
-        player2.RED = 0
-        print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP1)
-    else 
-        TEXT = "DISCONNECTED"
-    end
     if gameMode == "reverse" then 
         reversegame(dt)
     end 
@@ -990,7 +989,7 @@ function clientsBaseGame(dt)
         print("moving player1 down")
     else
         player1.dy = 0
-        print("stopping player")
+       -- print("stopping player")
     end
     if ((love.keyboard.isDown(p2control.up))) then
         player2.dy = (paddle_SPEED + p2bonus) * -1
