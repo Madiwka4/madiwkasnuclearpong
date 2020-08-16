@@ -768,7 +768,19 @@ function nettest(dt)
     end 
     for i = 1, maxBalls do 
         print (tostring(ball[i].dy))
-    udp:send(tostring(lastSentKey) ..'|'.. tostring(ball[i].dy) .. '|' .. tostring(player2.y) .. '|' .. tostring(player1.y) .. '|' .. tostring(player1score) .. '|' .. tostring(player2score) .. '|' .. tostring(player1nukescore) .. '|' .. tostring(player2nukescore) .. '|' tostring(ball[i].x) .. '|' .. tostring(ball[i].y) .. '|' .. gameState .. '|' .. tostring(ball[i].dx) .. "|HOST")
+    udp:send(tostring(lastSentKey) .. 
+    '|' .. tostring(ball[i].dy) .. 
+    '|' .. tostring(player2.y) .. 
+    '|' .. tostring(player1.y) .. 
+    '|' .. tostring(player1score) .. 
+    '|' .. tostring(player2score) .. 
+    '|' .. tostring(player1nukescore) .. 
+    '|' .. tostring(player2nukescore) .. 
+    '|' .. tostring(ball[i].x) .. 
+    '|' .. tostring(ball[i].y) .. 
+    '|' .. gameState .. 
+    '|' .. tostring(ball[i].dx) .. 
+    "|HOST")
     print("SENT: " .. lastSentKey .. " TO ADDRESS: " .. IP)
     end 
     data = udp:receive() 
