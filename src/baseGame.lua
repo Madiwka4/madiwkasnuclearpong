@@ -685,6 +685,11 @@ function menuDraw()
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, modeSelectorButtons, sounds, "middle")
         love.keyboard.mouseisReleased = false
     end
+    if gameState == "chooseIP" then
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, IPselect, sounds, "middle")
+        love.graphics.printf(IP, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
+        love.keyboard.mouseisReleased = false
+    end
     if gameState == "menu" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds, "middle")
         love.keyboard.mouseisReleased = false
