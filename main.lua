@@ -836,7 +836,7 @@ function clienttest(dt)
             if p[13] ~= "HOST" then 
                 confirmation = "U"
             end
-            if tonumber(p[14]) > 5 then 
+            if tonumber(p[14]) > 90 then 
                 confirmation = "L"
             end 
             for i = 1, maxBalls do 
