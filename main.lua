@@ -783,6 +783,10 @@ function nettest(dt)
 
     local data
     local datanumtest = 0
+    data = udp:receive()
+    if not data then 
+        confirmation = "D"
+    end
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
@@ -799,10 +803,6 @@ function nettest(dt)
         lastSentKeyClient = p[1]
         player2.y = tonumber(p[2])
         
-        
-    else 
-        confirmation = "D"
-        print("NO PLAYER 2!!")
     end 
 until not data 
 end
@@ -824,6 +824,10 @@ function clienttest(dt)
     end
     local data
     local datanumtest = 0
+    data = udp:receive()
+    if not data then 
+        confirmation = "D"
+    end
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
@@ -847,8 +851,6 @@ function clienttest(dt)
             lastSentKeyClient, ball[i].dy, player2.y, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx = p[1], die, tonumber(p[3]), tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12])
             end 
         end 
-    else 
-        confirmation = "D"
     end
     print("GOT: " .. lastSentKeyClient)
     until not data 
