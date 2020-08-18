@@ -995,7 +995,7 @@ function clientsBaseGame(dt)
         print("moving player1 down")
     else
         player1.dy = 0
-        print("stopping player")
+       -- print("stopping player")
     end
     if ((love.keyboard.isDown(p2control.up))) then
         player2.dy = (paddle_SPEED + p2bonus) * -1

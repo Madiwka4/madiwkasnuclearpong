@@ -744,7 +744,7 @@ function love.update(dt)
         if ts > updaterate then 
         clienttest(dt)
         ts = ts - updaterate
-    end 
+        end 
     end
    
 
@@ -783,14 +783,20 @@ function nettest(dt)
     "|HOST")
     print("SENT: " .. lastSentKey)
     end 
-    data = udp:receive() 
+
+    local data
+    local datanumtest = 0
+    repeat 
+        datanumtest = datanumtest + 1
+        print("LATENCY: " .. tostring(datanumtest))
+    data = udp:receive()
     if data then
         confirmation = "N"
         local p = split(data, '|')
         if p[3] ~= "CLIENT" then 
             confirmation = "U"
         end
-        if tonumber(p[4]) > 5 then 
+        if tonumber(p[4]) > 90 then 
             confirmation = "L"
         end
         lastSentKeyClient = p[1]
@@ -801,6 +807,7 @@ function nettest(dt)
         confirmation = "D"
         print("NO PLAYER 2!!")
     end 
+until not data 
 end
 function clienttest(dt) 
     if clientinit == false then 
@@ -810,14 +817,20 @@ function clienttest(dt)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
+        udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
         clientinit = true 
     end
-    udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
-    print("SENT TO SERVER:" ..  lastSentKey)
+    local data
+    local datanumtest = 0
+    repeat 
+        datanumtest = datanumtest + 1
+        print("LATENCY: " .. tostring(datanumtest))
     data = udp:receive()
     
     if data then
         print(data)
+        udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
+        print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
         if p[13] then 
@@ -836,7 +849,7 @@ function clienttest(dt)
         confirmation = "D"
     end
     print("GOT: " .. lastSentKeyClient)
-
+    until not data 
 end
 function wallbreaker(x, y)
     if (gameState == "editor") then
