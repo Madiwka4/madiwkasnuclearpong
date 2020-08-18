@@ -724,7 +724,7 @@ function love.update(dt)
     end
     
     if globalState == "nettest" then 
-        print("Confcode: " .. confirmation)
+        --print("Confcode: " .. confirmation)
         if confirmation == "N" then 
             basegame(dt)
         end
@@ -784,6 +784,7 @@ function nettest(dt)
     local data
     local datanumtest = 0
     data = udp:receive()
+    print("ReceivedINFO: " .. data)
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
@@ -826,8 +827,8 @@ function clienttest(dt)
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
-    data = udp:receive()
-    
+        data = udp:receive()
+        print("RECEIVED DATA: " .. data)
     if data then
         print(data)
         
