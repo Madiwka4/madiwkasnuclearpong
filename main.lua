@@ -743,6 +743,7 @@ function love.update(dt)
 
 end
 serverinit = false 
+datawaspassedtimer = 0
 clientinit = false 
 function love.textinput(t)
     if gameState == "chooseIP" then 
@@ -806,7 +807,13 @@ function nettest(dt)
     end 
 until not data
     if not datawaspassed then  
+        datawaspassedtimer = datawaspassedtimer + 1 
+        if datawaspassedtimer > 5 then 
         confirmation = "D"
+        datawaspassedtimer = 0
+        end 
+    else 
+        datawaspassedtimer = 0 
     end
 end
 function clienttest(dt) 
@@ -854,8 +861,14 @@ function clienttest(dt)
     end
     print("GOT: " .. lastSentKeyClient)
     until not data 
-    if not datawaspassed then 
+    if not datawaspassed then  
+        datawaspassedtimer = datawaspassedtimer + 1 
+        if datawaspassedtimer > 5 then 
         confirmation = "D"
+        datawaspassedtimer = 0
+        end 
+    else 
+        datawaspassedtimer = 0 
     end
 end
 function wallbreaker(x, y)
