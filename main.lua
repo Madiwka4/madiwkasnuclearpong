@@ -24,7 +24,7 @@ wall1width = 30
 nuclearanimation = 3
 easternum = 0
 ball_DIR = 0
-updaterate = 0.03
+updaterate = 0.1
 RED = 255
 hitNum = {}
 hitNum[1] = 0
@@ -709,7 +709,7 @@ function speedControl()
 end
 
 function love.update(dt)
-    print("IMPORTANT!!!!!" .. globalState .. gameState)
+    --print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
     musicController('norm', 1)
     
@@ -781,7 +781,7 @@ function nettest(dt)
     '|' .. gameState .. 
     '|' .. tostring(ball[i].dx) .. 
     "|HOST")
-    print("SENT: " .. lastSentKey .. " TO ADDRESS: " .. IP)
+    print("SENT: " .. lastSentKey)
     end 
     data = udp:receive() 
     if data then
@@ -813,7 +813,7 @@ function clienttest(dt)
         clientinit = true 
     end
     udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
-    print("SENT TO SERVER:" ..  lastSentKey .. " AT ADDRESS: " .. IP)
+    print("SENT TO SERVER:" ..  lastSentKey)
     data = udp:receive()
     
     if data then
@@ -835,7 +835,7 @@ function clienttest(dt)
     else 
         confirmation = "D"
     end
-    print(confirmation .. " recieved " .. lastSentKeyClient .. " AND ")
+    print("GOT: " .. lastSentKeyClient)
 
 end
 function wallbreaker(x, y)
