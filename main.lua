@@ -775,7 +775,7 @@ function nettest(dt)
     '|' .. tostring(ball[i].y) .. 
     '|' .. gameState .. 
     '|' .. tostring(ball[i].dx) .. 
-    '|' .. tostring(ballSpeed)
+    '|' .. tostring(ballSpeed) .. 
     "|HOST")
     print("SENT: " .. lastSentKey)
             ts = 0
