@@ -355,7 +355,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.6 Chalkboard Update"
+        updateTEXT = "0.7.7 Chalkboard Update"
     end
     dangerChecker()
     elapsed = elapsed + dt  

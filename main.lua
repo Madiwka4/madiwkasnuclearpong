@@ -1361,7 +1361,7 @@ function love.draw()
         baseDraw()
         if (globalState == "nettest" or globalState == "clienttest") and confirmation == "D" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
-            love.graphics.printf("WAIT FOR PLAYER 2", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+            love.graphics.printf("WAIT FOR OPPONENT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         end
         if (globalState == "nettest" or globalState == "clienttest") and confirmation == "U" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
