@@ -783,7 +783,6 @@ function nettest(dt)
 
     local data
     local datanumtest = 0
-    data = udp:receive()
     
     repeat 
         datanumtest = datanumtest + 1
@@ -823,8 +822,6 @@ function clienttest(dt)
     end
     local data
     local datanumtest = 0
-    data = udp:receive()
-    
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
