@@ -725,14 +725,10 @@ function love.update(dt)
     
     if globalState == "nettest" then 
         print("Confcode: " .. confirmation)
-        ts = ts + dt 
         if confirmation == "N" then 
             basegame(dt)
         end
-        if ts > updaterate then 
             nettest(dt)
-            ts = ts - updaterate
-        end 
         
     end
     if globalState == "clienttest" then
@@ -740,11 +736,8 @@ function love.update(dt)
         if confirmation == "N" then 
             lastSentKeyP1 = lastSentKeyClient
         clientsBaseGame(dt) 
-        end
-        if ts > updaterate then 
-        clienttest(dt)
-        ts = ts - updaterate
         end 
+        clienttest(dt)
     end
    
 
@@ -767,7 +760,9 @@ function nettest(dt)
         serverinit = true 
     end 
     for i = 1, maxBalls do 
-        print (tostring(ball[i].dy))
+        ts = ts + dt 
+        if ts > updaterate then 
+        --print (tostring(ball[i].dy))
     udp:send(tostring(lastSentKey) .. 
     '|' .. tostring(ball[i].dy) .. 
     '|' .. tostring(player2.y) .. 
@@ -782,6 +777,8 @@ function nettest(dt)
     '|' .. tostring(ball[i].dx) .. 
     "|HOST")
     print("SENT: " .. lastSentKey)
+            ts = 0
+        end 
     end 
 
     local data
@@ -820,6 +817,11 @@ function clienttest(dt)
         udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
         clientinit = true 
     end
+    ts = ts + dt 
+    if ts > updaterate then 
+        udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
+        ts = 0 
+    end
     local data
     local datanumtest = 0
     repeat 
@@ -829,7 +831,7 @@ function clienttest(dt)
     
     if data then
         print(data)
-        udp:send(tostring(lastSentKey) .. '|' .. tostring(player2.y) .. "|CLIENT")
+        
         print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
