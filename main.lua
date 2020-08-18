@@ -24,7 +24,7 @@ wall1width = 30
 nuclearanimation = 3
 easternum = 0
 ball_DIR = 0
-updaterate = 0.03
+updaterate = 0.015
 RED = 255
 hitNum = {}
 hitNum[1] = 0
@@ -201,6 +201,7 @@ function love.load()
         newButton(
             "Online",
             function()
+                MAP_TYPE = 0
                 gameState = "chooseIP"
             end
         )
@@ -291,15 +292,15 @@ function love.load()
             end
         )
     )
-    table.insert(
-        settings,
-        newButton(
-            "Change Map",
-            function()
-                MAP_TYPE = MAP_TYPE + 1
-            end
-        )
-    )
+    --table.insert(
+    --    settings,
+    --    newButton(
+    --        "Change Map",
+    --        function()
+    --            MAP_TYPE = MAP_TYPE + 1
+    --        end
+    --    )
+    --)
     table.insert(
         settings,
         newButton(
@@ -588,6 +589,7 @@ function love.load()
             function()
                 gameState = "1serve"
                 gameMode = "reversegame"
+                globalState = "base"
             end
         )
     )
@@ -763,6 +765,7 @@ function nettest(dt)
     for i = 1, maxBalls do 
         ts = ts + dt 
         if ts > updaterate then 
+            if ball[1].dx <= 0 then 
         --print (tostring(ball[i].dy))
     udp:send(tostring(lastSentKey) .. 
     '|' .. tostring(ball[i].dy) .. 
@@ -777,8 +780,12 @@ function nettest(dt)
     '|' .. gameState .. 
     '|' .. tostring(ball[i].dx) .. 
     '|' .. tostring(ballSpeed) .. 
+    '|' .. tostring(paddle_SPEED) .. 
     "|HOST")
-    print("SENT: " .. lastSentKey)
+    print("PRIVILEGE SENT: " .. lastSentKey)
+            else 
+                udp:send(tostring(lastSentKey) ..'|' .. player1.y .. "|HOST")
+            end 
             ts = 0
         end 
     end 
@@ -795,14 +802,23 @@ function nettest(dt)
         print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
-        if p[3] ~= "CLIENT" then 
+        if p[3] ~= "CLIENT" and not p[15] then 
             confirmation = "U"
         end
+        if p[15] then 
+            if p[15] ~= "CLIENT" then 
+                confirmation = "U"
+            end 
+        end 
         if tonumber(p[4]) > 90 then 
             confirmation = "L"
         end
+        if ball[1].dx <= 0 then 
         lastSentKeyClient = p[1]
         player2.y = tonumber(p[2])
+        elseif ball[1].dx > 0 then 
+            lastSentKeyClient, ball[i].dy, player2.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+        end
         
     end 
 until not data
@@ -829,7 +845,27 @@ function clienttest(dt)
     end
     ts = ts + dt 
     if ts > updaterate then 
+        if ball[1].dx <= 0 then 
+            print("MINOR SENDING")
         udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
+        elseif ball[1].dx > 0 then 
+            print("PRIVILEGED SENDING")
+            udp:send(tostring(lastSentKey) .. 
+            '|' .. tostring(ball[1].dy) .. 
+            '|' .. tostring(player1.y) ..
+            '|' .. tostring(player2.y) .. 
+            '|' .. tostring(player1score) .. 
+            '|' .. tostring(player2score) .. 
+            '|' .. tostring(player1nukescore) .. 
+            '|' .. tostring(player2nukescore) .. 
+            '|' .. tostring(ball[1].x) .. 
+            '|' .. tostring(ball[1].y) .. 
+            '|' .. gameState .. 
+            '|' .. tostring(ball[1].dx) .. 
+            '|' .. tostring(ballSpeed) .. 
+            '|' .. tostring(paddle_SPEED) .. 
+            "|CLIENT")
+        end
         ts = 0 
     end
     local data
@@ -846,18 +882,25 @@ function clienttest(dt)
         print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
-        if p[14] then 
-            if p[14] ~= "HOST" then 
+        if p[15] then 
+            if p[15] ~= "HOST" then 
                 confirmation = "U"
             end
-            if tonumber(p[15]) > 90 then 
+            if tonumber(p[16]) > 90 then 
                 confirmation = "L"
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
-            lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13])
+            if ball[i].dx <= 0 then 
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+            elseif ball[i].dx > 0 then 
+                lastSentKeyClient = p[1] 
+                player1.y = tonumber(p[4])
             end 
-        end 
+            end
+        elseif p[3] ~= "HOST" then 
+            confirmation = "U"
+        end  
     end
     print("GOT: " .. lastSentKeyClient)
     until not data 
@@ -1360,7 +1403,7 @@ function love.draw()
         baseDraw()
         if (globalState == "nettest" or globalState == "clienttest") and confirmation == "D" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
-            love.graphics.printf("WAIT FOR PLAYER 2", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+            love.graphics.printf("WAIT FOR OPPONENT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         end
         if (globalState == "nettest" or globalState == "clienttest") and confirmation == "U" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)

@@ -1,5 +1,5 @@
 function basegame(dt) 
-    if gameMode == "reverse" then 
+    if gameMode == "reversegame" then 
         reversegame(dt)
     end 
     if player1nukescore > 300 then 
@@ -89,7 +89,7 @@ function basegame(dt)
                 end
                 if (striken == 1) then
                     
-                    player1nukescore = player1nukescore * 1.2
+                    player1nukescore = player1nukescore * 1.5
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
                     elseif (synctype == 1) then
@@ -355,7 +355,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.6 Chalkboard Update"
+        updateTEXT = "0.7.7 Chalkboard Update"
     end
     dangerChecker()
     elapsed = elapsed + dt  
@@ -604,12 +604,7 @@ function normalDraw()
         end
     end
 
-    if gameMode == 'practice' then 
-        practiceDraw()
-    end
-    if gameMode == 'normal' then 
-        pongDraw()
-    end
+    pongDraw()
     love.graphics.setFont(smallfont)
     for i = 1, maxBalls do
         if areanuclear == 1 then
@@ -743,7 +738,7 @@ function baseDraw()
             nuclearDraw()
         end 
         if gameState == 'play' or gameState == '1serve' or gameState == '2serve' or gameState == 'done' then 
-           --print("Drawing normally")
+           print("Drawing normally")
             normalDraw()
         end 
 
@@ -1056,7 +1051,7 @@ function clientsBaseGame(dt)
                 end
                 if (striken == 1) then
                     
-                    player1nukescore = player1nukescore * 1.2
+                    player1nukescore = player1nukescore * 1.5
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
                     elseif (synctype == 1) then
@@ -1148,6 +1143,61 @@ function clientsBaseGame(dt)
                 player2nukescore = player2nukescore + 10
                 ball[i].dx = -ball[i].dx
                 ball[i].x = player2.x - 30
+                if ((love.keyboard.isDown(p2control.up))) then
+                    select = math.random(1, 5)
+                    if select == 1 then
+                        ball[i].dy = -1
+                    elseif select == 2 then
+                        ball[i].dy = -1.2
+                    elseif select == 3 then
+                        ball[i].dy = -1.5
+                    elseif select == 4 then
+                        ball[i].dy = -1.8
+                    elseif select == 5 then
+                        ball[i].dy = -2
+                    end
+                elseif (love.keyboard.isDown(p2control.down))then
+                    select = math.random(1, 5)
+                    if select == 1 then
+                        ball[i].dy = 1
+                    elseif select == 2 then
+                        ball[i].dy = 1.2
+                    elseif select == 3 then
+                        ball[i].dy = 1.5
+                    elseif select == 4 then
+                        ball[i].dy = 1.8
+                    elseif select == 5 then
+                        ball[i].dy = 2
+                    end
+                else
+                    if ball[i].dy < 0 then
+                        select = math.random(1, 5)
+                        if select == 1 then
+                            ball[i].dy = -1
+                        elseif select == 2 then
+                            ball[i].dy = -1.2
+                        elseif select == 3 then
+                            ball[i].dy = -1.5
+                        elseif select == 4 then
+                            ball[i].dy = -1.8
+                        elseif select == 5 then
+                            ball[i].dy = -2
+                        end
+                    else
+                        select = math.random(1, 5)
+                        if select == 1 then
+                            ball[i].dy = 1
+                        elseif select == 2 then
+                            ball[i].dy = 1.2
+                        elseif select == 3 then
+                            ball[i].dy = 1.5
+                        elseif select == 4 then
+                            ball[i].dy = 1.8
+                        elseif select == 5 then
+                            ball[i].dy = 2
+                        end
+                    end
+                end
             end
             hitIdentifier()
             if ball[i].y <= 0 then
@@ -1155,7 +1205,7 @@ function clientsBaseGame(dt)
                 sounds["wallhit"]:setPitch(ballSpeed / 250)
                 sounds["wallhit"]:play()
                 ball[i].y = 0
-                
+                ball[i].dy = -ball[i].dy
             end
 
             -- -4 to account for the ball's size
@@ -1164,6 +1214,7 @@ function clientsBaseGame(dt)
                 sounds["wallhit"]:setPitch(ballSpeed / 250)
                 sounds["wallhit"]:play()
                 ball[i].y = VIRTUAL_HEIGHT - 40
+                ball[i].dy = -ball[i].dy
                
             end
             --love.window.setTitle('Trying to update the ball')

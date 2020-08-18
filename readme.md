@@ -32,4 +32,4 @@ To play on Windows, download and install <a href = "https://love2d.org">Love</a>
 To play an old, outdated EXE version on Windows, head to <a href = "https://madi-wka.club/Downloads.php">my website</a>, and download the old, outdated game.
 
 # Changes
-<p>0.7.6 is here! With this update, I improved the AI, allowing it to follow 2 balls at the same time! I also added "Smart" difficulty, where the AI uses physics and math to pre-calculate where the ball is going to land. Alpha-testing of the Online gameplay is now here, although its stupid and doesnt work. </p>
+<p>0.7.7 is here! Wiht this uodate, Online mode FINALLY, FINALLY WORKS! The default IP is my server, but you can launch the server from anywhere! The code for the server is under the server/ directory. The client is kind of laggy, though. I am trying my best to fix the issue. </p>
