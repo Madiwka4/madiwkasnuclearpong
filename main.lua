@@ -784,12 +784,13 @@ function nettest(dt)
     local data
     local datanumtest = 0
     data = udp:receive()
-    print("ReceivedINFO: " .. data)
+    
     repeat 
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
     data = udp:receive()
     if data then
+        print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
         if p[3] ~= "CLIENT" then 
@@ -828,9 +829,9 @@ function clienttest(dt)
         datanumtest = datanumtest + 1
         print("LATENCY: " .. tostring(datanumtest))
         data = udp:receive()
-        print("RECEIVED DATA: " .. data)
+        
     if data then
-        print(data)
+        print("RECEIVED DATA: " .. data)
         
         print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
