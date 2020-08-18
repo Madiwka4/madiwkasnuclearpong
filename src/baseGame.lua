@@ -32,7 +32,7 @@ function basegame(dt)
                 player2.dy = (paddle_SPEED + p2bonus) * -1
             elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down))) then
                 player2.dy = paddle_SPEED + p2bonus
-            elseif (globalState ~= "nettest")
+            elseif (globalState ~= "nettest") then 
                 player2.dy = 0
             end
         end
