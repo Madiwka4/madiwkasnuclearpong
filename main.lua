@@ -777,6 +777,7 @@ function nettest(dt)
     '|' .. gameState .. 
     '|' .. tostring(ball[i].dx) .. 
     '|' .. tostring(ballSpeed) .. 
+    '|' .. tostring(paddle_SPEED) .. 
     "|HOST")
     print("SENT: " .. lastSentKey)
             ts = 0
@@ -846,16 +847,16 @@ function clienttest(dt)
         print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
-        if p[14] then 
-            if p[14] ~= "HOST" then 
+        if p[15] then 
+            if p[15] ~= "HOST" then 
                 confirmation = "U"
             end
-            if tonumber(p[15]) > 90 then 
+            if tonumber(p[16]) > 90 then 
                 confirmation = "L"
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
-            lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13])
+            lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
             end 
         end 
     end

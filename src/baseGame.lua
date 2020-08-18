@@ -1058,17 +1058,11 @@ function clientsBaseGame(dt)
                     
                     player1nukescore = player1nukescore * 1.2
                     if (synctype == 0) then
-                        paddle_SPEED = paddle_SPEED * 1.10
-                    elseif (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
-                    end
-                    if (synctype == 0) then
                         AI_SPEED = AI_SPEED * 1.10
                     end
                     if (synctype == 1) then
                         AI_SPEED = ballSpeed * 1.1 / 10
                     end
-                    ballSpeed = ballSpeed * 1.10
                 end
                 player1nukescore = player1nukescore + 10
                 ball[i].dx = -ball[i].dx
