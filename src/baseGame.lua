@@ -28,11 +28,11 @@ function basegame(dt)
             player1.dy = 0
         end
         if (AGAINST_AI == 0) then
-            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) or lastSentKeyClient == p2control.up) then
+            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) ) then
                 player2.dy = (paddle_SPEED + p2bonus) * -1
-            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down)) or lastSentKeyClient == p2control.down) then
+            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down))) then
                 player2.dy = paddle_SPEED + p2bonus
-            else
+            elseif (globalState ~= "nettest")
                 player2.dy = 0
             end
         end

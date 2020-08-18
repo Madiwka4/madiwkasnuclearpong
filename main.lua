@@ -792,13 +792,14 @@ function nettest(dt)
         print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
-        if p[2] ~= "CLIENT" then 
+        if p[3] ~= "CLIENT" then 
             confirmation = "U"
         end
-        if tonumber(p[3]) > 90 then 
+        if tonumber(p[4]) > 90 then 
             confirmation = "L"
         end
         lastSentKeyClient = p[1]
+        player2.y = tonumber(p[2])
         
     end 
 until not data 
@@ -811,12 +812,12 @@ function clienttest(dt)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
-        udp:send(tostring(lastSentKey) .. "|CLIENT")
+        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         clientinit = true 
     end
     ts = ts + dt 
     if ts > updaterate then 
-        udp:send(tostring(lastSentKey) .. "|CLIENT")
+        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         ts = 0 
     end
     local data
