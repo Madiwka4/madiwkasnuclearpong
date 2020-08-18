@@ -456,20 +456,20 @@ end
 function powerAvailability()
     if (player1nukescore >= 20 and player1nukescore < 140) then
         potentialstrike1 = 1
-        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (confirmation == "confirmed" and lastSentKeyP1 == p1control.super)) ) then
+        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (globalState == "clienttest" and lastSentKeyP1 == p1control.super)) ) then
             player1striken = 1
             player1reverbav = 0
         end
     end
     if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false then
         player1reverbav = 1
-        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
+        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
             powerControl(1, "special")
         end
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((confirmation == "confirmed" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -965,12 +965,6 @@ function rules(query, i)
     end 
 end 
 function clientsBaseGame(dt)
-    if confirmation == "confirmed" then 
-        player2.RED = 0
-        print("KEYS ARE: " .. confirmation .. " " .. lastSentKeyP1)
-    else 
-        TEXT = "DISCONNECTED"
-    end
     if gameMode == "reverse" then 
         reversegame(dt)
     end 
