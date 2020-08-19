@@ -51,7 +51,7 @@ rotation = 0
 TEXT = "Nuclear Pong"
 currentKey = " "
 ptw = 10
-
+checkrate = 2
 --CHECKING IF CONTROLS ARE TAKEN
 danger = "none"
 danger2 = "none"
@@ -751,6 +751,7 @@ function love.update(dt)
 
 end
 serverinit = false 
+dserverinit = false
 datawaspassedtimer = 0
 clientinit = false 
 function love.textinput(t)
@@ -1650,32 +1651,38 @@ function split(s, delimiter)
 	end
 	return result
 end
+address, port = IP, 12345
 function checkCurrentServer(dt)
+
+    if dserverinit == false then 
+        local socket = require "socket"
+        local address, port = IP, 12345
+        print(address)
+        udp = socket.udp()
+        udp:setpeername(address, port)
+        udp:settimeout(0)
+        dserverinit = true 
+    end 
+    if IP ~= address then dserverinit = false print(IP .. " " .. address)
+    end
     ts = ts + dt
-    local socket = require "socket"
-    local address, port = IP, 12345
-    udp = socket.udp()
-    udp:setpeername(address, port)
-    udp:settimeout(0)
-    if ts > updaterate then 
+    print(ts)
+    if ts > checkrate then 
+        status = "offline"
         print("sent ping")
     udp:send("HELLO")
+    local data
+    data = udp:receive()
+    if data then 
+        print("got answer!")
+        local p = split(data, '|')
+        status = p[1]
+        print("answer is " .. status)
+    else 
+        print("no response!")
+    end
     ts = 0 
     end 
-    status = "offline"
-    local data
-    local datanumtest = 0 
-    local datawaspassed = false
-    data = udp:receive()
-    repeat 
-        datanumtest = datanumtest + 1
-        print("LATENCY: " .. tostring(datanumtest))
-    data = udp:receive()
-    if data then
-        datawaspassed = true 
-        print("ReceivedINFO: " .. data)
-        local p = split(data, '|')
-    end 
-until not data
+    
 
 end 
