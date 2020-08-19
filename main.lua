@@ -851,7 +851,7 @@ function nettest(dt)
                 paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
                 print("ACCEPTED")
             end
-            print("ENFORCED")
+            print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
             lastSentKeyClient = p[1]
             player2.y = tonumber(p[4])
         end
@@ -876,7 +876,6 @@ function clienttest(dt)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
-        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         clientinit = true 
     end
     ts = ts + dt 
