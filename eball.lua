@@ -98,7 +98,9 @@ function eball:update(dt)
 	else 
 		potentialnuke2 = 0
 	end
+	print("ATTEMP TO UPDATE BALL")
 	if self.disabled == false then 
+		print("BALL IS BEING AUTO-UPDATED")
     self.x = self.x + ballSpeed * self.dx * dt 
 	self.y = self.y + ballSpeed * self.dy * dt
 	end
