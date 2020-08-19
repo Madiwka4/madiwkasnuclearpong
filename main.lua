@@ -935,6 +935,7 @@ function clienttest(dt)
                 else lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
                 print("ENFORCED")
+                end
             end 
             end
         else
