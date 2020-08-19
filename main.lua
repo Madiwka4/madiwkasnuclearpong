@@ -765,6 +765,7 @@ function nettest(dt)
     for i = 1, maxBalls do 
         ts = ts + dt 
         if ts > updaterate then 
+            if ball[1].dx <= 0 then 
         --print (tostring(ball[i].dy))
     udp:send(tostring(lastSentKey) .. 
     '|' .. tostring(ball[i].dy) .. 
@@ -781,7 +782,10 @@ function nettest(dt)
     '|' .. tostring(ballSpeed) .. 
     '|' .. tostring(paddle_SPEED) .. 
     "|HOST")
-    print("SENT: " .. lastSentKey)
+    print("PRIVILEGE SENT: " .. lastSentKey)
+            else 
+                udp:send(tostring(lastSentKey) ..'|' .. player1.y .. "|HOST")
+            end 
             ts = 0
         end 
     end 
@@ -842,8 +846,10 @@ function clienttest(dt)
     ts = ts + dt 
     if ts > updaterate then 
         if ball[1].dx <= 0 then 
+            print("MINOR SENDING")
         udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         elseif ball[1].dx > 0 then 
+            print("PRIVILEGED SENDING")
             udp:send(tostring(lastSentKey) .. 
             '|' .. tostring(ball[1].dy) .. 
             '|' .. tostring(player1.y) ..
