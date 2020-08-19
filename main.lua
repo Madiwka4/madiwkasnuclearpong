@@ -767,8 +767,8 @@ function nettest(dt)
         if ts > updaterate then 
             udp:send(tostring(lastSentKey) .. 
             '|' .. tostring(ball[1].dy) .. 
-            '|' .. tostring(player1.y) ..
-            '|' .. tostring(player2.y) .. 
+            '|' .. tostring(player2.y) ..
+            '|' .. tostring(player1.y) .. 
             '|' .. tostring(player1score) .. 
             '|' .. tostring(player2score) .. 
             '|' .. tostring(player1nukescore) .. 
@@ -803,14 +803,29 @@ function nettest(dt)
         else 
             confirmation = "U"
         end
-        if tonumber(p[4]) > 90 then 
+        if tonumber(p[16]) > 90 then 
             confirmation = "L"
         end
-        if ball[1].dx <= 0 then 
-        lastSentKeyClient = p[1]
-        player2.y = tonumber(p[4])
-        elseif ball[1].dx > 0 then 
-            lastSentKeyClient, ball[i].dy, player2.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+
+        
+        if (ball[1].dx > 0 and ball[1].x >= 40) or (ball[i].dx <= 0 and ball.x > VIRTUAL_WIDTH - 40) then 
+            die = tonumber(p[2])
+            lastSentKeyClient, 
+            ball[1].dy, 
+            player2.y,
+            player1score, 
+            player2score, 
+            player1nukescore, 
+            player2nukescore, 
+            ball[1].x, 
+            ball[1].y, 
+            gameState, 
+            ball[1].dx, 
+            ballSpeed, 
+            paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+        else  
+            lastSentKeyClient = p[1]
+            player2.y = tonumber(p[4])
         end
         
     end 
@@ -878,9 +893,9 @@ function clienttest(dt)
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
-            if ball[i].dx <= 0 then 
+            if (ball[i].dx <= 0 and ball.x < VIRTUAL_WIDTH - 40) or (ball[i].dx > 0 and ball.x < 40) then 
                 lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
-            elseif ball[i].dx > 0 then 
+            else 
                 lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
             end 
