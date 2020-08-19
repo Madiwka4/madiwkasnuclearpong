@@ -687,6 +687,39 @@ function menuDraw()
         love.keyboard.mouseisReleased = false
     end
     if gameState == "chooseIP" then
+        IPselect = {}
+        if status == "offine" then 
+            love.graphics.printf("UNABLE TO CONNECT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        elseif status == "nettest" then 
+            table.insert(
+                IPselect,
+                newButton(
+                    "Connect as Host",
+                    function()
+                        globalState = "nettest"
+                        AGAINST_AI = 0 
+                        gameState = "1serve"
+                        ball[1]:reset(1, 1)
+                    end
+                )
+            )
+            
+        elseif status == "clienttest" then 
+            table.insert(
+                IPselect,
+                newButton(
+                    "Guest",
+                    function()
+                        globalState = "clienttest"
+                        AGAINST_AI = 0 
+                        gameState = "1serve"
+                        ball[1]:reset(1, 1)
+                    end
+                )
+            )
+        elseif status == "full" then 
+            love.graphics.printf("SERVER FULL", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        end
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, IPselect, sounds, "middle")
         love.graphics.printf(IP, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
         love.keyboard.mouseisReleased = false

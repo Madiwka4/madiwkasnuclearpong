@@ -12,6 +12,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 
 debug = true
 --GLOBAL VARIABLES
+status = "offline"
 gameMode = "normal"
 ts = 0
 globalState = "menu"
@@ -715,6 +716,9 @@ end
 function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
     staticanimatorcounter(dt)
+    if gameState == "chooseIP" then 
+    checkCurrentServer(dt)
+    end
     musicController('norm', 1)
     
     if debug then
@@ -799,17 +803,28 @@ function nettest(dt)
         confirmation = "N"
         local p = split(data, '|')
         if p[15] then 
+            if tonumber(p[16]) > 90 then 
+                confirmation = "L"
+            end
             if p[15] ~= "CLIENT" then 
                 confirmation = "U"
-            end 
+            end
+        elseif p[1] == "RESPONSE" then 
+            if p[2] == "1" then 
+
+            elseif p[2] == "2" then 
+
+            elseif p[2] == "3" then 
+            end
         else 
             confirmation = "U"
         end
-        if tonumber(p[16]) > 90 then 
-            confirmation = "L"
-        end
 
-        
+
+        if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
+            ball[1].disabled = false 
+            print("illegal disabling")
+        end
         if (ball[1].x > VIRTUAL_WIDTH/2) then 
             if tonumber(p[9]) > VIRTUAL_WIDTH/2 then
             die = tonumber(p[2])
@@ -829,9 +844,6 @@ function nettest(dt)
             print("ACCEPTED")
         else 
         print("DECLINED")
-        lastSentKeyClient = p[1]
-        player2.y = tonumber(p[4])
-        ball[1].x = tonumber(p[9])
         end
         else  
             if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
@@ -850,10 +862,11 @@ function nettest(dt)
                 ballSpeed, 
                 paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
                 print("ACCEPTED")
-            end
-            print("ENFORCED")
+            else 
+            print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
             lastSentKeyClient = p[1]
             player2.y = tonumber(p[4])
+            end 
         end
         
     end 
@@ -876,7 +889,6 @@ function clienttest(dt)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
-        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
         clientinit = true 
     end
     ts = ts + dt 
@@ -935,6 +947,7 @@ function clienttest(dt)
                 else lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
                 print("ENFORCED")
+                end
             end 
             end
         else
@@ -1435,7 +1448,7 @@ function gameModeChanger()
     end
 end
 
-function love.draw()
+function love.draw(dt)
     simpleScale.set()
 
     
@@ -1637,3 +1650,32 @@ function split(s, delimiter)
 	end
 	return result
 end
+function checkCurrentServer(dt)
+    ts = ts + dt
+    local socket = require "socket"
+    local address, port = IP, 12345
+    udp = socket.udp()
+    udp:setpeername(address, port)
+    udp:settimeout(0)
+    if ts > updaterate then 
+        print("sent ping")
+    udp:send("HELLO")
+    ts = 0 
+    end 
+    status = "offline"
+    local data
+    local datanumtest = 0 
+    local datawaspassed = false
+    data = udp:receive()
+    repeat 
+        datanumtest = datanumtest + 1
+        print("LATENCY: " .. tostring(datanumtest))
+    data = udp:receive()
+    if data then
+        datawaspassed = true 
+        print("ReceivedINFO: " .. data)
+        local p = split(data, '|')
+    end 
+until not data
+
+end 
