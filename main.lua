@@ -765,27 +765,21 @@ function nettest(dt)
     for i = 1, maxBalls do 
         ts = ts + dt 
         if ts > updaterate then 
-            if ball[1].dx <= 0 then 
-        --print (tostring(ball[i].dy))
-    udp:send(tostring(lastSentKey) .. 
-    '|' .. tostring(ball[i].dy) .. 
-    '|' .. tostring(player2.y) .. 
-    '|' .. tostring(player1.y) .. 
-    '|' .. tostring(player1score) .. 
-    '|' .. tostring(player2score) .. 
-    '|' .. tostring(player1nukescore) .. 
-    '|' .. tostring(player2nukescore) .. 
-    '|' .. tostring(ball[i].x) .. 
-    '|' .. tostring(ball[i].y) .. 
-    '|' .. gameState .. 
-    '|' .. tostring(ball[i].dx) .. 
-    '|' .. tostring(ballSpeed) .. 
-    '|' .. tostring(paddle_SPEED) .. 
-    "|HOST")
-    print("PRIVILEGE SENT: " .. lastSentKey)
-            else 
-                udp:send(tostring(lastSentKey) ..'|' .. player1.y .. "|HOST")
-            end 
+            udp:send(tostring(lastSentKey) .. 
+            '|' .. tostring(ball[1].dy) .. 
+            '|' .. tostring(player1.y) ..
+            '|' .. tostring(player2.y) .. 
+            '|' .. tostring(player1score) .. 
+            '|' .. tostring(player2score) .. 
+            '|' .. tostring(player1nukescore) .. 
+            '|' .. tostring(player2nukescore) .. 
+            '|' .. tostring(ball[1].x) .. 
+            '|' .. tostring(ball[1].y) .. 
+            '|' .. gameState .. 
+            '|' .. tostring(ball[1].dx) .. 
+            '|' .. tostring(ballSpeed) .. 
+            '|' .. tostring(paddle_SPEED) .. 
+            "|HOST") 
             ts = 0
         end 
     end 
@@ -802,20 +796,19 @@ function nettest(dt)
         print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
-        if p[3] ~= "CLIENT" and not p[15] then 
-            confirmation = "U"
-        end
         if p[15] then 
             if p[15] ~= "CLIENT" then 
                 confirmation = "U"
             end 
-        end 
+        else 
+            confirmation = "U"
+        end
         if tonumber(p[4]) > 90 then 
             confirmation = "L"
         end
         if ball[1].dx <= 0 then 
         lastSentKeyClient = p[1]
-        player2.y = tonumber(p[2])
+        player2.y = tonumber(p[4])
         elseif ball[1].dx > 0 then 
             lastSentKeyClient, ball[i].dy, player2.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
         end
@@ -845,27 +838,21 @@ function clienttest(dt)
     end
     ts = ts + dt 
     if ts > updaterate then 
-        if ball[1].dx <= 0 then 
-            print("MINOR SENDING")
-        udp:send(tostring(lastSentKey) ..'|' .. player2.y .. "|CLIENT")
-        elseif ball[1].dx > 0 then 
-            print("PRIVILEGED SENDING")
-            udp:send(tostring(lastSentKey) .. 
-            '|' .. tostring(ball[1].dy) .. 
-            '|' .. tostring(player1.y) ..
-            '|' .. tostring(player2.y) .. 
-            '|' .. tostring(player1score) .. 
-            '|' .. tostring(player2score) .. 
-            '|' .. tostring(player1nukescore) .. 
-            '|' .. tostring(player2nukescore) .. 
-            '|' .. tostring(ball[1].x) .. 
-            '|' .. tostring(ball[1].y) .. 
-            '|' .. gameState .. 
-            '|' .. tostring(ball[1].dx) .. 
-            '|' .. tostring(ballSpeed) .. 
-            '|' .. tostring(paddle_SPEED) .. 
-            "|CLIENT")
-        end
+        udp:send(tostring(lastSentKey) .. 
+        '|' .. tostring(ball[1].dy) .. 
+        '|' .. tostring(player1.y) ..
+        '|' .. tostring(player2.y) .. 
+        '|' .. tostring(player1score) .. 
+        '|' .. tostring(player2score) .. 
+        '|' .. tostring(player1nukescore) .. 
+        '|' .. tostring(player2nukescore) .. 
+        '|' .. tostring(ball[1].x) .. 
+        '|' .. tostring(ball[1].y) .. 
+        '|' .. gameState .. 
+        '|' .. tostring(ball[1].dx) .. 
+        '|' .. tostring(ballSpeed) .. 
+        '|' .. tostring(paddle_SPEED) .. 
+        "|CLIENT")
         ts = 0 
     end
     local data
@@ -898,9 +885,9 @@ function clienttest(dt)
                 player1.y = tonumber(p[4])
             end 
             end
-        elseif p[3] ~= "HOST" then 
+        else
             confirmation = "U"
-        end  
+        end 
     end
     print("GOT: " .. lastSentKeyClient)
     until not data 
