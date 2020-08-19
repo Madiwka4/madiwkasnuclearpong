@@ -688,7 +688,7 @@ function menuDraw()
     end
     if gameState == "chooseIP" then
         IPselect = {}
-        if status == "offine" then 
+        if status == "offline" then 
             love.graphics.printf("UNABLE TO CONNECT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         elseif status == "nettest" then 
             table.insert(
@@ -708,7 +708,7 @@ function menuDraw()
             table.insert(
                 IPselect,
                 newButton(
-                    "Guest",
+                    "Connect as Guest",
                     function()
                         globalState = "clienttest"
                         AGAINST_AI = 0 

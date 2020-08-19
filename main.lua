@@ -51,7 +51,7 @@ rotation = 0
 TEXT = "Nuclear Pong"
 currentKey = " "
 ptw = 10
-checkrate = 2
+checkrate = 0.5
 --CHECKING IF CONTROLS ARE TAKEN
 danger = "none"
 danger2 = "none"
@@ -1666,7 +1666,7 @@ function checkCurrentServer(dt)
     if IP ~= address then dserverinit = false print(IP .. " " .. address)
     end
     ts = ts + dt
-    print(ts)
+    --print(ts)
     if ts > checkrate then 
         status = "offline"
         print("sent ping")
