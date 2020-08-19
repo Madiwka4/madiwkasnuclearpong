@@ -214,6 +214,7 @@ function love.load()
                 globalState = "nettest"
                 AGAINST_AI = 0 
                 gameState = "1serve"
+                ball[1]:reset(1, 1)
             end
         )
     )
@@ -225,6 +226,7 @@ function love.load()
                 globalState = "clienttest"
                 AGAINST_AI = 0 
                 gameState = "1serve"
+                ball[1]:reset(1, 1)
             end
         )
     )
@@ -808,7 +810,8 @@ function nettest(dt)
         end
 
         
-        if (ball[1].x > VIRTUAL_WIDTH/2) and gameState ~= "play" then 
+        if (ball[1].x > VIRTUAL_WIDTH/2) then 
+            if tonumber(p[9]) > VIRTUAL_WIDTH/2 then
             die = tonumber(p[2])
             lastSentKeyClient, 
             ball[1].dy, 
@@ -823,7 +826,32 @@ function nettest(dt)
             ball[1].dx, 
             ballSpeed, 
             paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+            print("ACCEPTED")
+        else 
+        print("DECLINED")
+        lastSentKeyClient = p[1]
+        player2.y = tonumber(p[4])
+        ball[1].x = tonumber(p[9])
+        end
         else  
+            if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
+                die = tonumber(p[2])
+                lastSentKeyClient, 
+                ball[1].dy, 
+                player2.y,
+                player1score, 
+                player2score, 
+                player1nukescore, 
+                player2nukescore, 
+                ball[1].x, 
+                ball[1].y, 
+                gameState, 
+                ball[1].dx, 
+                ballSpeed, 
+                paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                print("ACCEPTED")
+            end
+            print("ENFORCED")
             lastSentKeyClient = p[1]
             player2.y = tonumber(p[4])
         end
@@ -893,11 +921,20 @@ function clienttest(dt)
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
-            if (ball[i].x <= VIRTUAL_WIDTH/2) or gameState ~= "play" then 
+            if (ball[i].x <= VIRTUAL_WIDTH/2) then
+                if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
                 lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                print("ACCEPTED")
+                else 
+                print("DECLINED")
+                end
             else 
-                lastSentKeyClient = p[1] 
+                if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                print("REROUTED")
+                else lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
+                print("ENFORCED")
             end 
             end
         else
@@ -1125,7 +1162,7 @@ function love.keypressed(key)
                 gameState = "1serve"
                 resettinggenius()
                 for i = 1, maxBalls do
-                    ball[i]:reset(i)
+                    ball[i]:reset(i, 1)
                 end
             end
         else
@@ -1476,7 +1513,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             TEXT = "Lets Begin!"
             ball_DIR = 1
             for i = 1, maxBalls do
-                ball[i]:reset(i)
+                ball[i]:reset(i, 1)
             end
             gameState = "play"
             
@@ -1488,7 +1525,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             TEXT = ""
             ball_DIR = -1
             for i = 1, maxBalls do
-                ball[i]:reset(i)
+                ball[i]:reset(i, 2)
             end
 
             gameState = "play"
@@ -1498,7 +1535,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             TEXT = "Lets Begin"
             ball_DIR = -1
             for i = 1, maxBalls do
-                ball[i]:reset(i)
+                ball[i]:reset(i, 2)
             end
             --love.window.setTitle("An atttttttt")
             gameState = "play"
