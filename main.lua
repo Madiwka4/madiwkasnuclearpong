@@ -808,7 +808,7 @@ function nettest(dt)
         end
 
         
-        if (ball[1].dx > 0 and ball[1].x >= 40) or (ball[i].dx <= 0 and ball.x > VIRTUAL_WIDTH - 40) then 
+        if (ball[1].dx > 0 and ball[1].x >= 40) or (ball[1].dx <= 0 and ball.x > VIRTUAL_WIDTH - 40) then 
             die = tonumber(p[2])
             lastSentKeyClient, 
             ball[1].dy, 
@@ -893,7 +893,7 @@ function clienttest(dt)
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
-            if (ball[i].dx <= 0 and ball.x < VIRTUAL_WIDTH - 40) or (ball[i].dx > 0 and ball.x < 40) then 
+            if (ball[i].dx <= 0 and ball.x < VIRTUAL_WIDTH - 40) or (ball[i].dx > 0 and ball[i].x < 40) then 
                 lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
             else 
                 lastSentKeyClient = p[1] 
