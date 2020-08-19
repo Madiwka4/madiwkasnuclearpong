@@ -404,7 +404,7 @@ function goalManager()
                     if globalState ~= "clienttest" or (globalState == "clienttest" and gameState == "1serve") then 
                         gameState = "1serve"
                         serveBot()
-                        ball[i]:reset(i)
+                        ball[i]:reset(i, 1)
                     end 
                 end 
             end 
@@ -446,7 +446,7 @@ function goalManager()
                     gameState = "2serve"
                     serveBot()
     
-                    ball[i]:reset(i)
+                    ball[i]:reset(i, 2)
                     end 
     
 
