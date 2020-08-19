@@ -391,7 +391,7 @@ function goalManager()
         
                 AI_SPEED = difficultyl / 10
                 for i = 1, maxBalls do
-                    ball[i]:reset(i)
+                    ball[i]:reset(i, 2)
                 end
                 if (player2score == ptw and gameMode ~= "practice") then
                     for i = 1, maxBalls do

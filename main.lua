@@ -214,6 +214,7 @@ function love.load()
                 globalState = "nettest"
                 AGAINST_AI = 0 
                 gameState = "1serve"
+                ball[1]:reset(1, 1)
             end
         )
     )
@@ -225,6 +226,7 @@ function love.load()
                 globalState = "clienttest"
                 AGAINST_AI = 0 
                 gameState = "1serve"
+                ball[1]:reset(1, 1)
             end
         )
     )
@@ -1125,7 +1127,7 @@ function love.keypressed(key)
                 gameState = "1serve"
                 resettinggenius()
                 for i = 1, maxBalls do
-                    ball[i]:reset(i)
+                    ball[i]:reset(i, 1)
                 end
             end
         else

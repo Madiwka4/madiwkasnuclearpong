@@ -50,7 +50,15 @@ else
 		self.dx = ball_DIR
 	end
 	self.disabled = false 
-self.x = VIRTUAL_WIDTH /2 - 2
+	if not player then 
+		self.x = VIRTUAL_WIDTH /2 - 2
+	elseif player == 1 then 
+		self.x = 50 
+	elseif player == 2 then 
+		self.x = VIRTUAL_WIDTH - 50
+	else 
+		self.x = VIRTUAL_WIDTH /2 - 2
+	end
 	self.y = VIRTUAL_HEIGHT /2 - 2
 	self.dy = math.random(-1, 1)
 	
