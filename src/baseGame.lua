@@ -401,8 +401,11 @@ function goalManager()
                     gameState = "done"
                     TEXT = "Player 2 Won!"
                 else
-                gameState = "1serve"
-                serveBot()
+                    if globalState ~= "clienttest" or (globalState == "clienttest" and gameState == "1serve") then 
+                        gameState = "1serve"
+                        serveBot()
+                        ball[i]:reset(i)
+                    end 
                 end 
             end 
 
@@ -439,11 +442,14 @@ function goalManager()
                     gameState = "done"
                     TEXT = "Player 1 Won!"
                 else
+                    if globalState ~= "nettest" or (globalState == "nettest" and gameState == "2serve") then 
                     gameState = "2serve"
-    
                     serveBot()
     
                     ball[i]:reset(i)
+                    end 
+    
+
                 end
             end 
             sounds["score"]:play()
