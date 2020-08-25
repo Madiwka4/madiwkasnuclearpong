@@ -14,6 +14,7 @@ debug = true
 --GLOBAL VARIABLES
 frameratecap = 1/60
 realtimer = 0
+myip = "unknown"
 status = "offline"
 gameMode = "normal"
 ts = 0
@@ -1488,6 +1489,7 @@ function love.draw(dt)
         if (globalState == "nettest" or globalState == "clienttest" or globalState == "selfhost") and confirmation == "S" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
             love.graphics.printf("INTERNAL SERVER WAITING", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+            love.graphics.printf(myip, 0, VIRTUAL_HEIGHT / 2 + 120, VIRTUAL_WIDTH, "center")
         end
         
     simpleScale.unSet()
@@ -1745,7 +1747,9 @@ function selfHost(dt)
         udp = socket.udp()
         udp:setsockname('*', 12345)
         udp:settimeout(0)
-
+        local s = socket.udp()
+        s:setpeername("74.125.115.104",80)
+        myip, _ = s:getsockname()
 
         hostinit = true 
     else 
