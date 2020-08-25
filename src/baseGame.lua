@@ -697,6 +697,14 @@ function menuDraw()
                     AGAINST_AI = 0 
                     gameState = "1serve"
                     ball[1]:reset(1, 1)
+            )
+        )
+        table.insert(
+            IPselect,
+            newButton(
+                "Check Server",
+                function()
+                    IP = IPnew
                 end
             )
         )
@@ -733,7 +741,7 @@ function menuDraw()
             love.graphics.printf("SERVER FULL", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         end
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, IPselect, sounds, "middle")
-        love.graphics.printf(IP, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
+        love.graphics.printf(IPnew, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
         love.keyboard.mouseisReleased = false
     end
     if gameState == "menu" then

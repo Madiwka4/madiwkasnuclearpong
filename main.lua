@@ -41,6 +41,7 @@ hitNum[5] = 0
 hitNum[6] = 0
 GREEN = 255
 IP = '45.76.95.31'
+IPnew = '45.76.95.31'
 BLUE = 255
 updateTEXT = "Chalkboard Update"
 maxBalls = 1
@@ -719,11 +720,10 @@ function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
     
     staticanimatorcounter(dt)
-    if gameState == "chooseIP" then 
-    checkCurrentServer(dt)
-    end
     musicController('norm', 1)
-    
+    if gameState == "chooseIP" then 
+        checkCurrentServer(dt)
+    end
     if debug then
         displayFPS()
     end
@@ -769,7 +769,7 @@ datawaspassedtimer = 0
 clientinit = false 
 function love.textinput(t)
     if gameState == "chooseIP" then 
-    IP = IP .. t 
+    IPnew = IPnew .. t 
     end 
 end
 function nettest(dt)
@@ -1100,12 +1100,12 @@ function love.keypressed(key)
     if gameState == "chooseIP" then 
         if key == "backspace" then
             -- get the byte offset to the last UTF-8 character in the string.
-            local byteoffset = utf8.offset(IP, -1)
+            local byteoffset = utf8.offset(IPnew, -1)
      
             if byteoffset then
                 -- remove the last UTF-8 character.
                 -- string.sub operates on bytes rather than UTF-8 characters, so we couldn't do string.sub(text, 1, -2).
-                IP = string.sub(IP, 1, byteoffset - 1)
+                IPnew = string.sub(IPnew, 1, byteoffset - 1)
             end
         end
     end
@@ -1679,24 +1679,25 @@ function split(s, delimiter)
 end
 address, port = IP, 12345
 function checkCurrentServer(dt)
-
+    if IP ~= "" then 
     if dserverinit == false then 
-        local socket = require "socket"
-        local address, port = IP, 12345
+        print("Switching IP")
+        socket = require "socket"
+        address, port = IP, 12345
         print(address)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
         dserverinit = true 
     end 
-    if IP ~= address then dserverinit = false print(IP .. " " .. address)
-    end
+    if IP ~= address then dserverinit = false print(IP .. " doesnt equal " .. address)
+    else 
     ts = ts + dt
     --print(ts)
     if ts > checkrate then 
         status = "offline"
         print("sent ping")
-    udp:send("HELLO")
+        udp:send("HELLO")
     local data
     data = udp:receive()
     if data then 
@@ -1709,7 +1710,8 @@ function checkCurrentServer(dt)
     end
     ts = 0 
     end 
-    
+end
+end
 
 end 
 actualP2DATA = nil
