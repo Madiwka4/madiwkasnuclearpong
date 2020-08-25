@@ -1,3 +1,4 @@
+local counter = 0
 function basegame(dt) 
     if gameMode == "reversegame" then 
         reversegame(dt)
@@ -706,12 +707,13 @@ function menuDraw()
                 "Check Server",
                 function()
                     IP = IPnew
+                    counter = 0
                 end
             )
         )
         if status == "offline" then 
-            love.graphics.printf("UNABLE TO CONNECT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
-        elseif status == "nettest" then 
+            animateConnection()
+        elseif status == "nettest" and IP == IPnew then 
             table.insert(
                 IPselect,
                 newButton(
@@ -725,7 +727,7 @@ function menuDraw()
                 )
             )
             
-        elseif status == "clienttest" then 
+        elseif status == "clienttest" and IP == IPnew  then 
             table.insert(
                 IPselect,
                 newButton(
@@ -1314,3 +1316,48 @@ function clientsBaseGame(dt)
     player1:update(dt)
     player2:update(dt)
 end 
+
+function animateConnection()
+    if GetIPType(IP) ~= 1 then 
+        love.graphics.printf("WRONG SYNTAX", 0, VIRTUAL_HEIGHT-80, VIRTUAL_WIDTH, "center")
+    else 
+    counter = counter + 1 / love.timer.getFPS() 
+    if counter < 0.8 then 
+    love.graphics.printf("TRYING TO CONNECT.", 0, VIRTUAL_HEIGHT-80, VIRTUAL_WIDTH, "center")
+    elseif counter < 1.6 then 
+        love.graphics.printf("TRYING TO CONNECT..", 0, VIRTUAL_HEIGHT-80, VIRTUAL_WIDTH, "center")    
+    elseif counter < 2.4 then 
+        love.graphics.printf("TRYING TO CONNECT...", 0, VIRTUAL_HEIGHT-80, VIRTUAL_WIDTH, "center")
+    else 
+        love.graphics.printf("NO CONNECTION!", 0, VIRTUAL_HEIGHT-80, VIRTUAL_WIDTH, "center")
+    end
+end
+end 
+function GetIPType(ip)
+    -- must pass in a string value
+    if ip == nil or type(ip) ~= "string" then
+        return 0
+    end
+
+    -- check for format 1.11.111.111 for ipv4
+    local chunks = {ip:match("(%d+)%.(%d+)%.(%d+)%.(%d+)")}
+    if (#chunks == 4) then
+        for _,v in pairs(chunks) do
+            if (tonumber(v) < 0 or tonumber(v) > 255) then
+                return 0
+            end
+        end
+        return 1
+    else
+        return 0
+    end
+
+    -- check for ipv6 format, should be 8 'chunks' of numbers/letters
+    local _, chunks = ip:gsub("[%a%d]+%:?", "")
+    if chunks == 8 then
+        return 2
+    end
+
+    -- if we get here, assume we've been given a random string
+    return 3
+end

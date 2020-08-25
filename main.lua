@@ -1690,7 +1690,10 @@ function split(s, delimiter)
 end
 address, port = IP, 12345
 function checkCurrentServer(dt)
-    if IP ~= "" then 
+    if GetIPType(IP) ~= 1 then
+        status = "offline"
+    end 
+    if GetIPType(IP) == 1 then 
     if dserverinit == false then 
         print("Switching IP")
         socket = require "socket"
