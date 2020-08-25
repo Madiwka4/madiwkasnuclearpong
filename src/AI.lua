@@ -99,7 +99,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
         --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex))
         -- if (ifspecial == 0) then  
                 local answer = ey + bonus
-                love.window.setTitle(tostring(answer) .. "Basiccalc")
+                --love.window.setTitle(tostring(answer) .. "Basiccalc")
                 return ey + bonus 
                 
         -- else 
@@ -109,7 +109,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
             local emulatedx = ex + distance 
             local emulatedy = VIRTUAL_HEIGHT-40
             local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
-            love.window.setTitle(tostring(answer) .. "recursive calc bottom")
+            --love.window.setTitle(tostring(answer) .. "recursive calc bottom")
             return answer 
         end  
     elseif edy == 0 then 
@@ -129,7 +129,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
         --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex)) 
 --         if (ifspecial == 0) then 
                 local answer = ey + bonus 
-                love.window.setTitle(tostring(answer) .. "Basiccalc")
+                --love.window.setTitle(tostring(answer) .. "Basiccalc")
                 return answer 
     --       else 
     --         return -1 
@@ -139,7 +139,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
             local emulatedy = 0
 ----print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (VIRTUAL_WIDTH-ex)) 
             local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
-            love.window.setTitle(tostring(answer) .. "recursivecalc")
+            --love.window.setTitle(tostring(answer) .. "recursivecalc")
             return answer 
         end
     end

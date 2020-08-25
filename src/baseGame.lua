@@ -688,6 +688,18 @@ function menuDraw()
     end
     if gameState == "chooseIP" then
         IPselect = {}
+        table.insert(
+            IPselect,
+            newButton(
+                "LANHost",
+                function()
+                    globalState = "selfhost"
+                    AGAINST_AI = 0 
+                    gameState = "1serve"
+                    ball[1]:reset(1, 1)
+                end
+            )
+        )
         if status == "offline" then 
             love.graphics.printf("UNABLE TO CONNECT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         elseif status == "nettest" then 
