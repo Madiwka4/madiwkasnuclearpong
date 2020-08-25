@@ -60,9 +60,9 @@ function paddle:update(dt)
 			self.yx = self.y 
 		end
 	if (self.yx < self.y) then 
-		self.yx = self.yx + math.abs(paddle_SPEED/1.7) * dt 
+		self.yx = self.yx + math.abs(paddle_SPEED/1.7) * 7 * dt 
 	elseif (self.yx > self.y) then 
-		self.yx = self.yx - math.abs(paddle_SPEED/1.7) * dt
+		self.yx = self.yx - math.abs(paddle_SPEED/1.7) * 7 * dt
 	end
 end
 

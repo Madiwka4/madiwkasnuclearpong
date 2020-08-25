@@ -88,64 +88,59 @@ function predictBall(target, px)
     end
 end 
 function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
-    if VIRTUAL_WIDTH - ex < AI_SPEED then 
-        local time = (VIRTUAL_WIDTH - ex)/(ballSpeed*edx)
-        local distance = (ballSpeed * edy) * time 
-        love.window.setTitle(ey + (distance*edy))
-        return ey + (distance*edy)
-    else 
+    if (edy > 0) then 
+    --print ("normal" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
+        local time = (VIRTUAL_HEIGHT-40-ey) / (ballSpeed * edy)
+        local distance = (ballSpeed * edx) * time
+    --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
+        if distance > (px - ex) then 
+            local anstime = (px - ex) / (ballSpeed * edx) 
+            local bonus = (ballSpeed * edy) * anstime 
+        --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex))
+        -- if (ifspecial == 0) then  
+                local answer = ey + bonus
+                love.window.setTitle(tostring(answer) .. "Basiccalc")
+                return ey + bonus 
+                
+        -- else 
+            --   return -1  
+            --end
+        else 
+            local emulatedx = ex + distance 
+            local emulatedy = VIRTUAL_HEIGHT-40
+            local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
+            love.window.setTitle(tostring(answer) .. "recursive calc bottom")
+            return answer 
+        end  
+    elseif edy == 0 then 
+        return ey
+    else
+    --print ("inverse" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
+        local time = (ey) / math.abs((ballSpeed * edy))
+        local distance = (ballSpeed * edx) * time 
+    --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
 
-        if (edy > 0) then 
-        --print ("normal" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
-            local time = (VIRTUAL_HEIGHT-ey) / (ballSpeed * edy)
-            local distance = (ballSpeed * edx) * time
-        --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
-            if distance > (px - ex) then 
-                local anstime = (px - ex) / (ballSpeed * edx) 
-                local bonus = (ballSpeed * edy) * anstime 
-            --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex))
-            -- if (ifspecial == 0) then  
-                    return ey + bonus 
-            -- else 
-                --   return -1  
-                --end
-            else 
-                local emulatedx = ex + distance 
-                local emulatedy = VIRTUAL_HEIGHT
-                local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
-                love.window.setTitle(answer)
+        
+    --print("Why th efuck ")
+
+        if distance > (px - ex) then 
+            local anstime = (px - ex) / (ballSpeed * edx) 
+            local bonus = (ballSpeed * edy) * anstime
+        --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex)) 
+--         if (ifspecial == 0) then 
+                local answer = ey + bonus 
+                love.window.setTitle(tostring(answer) .. "Basiccalc")
                 return answer 
-            end  
-        elseif edy == 0 then 
-            return ey
-        else
-        --print ("inverse" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
-            local time = (ey) / math.abs((ballSpeed * edy))
-            local distance = (ballSpeed * edx) * time 
-        --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
-
-            
-        --print("Why th efuck ")
-
-            if distance > (px - ex) then 
-                local anstime = (px - ex) / (ballSpeed * edx) 
-                local bonus = (ballSpeed * edy) * anstime
-            --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex)) 
-    --         if (ifspecial == 0) then 
-                    local answer = ey + bonus 
-                    love.window.setTitle(answer)
-                    return answer 
-        --       else 
-        --         return -1 
-            --   end
-            else 
-                local emulatedx = ex + distance 
-                local emulatedy = 0
-    ----print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (VIRTUAL_WIDTH-ex)) 
-                local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
-                love.window.setTitle(answer)
-                return answer 
-            end
+    --       else 
+    --         return -1 
+        --   end
+        else 
+            local emulatedx = ex + distance 
+            local emulatedy = 0
+----print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (VIRTUAL_WIDTH-ex)) 
+            local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
+            love.window.setTitle(tostring(answer) .. "recursivecalc")
+            return answer 
         end
     end
 end

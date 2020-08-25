@@ -467,7 +467,7 @@ function powerAvailability()
             player1reverbav = 0
         end
     end
-    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false then
+    if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false and (maxBalls > 1 or (ball[1].dx < 0 and ball[1].x < VIRTUAL_WIDTH/2))then
         player1reverbav = 1
         if ((globalState == "clienttest" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
             powerControl(1, "special")
@@ -510,7 +510,7 @@ function powerAvailability()
             end
         end
     end
-    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false  then
+    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and (maxBalls > 1 or (ball[1].dx > 0 and ball[1].x < VIRTUAL_WIDTH/2)) then
         player2reverbav = 1
         if (globalState ~= "nettest" and love.keyboard.isDown(p2control.counter)) or lastSentKeyClient == p2control.counter then
             sounds["time"]:play()
