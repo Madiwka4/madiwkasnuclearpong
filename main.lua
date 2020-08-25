@@ -750,6 +750,7 @@ function love.update(dt)
         end
             globalState = "selfhost"
             selfHost(dt)
+            IP = "127.0.0.1"
         
     end
     if globalState == "clienttest" then
@@ -773,6 +774,7 @@ function love.textinput(t)
     end 
 end
 function nettest(dt)
+    print("nettest running")
     if serverinit == false then 
         local socket = require "socket"
         local address, port = IP, 12345
@@ -834,11 +836,12 @@ function nettest(dt)
             confirmation = "U"
         end
 
-
+        if p[15] then 
         if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
             ball[1].disabled = false 
             print("illegal disabling")
         end
+        if gameState ~= "1serve" then 
         if (ball[1].x > VIRTUAL_WIDTH/2) then 
             if tonumber(p[9]) > VIRTUAL_WIDTH/2 then
             die = tonumber(p[2])
@@ -882,7 +885,8 @@ function nettest(dt)
             player2.y = tonumber(p[4])
             end 
         end
-        
+        end
+        end
     end 
 until not data
     if not datawaspassed then  
@@ -1462,8 +1466,13 @@ end
 function love.draw(dt)
     simpleScale.set()
 
-    
-        baseDraw()
+        if globalState == "selfhost" then 
+            globalState = "nettest"
+            baseDraw()
+            globalState = "selfhost"
+        else
+            baseDraw()
+        end
         if (globalState == "nettest" or globalState == "clienttest" or globalState == "selfhost") and confirmation == "D" then 
             love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
             love.graphics.printf("WAIT FOR OPPONENT", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
@@ -1624,6 +1633,8 @@ function resettinggenius()
     nuclearanimation = 3
     timeIsSlow = false
     timeIsSlow2 = false
+    serverinit = false 
+    ts = 0 
     originalSpeed = 200
     gameState = "menu"
     globalState = "menu"
@@ -1714,177 +1725,152 @@ end
 end
 
 end 
-actualP2DATA = nil
-actualP1DATA = nil 
-running = false
+local gts = 0 
+hostinit = false 
+player1ip = "127.0.0.1"
+player1port = "12345"
+player2ip = "none"
+player2port = nil
 local p1ping = 0
 local p2ping = 0
 local requesterip 
 local requresterport
-local player1ip, player2ip, player1port, player2port = "127.0.0.1", "none", nil, nil
-local gts = 0 
 function selfHost(dt)
-    ts = ts + dt 
-    gts = gts + dt 
-    if serverinit == false then 
+    print("Server running")
+    if not hostinit then 
         local socket = require('socket')
         udp = socket.udp()
         udp:setsockname('*', 12345)
         udp:settimeout(0)
-        serverinit = true 
-    end 
+
+
+        hostinit = true 
+    else 
+    gts = gts + dt 
     if gts > 0.015 then 
-        gts = 0
-        data, msg_or_ip, port_or_nil = udp:receivefrom()
-        if not running then 
-            print("launching server")
-        running = true
-        local socket = require 'socket'
-        local udp = socket.udp()
+    local data, msg_or_ip, port_or_nil
+  local p1data, p2data
+  repeat
 
-        udp:settimeout(0)
-        udp:setsockname('*', 12345)
+    data, msg_or_ip, port_or_nil = udp:receivefrom()
+    if data then
 
-        end 
-        print("Acting as server")
-        actualP2DATA = nil 
-        local data, msg_or_ip, port_or_nil
-        local p1data, p2data
-        repeat
-        
-            data, msg_or_ip, port_or_nil = udp:receivefrom()
-            if data then
-        
-            if data == "HELLO" then
-                requesterip = msg_or_ip
-                requesterport = port_or_nil
-            else
-                print(string.sub(data,1,1) .. "Playerlist: " .. player1ip .. " " .. player2ip)
-                if player2ip == msg_or_ip then
-                p2data = data
-                p2ping = 0
-                else
-                if player2ip == "none" and msg_or_ip ~= player1ip then
-                    player2ip = msg_or_ip
-                    p2data = data
-                    p2ping = 0
-                    player2port = port_or_nil
-                    print("CONNECTED: PLAYER 2 FROM: " .. player2ip)
-                elseif (player1ip ~= msg_or_ip and player2ip ~= msg_or_ip) then
-                    print("Lobby Full!" .. player1ip .. player2ip)
-                end
-                end
-        
-            end
-            end
-        until not data
-        if player2ip ~= "none" then
-            p2ping = p2ping + 1
-            if p2ping > 100 then
-                if p1data then
-                    udp:sendto(p1data .. '|' .. p2ping, player2ip, player2port)
-                end
-                print("PLAYER 2 DISCONNECTED")
-                p2data = nil
-                player2ip = "none"
-                player2port = nil
-            end
+      if data == "HELLO" then
+        requesterip = msg_or_ip
+        requesterport = port_or_nil
+      else
+        print(string.sub(data,1,1) .. "Playerlist: " .. player1ip .. " " .. player2ip)
+        if player2ip == msg_or_ip then
+          p2data = data .. '|' .. p2ping
+          p2ping = 0
+        else
+          if player2ip == "none" and msg_or_ip ~= player1ip then
+            player2ip = msg_or_ip
+            p2data = data .. '|' ..  p2ping
+            p2ping = 0
+            player2port = port_or_nil
+            print("CONNECTED: PLAYER 2 FROM: " .. player2ip)
+          elseif (player1ip ~= msg_or_ip and player2ip ~= msg_or_ip) then
+            print("Lobby Full!" .. player1ip .. player2ip)
+          end
         end
-        if p1data and player2port then
-            udp:sendto(p1data .. '|' .. p2ping, player2ip, player2port)
-            print("SENT TO " .. player2ip .. ":" .. player2port ..  " : " .. string.sub(p1data,1,1))
-        end
-        if p2data and player1port then
-            actualP2DATA = p2data 
-            --print("SENT TO " .. player1ip .. ":" .. player1port .. " : " .. string.sub(p2data,1,1))
-            --print("1::" .. p1data)
-            --print("2::" .. p2data)
-            --print("SENT1: " .. player2ip .. " " .. player2port .. " " .. p1data)
-            --print("SENT2: " .. player1ip .. " " .. player1port .. " " .. p2data)
-        end
-        if requesterip then
-            print("getting pnged!")
-            if player2ip == "none" then
-                udp:sendto("clienttest", requesterip, requesterport)
-                print("clienttest av to: " .. requesterip)
-            else
-                udp:sendto("full", requesterip, requesterport)
-                print("full to: " .. msg_or_ip)
-            end
-            requesterip, requesterport = nil
-        end
+
+      end
     end
-    print("Integrating nettest")
-
-    for i = 1, maxBalls do 
-        
-        if ts > updaterate then 
-            ts = 0
-            actualP1DATA = tostring(lastSentKey) .. 
-            '|' .. tostring(ball[1].dy) .. 
-            '|' .. tostring(player2.y) ..
-            '|' .. tostring(player1.y) .. 
-            '|' .. tostring(player1score) .. 
-            '|' .. tostring(player2score) .. 
-            '|' .. tostring(player1nukescore) .. 
-            '|' .. tostring(player2nukescore) .. 
-            '|' .. tostring(ball[1].x) .. 
-            '|' .. tostring(ball[1].y) .. 
-            '|' .. gameState .. 
-            '|' .. tostring(ball[1].dx) .. 
-            '|' .. tostring(ballSpeed) .. 
-            '|' .. tostring(paddle_SPEED) .. 
-            "|HOST" 
+   until not data
+    if player1ip ~= "none" then
+      p1ping = p1ping + 1
+    end
+    if player2ip == "none" then 
+        confirmation = "S"
+    else 
+        print("Player2: " .. player2ip)
+      p2ping = p2ping + 1
+      if p2ping > 100 then
+            for i = 1, maxBalls do 
+                ts = ts + dt 
+                if ts > updaterate then 
+                    udp:sendto(tostring(lastSentKey) .. 
+                    '|' .. tostring(ball[1].dy) .. 
+                    '|' .. tostring(player2.y) ..
+                    '|' .. tostring(player1.y) .. 
+                    '|' .. tostring(player1score) .. 
+                    '|' .. tostring(player2score) .. 
+                    '|' .. tostring(player1nukescore) .. 
+                    '|' .. tostring(player2nukescore) .. 
+                    '|' .. tostring(ball[1].x) .. 
+                    '|' .. tostring(ball[1].y) .. 
+                    '|' .. gameState .. 
+                    '|' .. tostring(ball[1].dx) .. 
+                    '|' .. tostring(ballSpeed) .. 
+                    '|' .. tostring(paddle_SPEED) .. 
+                    "|HOST|".. p2ping, player2ip, player2port) 
+                    ts = 0
+                end 
+            end 
+        print("PLAYER 2 DISCONNECTED")
+        p2data = nil
+        player2ip = "none"
+        player2port = nil
+      end
+    end
+    if player2port then
+        for i = 1, maxBalls do 
+            ts = ts + dt 
+            if ts > updaterate then 
+                udp:sendto(tostring(lastSentKey) .. 
+                '|' .. tostring(ball[1].dy) .. 
+                '|' .. tostring(player2.y) ..
+                '|' .. tostring(player1.y) .. 
+                '|' .. tostring(player1score) .. 
+                '|' .. tostring(player2score) .. 
+                '|' .. tostring(player1nukescore) .. 
+                '|' .. tostring(player2nukescore) .. 
+                '|' .. tostring(ball[1].x) .. 
+                '|' .. tostring(ball[1].y) .. 
+                '|' .. gameState .. 
+                '|' .. tostring(ball[1].dx) .. 
+                '|' .. tostring(ballSpeed) .. 
+                '|' .. tostring(paddle_SPEED) .. 
+                "|HOST|".. p2ping, player2ip, player2port) 
+                ts = 0
+            end 
         end 
-    end 
-    
-    local data
+      print("SENT TO " .. player2ip .. ":" .. player2port ..  " : " ..lastSentKey)
+    end
     local datanumtest = 0
     local datawaspassed = false 
-    if actualP2DATA then
-        datawaspassed = true 
-        print("ReceivedINFO: " .. actualP2data)
-        confirmation = "N"
-        local p = split(actualP2data, '|')
-        if p[15] then 
-            if tonumber(p[16]) > 90 then 
-                confirmation = "L"
-            end
-            if p[15] ~= "CLIENT" then 
+    if p2data and player1port then
+            datawaspassed = true 
+            print("ReceivedINFO: " .. p2data)
+            confirmation = "N"
+            local p = split(p2data, '|')
+            if p[15] then 
+                if tonumber(p[16]) > 90 then 
+                    confirmation = "L"
+                end
+                if p[15] ~= "CLIENT" then 
+                    confirmation = "U"
+                end
+            elseif p[1] == "RESPONSE" then 
+                if p[2] == "1" then 
+    
+                elseif p[2] == "2" then 
+    
+                elseif p[2] == "3" then 
+                end
+            else 
                 confirmation = "U"
             end
-        elseif p[1] == "RESPONSE" then 
-        else 
-            confirmation = "U"
-        end
     
-    
-        if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
-            ball[1].disabled = false 
-            print("illegal disabling")
-        end
-        if (ball[1].x > VIRTUAL_WIDTH/2) then 
-            if tonumber(p[9]) > VIRTUAL_WIDTH/2 then
-            die = tonumber(p[2])
-            lastSentKeyClient, 
-            ball[1].dy, 
-            player2.y,
-            player1score, 
-            player2score, 
-            player1nukescore, 
-            player2nukescore, 
-            ball[1].x, 
-            ball[1].y, 
-            gameState, 
-            ball[1].dx, 
-            ballSpeed, 
-            paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
-            print("ACCEPTED")
-        else 
-            print("DECLINED")
-        end
-        else  
-            if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
+            if p[15] then 
+            if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
+                ball[1].disabled = false 
+                print("illegal disabling")
+            end
+            if gameState ~= "1serve" then 
+            if (ball[1].x > VIRTUAL_WIDTH/2) then 
+                if tonumber(p[9]) > VIRTUAL_WIDTH/2 then
                 die = tonumber(p[2])
                 lastSentKeyClient, 
                 ball[1].dy, 
@@ -1901,22 +1887,51 @@ function selfHost(dt)
                 paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
                 print("ACCEPTED")
             else 
+            print("DECLINED")
+            end
+            else  
+                if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
+                    die = tonumber(p[2])
+                    lastSentKeyClient, 
+                    ball[1].dy, 
+                    player2.y,
+                    player1score, 
+                    player2score, 
+                    player1nukescore, 
+                    player2nukescore, 
+                    ball[1].x, 
+                    ball[1].y, 
+                    gameState, 
+                    ball[1].dx, 
+                    ballSpeed, 
+                    paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                    print("ACCEPTED")
+                else 
                 print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
                 lastSentKeyClient = p[1]
                 player2.y = tonumber(p[4])
-            end 
-        end
-            
-        if not datawaspassed then  
-            datawaspassedtimer = datawaspassedtimer + 1 
-            if datawaspassedtimer > 5 then 
-                confirmation = "D"
-                datawaspassedtimer = 0
-            end 
-        else 
-            datawaspassedtimer = 0 
-        end
-    else 
-        confirmation = "S"
+                end 
+            end
+            end
+            end
+      print("SENT TO " .. player1ip .. ":" .. player1port .. " : " .. string.sub(p2data,1,1))
+      --print("1::" .. p1data)
+      --print("2::" .. p2data)
+      --print("SENT1: " .. player2ip .. " " .. player2port .. " " .. p1data)
+      --print("SENT2: " .. player1ip .. " " .. player1port .. " " .. p2data)
     end
-end 
+    if requesterip then
+        print("getting pnged!")
+        if player2ip == "none" then
+          udp:sendto("clienttest", requesterip, requesterport)
+          print("clienttest av to: " .. requesterip)
+        else
+          udp:sendto("full", requesterip, requesterport)
+          print("full to: " .. msg_or_ip)
+        end
+        requesterip, requesterport = nil
+    end
+    gts = 0
+    end
+end
+end

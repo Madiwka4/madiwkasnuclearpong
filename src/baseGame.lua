@@ -697,6 +697,7 @@ function menuDraw()
                     AGAINST_AI = 0 
                     gameState = "1serve"
                     ball[1]:reset(1, 1)
+                end
             )
         )
         table.insert(
@@ -1311,6 +1312,5 @@ function clientsBaseGame(dt)
     goalManager()
     powerAvailability()
     player1:update(dt)
-    love.event.quit()
     player2:update(dt)
 end 
