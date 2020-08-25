@@ -12,6 +12,8 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
 
 debug = true
 --GLOBAL VARIABLES
+frameratecap = 1/60
+realtimer = 0
 status = "offline"
 gameMode = "normal"
 ts = 0
@@ -60,7 +62,7 @@ nuckemodactive = 0
 maxspeed = 700
 DIFFERENCE_X = 1
 DIFFERENCE_Y = 1
-paddle_SPEED = 20
+paddle_SPEED = 200
 textamount = 15
 AI_STRIKEMOD = 1000
 resolutionWin = 0
@@ -68,7 +70,7 @@ AGAINST_AI = 0
 RESOLUTION_SET = 0
 AI_NUKEMOD = 1000
 animstart = true
-AI_SPEED = 30
+AI_SPEED = 300
 craz = 0
 AI_LEVEL = 500
 isFullscreen = 0
@@ -698,7 +700,7 @@ function startShake(duration, magnitude)
 end
 function displayFPS()
     --love.window.setTitle(love.timer.getFPS())
-    love.window.setTitle(globalState .. " " .. gameState)
+    --love.window.setTitle(globalState .. " " .. gameState .. " " .. paddle_SPEED .. " " .. p1bonus .. " " .. player1.dy)
     if love.keyboard.isDown("space") then
         player1nukescore = 200
         player1score = player1score + 0.2
@@ -715,6 +717,7 @@ end
 
 function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
+    
     staticanimatorcounter(dt)
     if gameState == "chooseIP" then 
     checkCurrentServer(dt)
@@ -982,7 +985,7 @@ function hardmanager(diff)
     if (diff == "easy") then
         INDIC[1] = ">"
         AGAINST_AI = 1
-        AI_SPEED = ballSet / 10
+        AI_SPEED = ballSet
         AI_STRIKEMOD = 100
         AI_NUKEMOD = 1000
         AI_LEVEL = 350
@@ -993,7 +996,7 @@ function hardmanager(diff)
     end
     if (diff == "normal") then
         INDIC[2] = ">"
-        AI_SPEED = ballSet / 10
+        AI_SPEED = ballSet
         AI_LEVEL = 500
         AI_NUKEMOD = 250
         AI_STRIKEMOD = 60
@@ -1006,7 +1009,6 @@ function hardmanager(diff)
     if (diff == "hard") then
         INDIC[3] = ">"
         AI_SPEED = ballSpeed * 1.1 + 50
-        AI_SPEED = AI_SPEED / 10
         AI_LEVEL = 700
         AI_NUKEMOD = 200
         AI_STRIKEMOD = 20
@@ -1019,7 +1021,6 @@ function hardmanager(diff)
     if (diff == "smart") then
         INDIC[3] = ">"
         AI_SPEED = ballSpeed * 1.1 + 50
-        AI_SPEED = AI_SPEED / 10
         AI_LEVEL = 1500
         AI_NUKEMOD = 200
         AI_STRIKEMOD = 20
@@ -1032,7 +1033,6 @@ function hardmanager(diff)
     if (diff == "practice") then
         INDIC[3] = ">"
         AI_SPEED = ballSpeed * 500 + 50
-        AI_SPEED = AI_SPEED / 10
         AI_LEVEL = 700
         AI_NUKEMOD = 9000000000
         AI_STRIKEMOD = 90000000
@@ -1239,15 +1239,15 @@ function speedSetter(requesttype)
             synctype = 0
             maxspeed = 700
             synctext = "Independent"
-            paddle_SPEED = ballSet / 10
-            AI_SPEED = ballSet / 10
+            paddle_SPEED = ballSet
+            AI_SPEED = ballSet
         end
         if (nuckemodactive == 1) then
             areanuclear = 1
             ballSet = 2000
             maxspeed = 2000
-            paddle_SPEED = ballSet / 10
-            AI_SPEED = ballSet / 10
+            paddle_SPEED = ballSet
+            AI_SPEED = ballSet
             synctext = "death is imminent"
         end
         ballSpeed = ballSet
@@ -1526,9 +1526,13 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or (globalState == "clienttest" and lastSentKeyP1 == "q")) then
             TEXT = "Lets Begin!"
             ball_DIR = 1
-            for i = 1, maxBalls do
-                ball[i]:reset(i, 1)
-            end
+            if maxBalls == 1 then 
+                ball[1]:reset(1, 1)
+            else 
+                for i = 1, maxBalls do
+                    ball[i]:reset(i)
+                end
+            end 
             gameState = "play"
             
         end
@@ -1538,9 +1542,13 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         if (AGAINST_AI == 1) then
             TEXT = ""
             ball_DIR = -1
-            for i = 1, maxBalls do
-                ball[i]:reset(i, 2)
-            end
+            if maxBalls == 1 then 
+                ball[2]:reset(i, 2)
+            else 
+                for i = 1, maxBalls do
+                    ball[i]:reset(i)
+                end
+            end 
 
             gameState = "play"
             
@@ -1548,9 +1556,13 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         if (((globalState == "nettest" and lastSentKeyClient == "p") or ((globalState ~= "nettest") and love.keyboard.isDown("p")))and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
             ball_DIR = -1
-            for i = 1, maxBalls do
-                ball[i]:reset(i, 2)
-            end
+            if maxBalls == 1 then 
+                ball[1]:reset(1, 2)
+            else 
+                for i = 1, maxBalls do
+                    ball[i]:reset(i)
+                end
+            end 
             --love.window.setTitle("An atttttttt")
             gameState = "play"
             
@@ -1594,7 +1606,7 @@ function resettinggenius()
     for i = 1, maxBalls do
         ball[i]:reset(i)
     end
-    paddle_SPEED = 20
+    paddle_SPEED = 200
     nuclearanimation = 3
     timeIsSlow = false
     timeIsSlow2 = false
@@ -1684,5 +1696,113 @@ function checkCurrentServer(dt)
     ts = 0 
     end 
     
+
+end 
+
+function selfHost(dt)
+    local running = true
+    local socket = require 'socket'
+    local udp = socket.udp()
+    local player1ip, player2ip, player1port, player2port = "127.0.0.1", "none", nil, nil
+    udp:settimeout(0)
+    udp:setsockname('*', 12345)
+    local p1ping = 0
+    local p2ping = 0
+    local requesterip 
+    local requresterport
+    
+    while running do
+      local data, msg_or_ip, port_or_nil
+      local p1data, p2data
+      repeat
+    
+        data, msg_or_ip, port_or_nil = udp:receivefrom()
+        if data then
+    
+          if data == "HELLO" then
+            requesterip = msg_or_ip
+            requesterport = port_or_nil
+          else
+            print(string.sub(data,1,1) .. "Playerlist: " .. player1ip .. " " .. player2ip)
+            if (player1ip == msg_or_ip) then
+              p1ping = 0
+              p1data = data
+            elseif player2ip == msg_or_ip then
+              p2data = data
+              p2ping = 0
+            else
+              if (player1ip == "none") then
+                player1ip = msg_or_ip
+                p1data = data
+                p1ping = 0
+                player1port = port_or_nil
+                print("CONNECTED: PLAYER 1 FROM: " .. player1ip)
+              elseif player2ip == "none" and msg_or_ip ~= player1ip then
+                player2ip = msg_or_ip
+                p2data = data
+                p2ping = 0
+                player2port = port_or_nil
+                print("CONNECTED: PLAYER 2 FROM: " .. player2ip)
+              elseif (player1ip ~= msg_or_ip and player2ip ~= msg_or_ip) then
+                print("Lobby Full!" .. player1ip .. player2ip)
+              end
+            end
+    
+          end
+        end
+       until not data
+        if player1ip ~= "none" then
+          p1ping = p1ping + 1
+          if p1ping > 100 then
+            if p2data then
+              udp:sendto(p2data .. '|' .. p1ping, player1ip, player1port)
+            end
+            print("PLAYER 1 DISCONNECTED")
+            p1data = nil
+            player1ip = "none"
+            player1port = nil
+          end
+        end
+        if player2ip ~= "none" then
+          p2ping = p2ping + 1
+          if p2ping > 100 then
+            if p1data then
+              udp:sendto(p1data .. '|' .. p2ping, player2ip, player2port)
+            end
+            print("PLAYER 2 DISCONNECTED")
+            p2data = nil
+            player2ip = "none"
+            player2port = nil
+          end
+        end
+        if p1data and player2port then
+          udp:sendto(p1data .. '|' .. p2ping, player2ip, player2port)
+          print("SENT TO " .. player2ip .. ":" .. player2port ..  " : " .. string.sub(p1data,1,1))
+        end
+        if p2data and player1port then
+          udp:sendto(p2data .. '|' .. p1ping, player1ip, player1port)
+          print("SENT TO " .. player1ip .. ":" .. player1port .. " : " .. string.sub(p2data,1,1))
+          --print("1::" .. p1data)
+          --print("2::" .. p2data)
+          --print("SENT1: " .. player2ip .. " " .. player2port .. " " .. p1data)
+          --print("SENT2: " .. player1ip .. " " .. player1port .. " " .. p2data)
+        end
+        if requesterip then
+            print("getting pnged!")
+            if player1ip == "none" then
+              udp:sendto("nettest",requesterip, requesterport)
+              print("nettest av to: " .. requesterip)
+            elseif player2ip == "none" then
+              udp:sendto("clienttest", requesterip, requesterport)
+              print("clienttest av to: " .. requesterip)
+            else
+              udp:sendto("full", requesterip, requesterport)
+              print("full to: " .. msg_or_ip)
+            end
+            requesterip, requesterport = nil
+        end
+        socket.sleep(0.015)
+    
+    end
 
 end 

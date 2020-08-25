@@ -93,7 +93,7 @@ function basegame(dt)
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
                     elseif (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
+                        paddle_SPEED = ballSpeed
                     end
                     if (synctype == 0) then
                         AI_SPEED = AI_SPEED * 1.10
@@ -209,7 +209,7 @@ function basegame(dt)
                         paddle_SPEED = paddle_SPEED * 1.10
                     end
                     if (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
+                        paddle_SPEED = ballSpeed
                     end
                     if (synctype == 0) then
                         AI_SPEED = AI_SPEED * 1.10
@@ -383,10 +383,10 @@ function goalManager()
                 player2striken = 0
                 ballSpeed = ballSet
                 if (synctype == 0) then
-                    paddle_SPEED = ballSet / 10
+                    paddle_SPEED = ballSet
                 end
                 if (synctype == 1) then
-                    paddle_SPEED = ballSpeed / 10
+                    paddle_SPEED = ballSpeed 
                 end
         
                 AI_SPEED = difficultyl / 10
@@ -425,15 +425,15 @@ function goalManager()
                 ballSpeed = ballSet
     
                 if (synctype == 0) then
-                    paddle_SPEED = ballSet / 10
-                    AI_SPEED = ballSet / 10
+                    paddle_SPEED = ballSet 
+                    AI_SPEED = ballSet 
                 end
                 if (synctype == 1) then
-                    paddle_SPEED = ballSpeed / 10
-                    AI_SPEED = ballSpeed / 10
+                    paddle_SPEED = ballSpeed 
+                    AI_SPEED = ballSpeed 
                 end
     
-                AI_SPEED = difficultyl / 10
+                AI_SPEED = difficultyl 
                 
                 if (player1score == ptw) then
                     ball[i]:reset(i)
@@ -488,7 +488,7 @@ function powerAvailability()
                 paddle_SPEED = paddle_SPEED * 2
             end
             if (synctype == 1) then
-                paddle_SPEED = ballSpeed / 10
+                paddle_SPEED = ballSpeed 
             end
             if (synctype == 0) then
                 AI_SPEED = AI_SPEED * 2.2
@@ -538,7 +538,7 @@ function powerAvailability()
                 paddle_SPEED = paddle_SPEED * 2
             end
             if (synctype == 1) then
-                paddle_SPEED = ballSpeed / 10
+                paddle_SPEED = ballSpeed
             end
             if (synctype == 0) then
                 AI_SPEED = AI_SPEED * 2.2
@@ -1094,7 +1094,7 @@ function clientsBaseGame(dt)
                     if (synctype == 0) then
                         paddle_SPEED = paddle_SPEED * 1.10
                     elseif (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
+                        paddle_SPEED = ballSpeed
                     end
                     if (synctype == 0) then
                         AI_SPEED = AI_SPEED * 1.10
@@ -1154,7 +1154,7 @@ function clientsBaseGame(dt)
                         paddle_SPEED = paddle_SPEED * 1.10
                     end
                     if (synctype == 1) then
-                        paddle_SPEED = ballSpeed / 10
+                        paddle_SPEED = ballSpeed
                     end
                     if (synctype == 0) then
                         AI_SPEED = AI_SPEED * 1.10
@@ -1291,5 +1291,6 @@ function clientsBaseGame(dt)
     goalManager()
     powerAvailability()
     player1:update(dt)
+    love.event.quit()
     player2:update(dt)
 end 
