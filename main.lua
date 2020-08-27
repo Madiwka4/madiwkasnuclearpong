@@ -873,6 +873,11 @@ function nettest(dt)
         udp:settimeout(0)
         serverinit = true 
     end 
+    if isAndroid then 
+        if table.empty(touches) then 
+            lastSentKey = "g"
+        end
+    end
     for i = 1, maxBalls do 
         ts = ts + dt 
         if ts > updaterate then 
@@ -983,7 +988,7 @@ function nettest(dt)
 until not data
     if not datawaspassed then  
         datawaspassedtimer = datawaspassedtimer + 1 
-        if datawaspassedtimer > 5 then 
+        if datawaspassedtimer > 10 then 
         confirmation = "D"
         datawaspassedtimer = 0
         end 
@@ -1000,6 +1005,11 @@ function clienttest(dt)
         udp:setpeername(address, port)
         udp:settimeout(0)
         clientinit = true 
+    end
+    if isAndroid then 
+        if table.empty(touches) then 
+            lastSentKey = "g"
+        end
     end
     ts = ts + dt 
     if ts > updaterate then 
@@ -1070,7 +1080,7 @@ function clienttest(dt)
     until not data 
     if not datawaspassed then  
         datawaspassedtimer = datawaspassedtimer + 1 
-        if datawaspassedtimer > 5 then 
+        if datawaspassedtimer > 10 then 
         confirmation = "D"
         datawaspassedtimer = 0
         end 
@@ -1865,12 +1875,16 @@ function selfHost(dt)
     if gts > 0.015 then 
     local data, msg_or_ip, port_or_nil
   local p1data, p2data
+  if table.empty(touches) then 
+    lastSentKey = "g"
+end
   repeat
 
     data, msg_or_ip, port_or_nil = udp:receivefrom()
     if data then
 
       if data == "HELLO" then
+        print("getting pinged")
         requesterip = msg_or_ip
         requesterport = port_or_nil
       else
@@ -1919,6 +1933,7 @@ function selfHost(dt)
                     '|' .. tostring(ball[1].dx) .. 
                     '|' .. tostring(ballSpeed) .. 
                     '|' .. tostring(paddle_SPEED) .. 
+                    '|' .. tostring(player1striken) .. 
                     "|HOST|".. p2ping, player2ip, player2port) 
                     ts = 0
                 end 
@@ -1947,6 +1962,7 @@ function selfHost(dt)
                 '|' .. tostring(ball[1].dx) .. 
                 '|' .. tostring(ballSpeed) .. 
                 '|' .. tostring(paddle_SPEED) .. 
+                '|' .. tostring(player1striken) .. 
                 "|HOST|".. p2ping, player2ip, player2port) 
                 ts = 0
             end 
@@ -1960,11 +1976,11 @@ function selfHost(dt)
             print("ReceivedINFO: " .. p2data)
             confirmation = "N"
             local p = split(p2data, '|')
-            if p[15] then 
-                if tonumber(p[16]) > 90 then 
+            if p[16] then 
+                if tonumber(p[17]) > 90 then 
                     confirmation = "L"
                 end
-                if p[15] ~= "CLIENT" then 
+                if p[16] ~= "CLIENT" then 
                     confirmation = "U"
                 end
             elseif p[1] == "RESPONSE" then 
@@ -1978,7 +1994,7 @@ function selfHost(dt)
                 confirmation = "U"
             end
     
-            if p[15] then 
+            if p[16] then 
             if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
                 ball[1].disabled = false 
                 print("illegal disabling")
@@ -1999,7 +2015,7 @@ function selfHost(dt)
                 gameState, 
                 ball[1].dx, 
                 ballSpeed, 
-                paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
                 print("ACCEPTED")
             else 
             print("DECLINED")
@@ -2019,12 +2035,13 @@ function selfHost(dt)
                     gameState, 
                     ball[1].dx, 
                     ballSpeed, 
-                    paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                    paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
                     print("ACCEPTED")
                 else 
                 print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
                 lastSentKeyClient = p[1]
                 player2.y = tonumber(p[4])
+                player2striken = tonumber(p[15])
                 end 
             end
             end
@@ -2074,7 +2091,7 @@ function love.touchpressed( id, x, y, dx, dy, pressure )
                 lastclick = time
             end
             else 
-                if time <= lastclick + clickInterval and x*DIFFERENCE_X > VIRTUAL_WIDTH-100 then
+                if time <= lastclick + clickInterval and x*DIFFERENCE_X < VIRTUAL_WIDTH-100 then
                     doubleclick2 = true 
                     if gameState == "2serve" then 
                         lastSentKey = "p"

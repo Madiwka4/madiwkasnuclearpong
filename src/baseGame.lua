@@ -668,6 +668,11 @@ function menuDraw()
         end
     end
     if gameState == "touchcontrols" then
+        if doubleclick1 or doubleclick2 then 
+            gameState = "menu"
+            globalState = "menu"
+            resettinggenius()
+        end
         love.graphics.setFont(smallfont)
         love.graphics.printf("The green zones are for moving up and down, double tap the red zone for special attack or to start the serve.", 10, 150, VIRTUAL_WIDTH, "center")
         love.graphics.printf("Swipe from red to green for stopping time", 10, 450, VIRTUAL_WIDTH, "center")
