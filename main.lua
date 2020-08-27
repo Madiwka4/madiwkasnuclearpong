@@ -2062,7 +2062,7 @@ function love.touchpressed( id, x, y, dx, dy, pressure )
             table.insert(touches, newTouch(id, x*DIFFERENCE_X, y*DIFFERENCE_Y))
             local time = love.timer.getTime()
             if x * DIFFERENCE_X < VIRTUAL_WIDTH/2  then 
-            if time <= lastclick + clickInterval and x*DIFFERENCE_X > 50 then
+            if time <= lastclick + clickInterval and x*DIFFERENCE_X > 100 then
                 doubleclick1 = true 
                 if gameState == "1serve" then 
                     lastSentKey = "q"
@@ -2074,7 +2074,7 @@ function love.touchpressed( id, x, y, dx, dy, pressure )
                 lastclick = time
             end
             else 
-                if time <= lastclick + clickInterval and x*DIFFERENCE_X > VIRTUAL_WIDTH-50 then
+                if time <= lastclick + clickInterval and x*DIFFERENCE_X > VIRTUAL_WIDTH-100 then
                     doubleclick2 = true 
                     if gameState == "2serve" then 
                         lastSentKey = "p"
@@ -2143,16 +2143,16 @@ function table.empty (self)
 end
 function sectortouched(sector)
 for i, touch in ipairs(touches) do 
-    if sector == 1 and touch.x > VIRTUAL_WIDTH-60 and touch.y < VIRTUAL_HEIGHT/2 then 
+    if sector == 1 and touch.x > VIRTUAL_WIDTH-100 and touch.y < VIRTUAL_HEIGHT/2 then 
         lastSentKey = p2control.up 
         return true 
-    elseif sector == 2 and touch.x < 60 and touch.y < VIRTUAL_HEIGHT/2 then 
+    elseif sector == 2 and touch.x < 100 and touch.y < VIRTUAL_HEIGHT/2 then 
         lastSentKey = p1control.up
         return true 
-    elseif sector == 3 and touch.x < 60 and touch.y > VIRTUAL_HEIGHT/2 then 
+    elseif sector == 3 and touch.x < 100 and touch.y > VIRTUAL_HEIGHT/2 then 
         lastSentKey = p1control.down
         return true    
-    elseif sector == 4 and touch.x > VIRTUAL_WIDTH-60 and touch.y > VIRTUAL_HEIGHT/2 then 
+    elseif sector == 4 and touch.x > VIRTUAL_WIDTH-100 and touch.y > VIRTUAL_HEIGHT/2 then 
         lastSentKey = p2control.down
         return true
     end 

@@ -1326,7 +1326,7 @@ function clientsBaseGame(dt)
             --love.window.setTitle('Trying to update the ball')
             if timeIsSlow then
                 if ballSpeed > originalSpeed / 3 then
-                    paddle_SPEED = 30
+                    paddle_SPEED = 300
                     ballSpeed = ballSpeed / (1 + (dt * 2))
                 end
                 player1nukescore = player1nukescore - (dt * 50)
@@ -1344,7 +1344,7 @@ function clientsBaseGame(dt)
                 end
                 player2nukescore = player2nukescore - (dt * 50)
                 if player2nukescore < 1 or ball[1].dx < 0 then
-                    paddle_SPEED = 30
+                    paddle_SPEED = 300
                     timeIsSlow2 = false
                     player2reverbav = false
                     ballSpeed = originalSpeed
