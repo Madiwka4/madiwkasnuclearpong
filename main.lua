@@ -9,8 +9,15 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords) {
     return pixel * color;
 }
 ]]
-
+--ANDROID EXLUSIVE VARIABLES
+touches = {}
+doubleclick1 = false 
+doubleclick2 = false 
+hold1 = false 
+hold2 = false 
 debug = true
+androidButtons = {}
+showTouchControls = false 
 --GLOBAL VARIABLES
 frameratecap = 1/60
 realtimer = 0
@@ -87,6 +94,15 @@ p1control = {up = "a", down = "z", super = "s", counter = "x"}
 p2control = {up = ";", down = ".", super = "l", counter = ","}
 synctext = "Independent"
 synctype = 0
+function newTouch(id, x, y)
+    return {
+        id = id, 
+        x = x, 
+        y = y,
+        originalX = x, 
+        originalY = y 
+    }
+end 
 function newButton(text, fn)
     return {
         text = text,
@@ -164,6 +180,53 @@ function love.load()
     light = 0
     image = love.graphics.newImage("Madi.png")
     table.insert(
+        androidButtons,
+        newButton(
+            "H",
+            function()
+                if gameState == "start" then
+                    resettinggenius()
+                    gameState = "menu"
+                    globalState = "menu"
+                    hardmanager()
+                elseif (gameState == "done") then
+                    if (player1score > player2score) then
+                        gameState = "2serve"
+                        potentialnuke1 = 0
+                        potentialnuke2 = 0
+                        striken = 0
+                        if (nuckemodactive == 0) then
+                            areanuclear = 0
+                            nuclearanimation = 3
+                        end
+                        potentialstrike1 = 0
+                        potentialstrike2 = 0
+                        player1nukescore = 0
+                        player2nukescore = 0
+                    else
+                        gameState = "1serve"
+                        resettinggenius()
+                        for i = 1, maxBalls do
+                            ball[i]:reset(i, 1)
+                        end
+                    end
+                else
+                    gameState = "menu"
+                    globalState = "menu"
+                    if (love.math.random(0, 10) == 1) then
+                        TEXT = "Nuclear Ching Chong"
+                    else
+                        TEXT = "Nuclear Pong"
+                    end
+                    resettinggenius()
+                    for i = 1, maxBalls do
+                        ball[i]:reset(i)
+                    end
+                end
+            end
+        )
+    )
+    table.insert(
         editorpicks,
         newButton(
             "C",
@@ -207,6 +270,9 @@ function love.load()
             "Online",
             function()
                 MAP_TYPE = 0
+                if isAndroid then 
+                    love.keyboard.setTextInput( true, 0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT/3)
+                end
                 gameState = "chooseIP"
             end
         )
@@ -244,16 +310,33 @@ function love.load()
             end
         )
     )
-    table.insert(
-        buttons,
-        newButton(
-            "Settings",
-            function()
-                AGAINST_AI = 0
-                gameState = "windowsettings"
-            end
+    if not isAndroid then 
+        table.insert(
+            buttons,
+            newButton(
+                "Settings",
+                function()
+                    AGAINST_AI = 0
+                    gameState = "windowsettings"
+                end
+            )
         )
-    )
+    else 
+        table.insert(
+            buttons,
+            newButton(
+                "Show Controls",
+                function()
+                    if showTouchControls then 
+                        showTouchControls = false 
+                    else 
+                        showTouchControls = true 
+                    end 
+                    gameState = "touchcontrols"
+                end
+            )
+        )
+    end 
     table.insert(
         buttons,
         newButton(
@@ -685,6 +768,11 @@ function love.load()
     ball[4] = eball(VIRTUAL_WIDTH / 2.2, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     ball[5] = eball(VIRTUAL_WIDTH / 2.1, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     myscreen = fullScreener(RESOLUTION_SET, isFullscreen, DIFFERENCE_X, DIFFERENCE_Y)
+    if isAndroid then 
+        myscreen:toggle(VIRTUAL_HEIGHT, VIRTUAL_WIDTH)
+        DIFFERENCE_X = myscreen.c
+        DIFFERENCE_Y = myscreen.d
+    end
     mymenu = mainMenu()
 
     ballSpeed = 200
@@ -802,6 +890,7 @@ function nettest(dt)
             '|' .. tostring(ball[1].dx) .. 
             '|' .. tostring(ballSpeed) .. 
             '|' .. tostring(paddle_SPEED) .. 
+            '|' .. tostring(player1striken) ..
             "|HOST") 
             ts = 0
         end 
@@ -819,11 +908,11 @@ function nettest(dt)
         print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
-        if p[15] then 
-            if tonumber(p[16]) > 90 then 
+        if p[16] then 
+            if tonumber(p[17]) > 90 then 
                 confirmation = "L"
             end
-            if p[15] ~= "CLIENT" then 
+            if p[16] ~= "CLIENT" then 
                 confirmation = "U"
             end
         elseif p[1] == "RESPONSE" then 
@@ -837,7 +926,7 @@ function nettest(dt)
             confirmation = "U"
         end
 
-        if p[15] then 
+        if p[16] then 
         if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
             ball[1].disabled = false 
             print("illegal disabling")
@@ -858,7 +947,8 @@ function nettest(dt)
             gameState, 
             ball[1].dx, 
             ballSpeed, 
-            paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+            paddle_SPEED,
+            player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
             print("ACCEPTED")
         else 
         print("DECLINED")
@@ -878,11 +968,12 @@ function nettest(dt)
                 gameState, 
                 ball[1].dx, 
                 ballSpeed, 
-                paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
                 print("ACCEPTED")
             else 
             print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
             lastSentKeyClient = p[1]
+            player2striken = tonumber(p[15])
             player2.y = tonumber(p[4])
             end 
         end
@@ -925,7 +1016,8 @@ function clienttest(dt)
         '|' .. gameState .. 
         '|' .. tostring(ball[1].dx) .. 
         '|' .. tostring(ballSpeed) .. 
-        '|' .. tostring(paddle_SPEED) .. 
+        '|' .. tostring(paddle_SPEED) ..
+        '|' .. tostring(player2striken) .. 
         "|CLIENT")
         ts = 0 
     end
@@ -943,28 +1035,29 @@ function clienttest(dt)
         print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
-        if p[15] then 
-            if p[15] ~= "HOST" then 
+        if p[16] then 
+            if p[16] ~= "HOST" then 
                 confirmation = "U"
             end
-            if tonumber(p[16]) > 90 then 
+            if tonumber(p[17]) > 90 then 
                 confirmation = "L"
             end 
             for i = 1, maxBalls do 
             local die = tonumber(p[2])
             if (ball[i].x <= VIRTUAL_WIDTH/2) then
                 if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
-                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken  = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
                 print("ACCEPTED")
                 else 
                 print("DECLINED")
                 end
             else 
                 if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
-                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14])
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
                 print("REROUTED")
                 else lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
+                player1striken = tonumber(p[15])
                 print("ENFORCED")
                 end
             end 
@@ -1101,7 +1194,10 @@ function dangerChecker() --CHECK IF CONTROLS ARE DUPLICATING
     end
 end
 function love.keypressed(key)
-    lastSentKey = key 
+    if not isAndroid then
+        lastSentKey = key  
+    end
+    
     if gameState == "chooseIP" then 
         if key == "backspace" then
             -- get the byte offset to the last UTF-8 character in the string.
@@ -1165,8 +1261,10 @@ function love.keypressed(key)
         end
     end
     if key == "escape" then
-        TEXT = "Escape Key"
-        love.event.quit()
+        if not isAndroid then 
+            TEXT = "Escape Key"
+            love.event.quit()
+        end 
     elseif key == "enter" or key == "return" then
         if gameState == "start" then
             resettinggenius()
@@ -1197,7 +1295,7 @@ function love.keypressed(key)
         else
             gameState = "menu"
             globalState = "menu"
-            if (love.math.random(0, 10) == 1) then
+            if (love.math.random(0, 20) == 1) then
                 TEXT = "Nuclear Ching Chong"
             else
                 TEXT = "Nuclear Pong"
@@ -1212,7 +1310,7 @@ end
 
 function love.keyreleased(key)
     currentKey = " "
-        if lastSentKey == key then
+        if lastSentKey == key and not isAndroid then
             lastSentKey = "g"
         end
 end
@@ -1546,9 +1644,13 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
     if (gameState == "1serve") then
         updateTEXT = ""
         if (gameMode ~= "practice") then
-            TEXT = "PLAYER 1, serve!(q)"
+            if isAndroid then 
+                TEXT = "PLAYER 1, serve!(double-click)"
+            else
+                TEXT = "PLAYER 1, serve!(q)"
+            end
         end
-        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or (globalState == "clienttest" and lastSentKeyP1 == "q")) then
+        if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or (globalState == "clienttest" and lastSentKeyP1 == "q") or doubleclick1) then
             TEXT = "Lets Begin!"
             ball_DIR = 1
             if maxBalls == 1 then 
@@ -1563,7 +1665,13 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         end
     end
     if (gameState == "2serve") then
-        TEXT = "PLAYER 2, serve!(p)"
+        if (gameMode ~= "practice") then
+            if isAndroid then 
+                TEXT = "PLAYER 2, serve!(double-click)"
+            else
+                TEXT = "PLAYER 2, serve!(p)"
+            end
+        end
         if (AGAINST_AI == 1) then
             TEXT = ""
             ball_DIR = -1
@@ -1578,7 +1686,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
             gameState = "play"
             
         end
-        if (((globalState == "nettest" and lastSentKeyClient == "p") or ((globalState ~= "nettest") and love.keyboard.isDown("p")))and AGAINST_AI == 0) then
+        if (((globalState == "nettest" and lastSentKeyClient == "p") or ((globalState ~= "nettest") and love.keyboard.isDown("p")) or doubleclick2)and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
             ball_DIR = -1
             if maxBalls == 1 then 
@@ -1942,3 +2050,112 @@ function selfHost(dt)
     end
 end
 end
+local lastclick = 0
+local clickInterval = 0.4
+function love.touchpressed( id, x, y, dx, dy, pressure )
+    if isAndroid then 
+        local existsingID = touchExists(id)
+        if existsingID ~= -1 then 
+            touches[existsingID].x = x * DIFFERENCE_X
+            touches[existsingID].y = y * DIFFERENCE_Y
+        else 
+            table.insert(touches, newTouch(id, x*DIFFERENCE_X, y*DIFFERENCE_Y))
+            local time = love.timer.getTime()
+            if x * DIFFERENCE_X < VIRTUAL_WIDTH/2  then 
+            if time <= lastclick + clickInterval and x*DIFFERENCE_X > 50 then
+                doubleclick1 = true 
+                if gameState == "1serve" then 
+                    lastSentKey = "q"
+                else 
+                    lastSentKey = p1control.super 
+                end 
+            else
+                doubleclick1 = false 
+                lastclick = time
+            end
+            else 
+                if time <= lastclick + clickInterval and x*DIFFERENCE_X > VIRTUAL_WIDTH-50 then
+                    doubleclick2 = true 
+                    if gameState == "2serve" then 
+                        lastSentKey = "p"
+                    else 
+                        lastSentKey = p2control.super 
+                    end 
+                else
+                    doubleclick2 = false 
+                    lastclick = time
+                end
+            end
+        end
+    end 
+end 
+function love.touchreleased( id, x, y, dx, dy, pressure )
+    if isAndroid then 
+        if gameState == "start" then 
+            resettinggenius()
+            gameState = "menu"
+            globalState = "menu"
+            hardmanager()
+
+        end 
+        local existsingID = touchExists(id)
+        if existsingID ~= -1 then 
+            table.remove(touches, existsingID)
+        end
+    end
+end 
+function love.touchmoved( id, x, y, dx, dy, pressure )
+    if isAndroid then 
+        local existsingID = touchExists(id)
+        if existsingID ~= -1 then 
+            touches[existsingID].x = x * DIFFERENCE_X
+            touches[existsingID].y = y * DIFFERENCE_Y
+            if touches[existsingID].originalX - touches[existsingID].x > 200 and 
+            touches[existsingID].originalX < VIRTUAL_WIDTH/2 then 
+                hold1 = true 
+                lastSentKey = p1control.counter 
+            else
+                hold1 = false
+            end
+            if touches[existsingID].x - touches[existsingID].originalX > 200 and 
+            touches[existsingID].originalX > VIRTUAL_WIDTH/2 then 
+                hold2 = true 
+                lastSentKey = p2control.counter 
+            else
+                hold2 = false
+            end
+        end
+    end 
+end 
+function touchExists(ID)
+    for i, touch in ipairs(touches) do 
+        if touch.id == ID then 
+            return i 
+        end 
+    end
+    return -1
+end 
+function table.empty (self)
+    for _, _ in pairs(self) do
+        return false
+    end
+    return true
+end
+function sectortouched(sector)
+for i, touch in ipairs(touches) do 
+    if sector == 1 and touch.x > VIRTUAL_WIDTH-60 and touch.y < VIRTUAL_HEIGHT/2 then 
+        lastSentKey = p2control.up 
+        return true 
+    elseif sector == 2 and touch.x < 60 and touch.y < VIRTUAL_HEIGHT/2 then 
+        lastSentKey = p1control.up
+        return true 
+    elseif sector == 3 and touch.x < 60 and touch.y > VIRTUAL_HEIGHT/2 then 
+        lastSentKey = p1control.down
+        return true    
+    elseif sector == 4 and touch.x > VIRTUAL_WIDTH-60 and touch.y > VIRTUAL_HEIGHT/2 then 
+        lastSentKey = p2control.down
+        return true
+    end 
+end
+return false 
+end 

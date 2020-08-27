@@ -21,17 +21,17 @@ function basegame(dt)
         if (AGAINST_AI == 1) then
             AI(player2, maxBalls, AI_LEVEL)
         end
-        if (love.keyboard.isDown(p1control.up)) then
+        if (love.keyboard.isDown(p1control.up) or sectortouched(2)) then
             player1.dy = (paddle_SPEED + p1bonus) * -1
-        elseif (love.keyboard.isDown(p1control.down)) then
+        elseif (love.keyboard.isDown(p1control.down) or sectortouched(3)) then
             player1.dy = paddle_SPEED + p1bonus
         else
             player1.dy = 0
         end
         if (AGAINST_AI == 0) then
-            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up)) ) then
+            if ((globalState ~= "nettest" and (love.keyboard.isDown(p2control.up) or sectortouched(1))) ) then
                 player2.dy = (paddle_SPEED + p2bonus) * -1
-            elseif ((globalState ~= "nettest" and love.keyboard.isDown(p2control.down))) then
+            elseif ((globalState ~= "nettest" and (love.keyboard.isDown(p2control.down) or sectortouched(4)))) then
                 player2.dy = paddle_SPEED + p2bonus
             elseif (globalState ~= "nettest") then 
                 player2.dy = 0
@@ -108,7 +108,7 @@ function basegame(dt)
                 ball[i].dx = -ball[i].dx
                 ball[i].x = player1.x + 30
 
-                if (love.keyboard.isDown(p1control.up)) then
+                if (love.keyboard.isDown(p1control.up) or sectortouched(2)) then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = -1
@@ -121,7 +121,7 @@ function basegame(dt)
                     elseif select == 5 then
                         ball[i].dy = -2
                     end
-                elseif love.keyboard.isDown(p1control.down) then
+                elseif love.keyboard.isDown(p1control.down) or sectortouched(3) then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = 1
@@ -239,7 +239,7 @@ function basegame(dt)
                 ball[i].dx = -ball[i].dx
                 ball[i].x = player2.x - 30
 
-                if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.up) ) or AI_SPEED < 0 or lastSentKeyClient == p2control.up) then
+                if ((globalState ~= "nettest" and (love.keyboard.isDown(p2control.up) or sectortouched(1)) ) or AI_SPEED < 0 or lastSentKeyClient == p2control.up) then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = -1
@@ -252,7 +252,7 @@ function basegame(dt)
                     elseif select == 5 then
                         ball[i].dy = -2
                     end
-                elseif (globalState ~= "nettest" and love.keyboard.isDown(p2control.down)) or AI_SPEED > 0 or lastSentKeyClient == p2control.down then
+                elseif (globalState ~= "nettest" and (love.keyboard.isDown(p2control.down)or sectortouched(4))) or AI_SPEED > 0 or lastSentKeyClient == p2control.down then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = 1
@@ -463,20 +463,20 @@ end
 function powerAvailability()
     if (player1nukescore >= 20 and player1nukescore < 140) then
         potentialstrike1 = 1
-        if (((globalState ~= "clienttest" and love.keyboard.isDown(p1control.super)) or (globalState == "clienttest" and lastSentKeyP1 == p1control.super)) ) then
+        if (((globalState ~= "clienttest" and (love.keyboard.isDown(p1control.super) or doubleclick1 == true)) or (globalState == "clienttest" and lastSentKeyP1 == p1control.super)) ) then
             player1striken = 1
             player1reverbav = 0
         end
     end
     if (player1nukescore >= 140) and timeIsSlow2 == false and timeIsSlow == false and (maxBalls > 1 or (ball[1].dx < 0 and ball[1].x < VIRTUAL_WIDTH/2))then
         player1reverbav = 1
-        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.counter))) then
+        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.counter) or (globalState ~= "clienttest" and (love.keyboard.isDown(p1control.counter) or hold1 == true))) then
             powerControl(1, "special")
         end
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((globalState == "clienttest" and lastSentKeyP1 == p1control.super)or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if ((globalState == "clienttest" and (lastSentKeyP1 == p1control.super or doubleclick1 == true))or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -505,7 +505,7 @@ function powerAvailability()
     if (player2nukescore >= 20 and player2nukescore <= 140) then
         potentialstrike2 = 1
         if (AGAINST_AI == 0) then
-            if ((globalState ~= "nettest" and love.keyboard.isDown(p2control.super)) or lastSentKeyClient == p2control.super ) then
+            if ((globalState ~= "nettest" and (love.keyboard.isDown(p2control.super) or doubleclick2)) or lastSentKeyClient == p2control.super ) then
                 player2striken = 1
                 player2reverbav = 0
             end
@@ -513,7 +513,7 @@ function powerAvailability()
     end
     if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and (maxBalls > 1 or (ball[1].dx > 0 and ball[1].x < VIRTUAL_WIDTH/2)) then
         player2reverbav = 1
-        if (globalState ~= "nettest" and love.keyboard.isDown(p2control.counter)) or lastSentKeyClient == p2control.counter then
+        if (globalState ~= "nettest" and (love.keyboard.isDown(p2control.counter) or hold2)) or lastSentKeyClient == p2control.counter then
             sounds["time"]:play()
             player2reverbav = false
             timeIsSlow2 = true
@@ -526,7 +526,7 @@ function powerAvailability()
     end
     if (player2nukescore >= 200) then
         potentialnuke2 = 1
-        if (((globalState ~= "nettest" and love.keyboard.isDown(p2control.super)) or lastSentKeyClient == p2control.super)) and AGAINST_AI == 0 then
+        if (((globalState ~= "nettest" and (love.keyboard.isDown(p2control.super) or doubleclick2)) or lastSentKeyClient == p2control.super)) and AGAINST_AI == 0 then
             sounds["nuke"]:play()
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
@@ -667,6 +667,11 @@ function menuDraw()
             love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
         end
     end
+    if gameState == "touchcontrols" then
+        love.graphics.setFont(smallfont)
+        love.graphics.printf("The green zones are for moving up and down, double tap the red zone for special attack or to start the serve.", 10, 150, VIRTUAL_WIDTH, "center")
+        love.graphics.printf("Swipe from red to green for stopping time", 10, 450, VIRTUAL_WIDTH, "center")
+    end
     if gameState == "windowsettings" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, settings, sounds, "right")
         love.keyboard.mouseisReleased = false
@@ -689,6 +694,17 @@ function menuDraw()
     end
     if gameState == "chooseIP" then
         IPselect = {}
+        if isAndroid then 
+        table.insert(
+            IPselect,
+            newButton(
+                IPnew,
+                function()
+                    love.keyboard.setTextInput( true, 0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT/3)
+                end
+            )
+        )
+        end 
         table.insert(
             IPselect,
             newButton(
@@ -744,7 +760,10 @@ function menuDraw()
             love.graphics.printf("SERVER FULL", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         end
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, IPselect, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+        if not isAndroid then 
         love.graphics.printf(IPnew, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
+        end 
         love.keyboard.mouseisReleased = false
     end
     if gameState == "menu" then
@@ -768,7 +787,11 @@ function menuDraw()
         love.graphics.translate(VIRTUAL_WIDTH * 0.4, VIRTUAL_HEIGHT * 0.5)
         love.graphics.rotate(rotation)
         love.graphics.setFont(smallfont)
-        love.graphics.print("Press Enter to Start", WINDOW_WIDTH / -10, VIRTUAL_HEIGHT / 8)
+        if isAndroid then 
+            love.graphics.print("Tap to Start", WINDOW_WIDTH / -10, VIRTUAL_HEIGHT / 8)
+        else
+            love.graphics.print("Press Enter to Start", WINDOW_WIDTH / -10, VIRTUAL_HEIGHT / 8)
+        end 
         love.graphics.setColor(255, 255, 255, 255)
         love.graphics.pop()
     end
@@ -791,10 +814,14 @@ function baseDraw()
         if gameState ~= 'animation' then
            --print("Drawing notanimtaion") 
             love.graphics.setFont(scorefont)
+            if isAndroid then 
+                androidDraw()
+            end
             menuDraw()
         end
     end
     if globalState == 'base' or globalState == 'reverse' or globalState == 'nettest' or globalState == 'clienttest' then 
+
         love.graphics.setFont(smallfont)
         if gameState == 'nuclearExplosion' then 
             nuclearDraw()
@@ -803,12 +830,29 @@ function baseDraw()
            print("Drawing normally")
             normalDraw()
         end 
-
+        if isAndroid then 
+            androidDraw()
+            love.keyboard.mouseisReleased = false
+        end
     end 
 
 
 end 
-
+function androidDraw()
+--HOME BUTTON HERE
+mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, androidButtons, sounds, "android")
+if showTouchControls then 
+    love.graphics.setColor(15/255, 255/255, 15/255, 0.5)
+    love.graphics.rectangle("fill", 0, 0, 50, VIRTUAL_HEIGHT)
+    love.graphics.setColor(15/255, 255/255, 15/255, 0.5)
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH-50, 0, 50, VIRTUAL_HEIGHT)
+    love.graphics.setColor(255/255, 15/255, 15/255, 0.5)
+    love.graphics.rectangle("fill", 50, 0, VIRTUAL_WIDTH/2-50, VIRTUAL_HEIGHT)
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH/2, 0, VIRTUAL_WIDTH/2-50, VIRTUAL_HEIGHT)
+    love.graphics.setColor(0, 0, 0, 0.5)
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH/2-5, 0, 10, VIRTUAL_HEIGHT)
+end 
+end 
 function renderEditor()
     if not blockinput then
         love.graphics.setColor(1, 0, 0, 1)
@@ -1048,9 +1092,9 @@ function clientsBaseGame(dt)
         player1.dy = 0
        -- print("stopping player")
     end
-    if ((love.keyboard.isDown(p2control.up))) then
+    if ((love.keyboard.isDown(p2control.up) or sectortouched(1))) then
         player2.dy = (paddle_SPEED + p2bonus) * -1
-    elseif ((love.keyboard.isDown(p2control.down))) then
+    elseif ((love.keyboard.isDown(p2control.down)) or sectortouched(4)) then
         player2.dy = paddle_SPEED + p2bonus
     else
         player2.dy = 0
@@ -1205,7 +1249,7 @@ function clientsBaseGame(dt)
                 player2nukescore = player2nukescore + 10
                 ball[i].dx = -ball[i].dx
                 ball[i].x = player2.x - 30
-                if ((love.keyboard.isDown(p2control.up))) then
+                if ((love.keyboard.isDown(p2control.up)) or sectortouched(1)) then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = -1
@@ -1218,7 +1262,7 @@ function clientsBaseGame(dt)
                     elseif select == 5 then
                         ball[i].dy = -2
                     end
-                elseif (love.keyboard.isDown(p2control.down))then
+                elseif (love.keyboard.isDown(p2control.down) or sectortouched(4))then
                     select = math.random(1, 5)
                     if select == 1 then
                         ball[i].dy = 1

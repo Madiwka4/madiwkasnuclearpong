@@ -52,9 +52,17 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
         elseif location == 'control' then
             locationx = (VIRTUAL_WIDTH * 0.2)
             locationy = (VIRTUAL_HEIGHT* 0.5)
+        elseif location == "android" then 
+            locationx = (VIRTUAL_WIDTH * 0.5)
+            locationy = (10)
         end
-        local ev_button_width = VIRTUAL_WIDTH * (1/3)
-        local ev_BUTTON_HEIGHT = 50
+
+            local ev_button_width = VIRTUAL_WIDTH * (1/3)
+            local ev_BUTTON_HEIGHT = 50
+            if location == "android" then 
+                ev_button_width = 30
+                ev_BUTTON_HEIGHT = 30
+            end 
         local margin = 16
         local hot = false
         local cursor_y = 0
