@@ -10,6 +10,7 @@ function eball:init(x, y, width, height)
 		self.dy = math.random(-1, 1)
 		self.dx = 1
 		self.disabled = false
+		
 end
 	
 function eball:collides(paddle)
@@ -98,9 +99,9 @@ function eball:update(dt)
 	else 
 		potentialnuke2 = 0
 	end
-	print("ATTEMP TO UPDATE BALL")
+	--print("ATTEMP TO UPDATE BALL")
 	if self.disabled == false then 
-		print("BALL IS BEING AUTO-UPDATED")
+		--print("BALL IS BEING AUTO-UPDATED" .. ballSpeed .. " " .. self.dx .. " " .. self.dy)
     self.x = self.x + ballSpeed * self.dx * dt 
 	self.y = self.y + ballSpeed * self.dy * dt
 	end

@@ -7,11 +7,11 @@ local diseffectRange = {[0] = 0,[1] = 0}
 function superanimator(type, param)
     if type == 'tensehit' then 
         if param == 1 then
-            print("Animation called!")
+           --print("Animation called!")
             player1anim = true 
         end
         if param == 2 then 
-            print("Animation called!")
+           --print("Animation called!")
             player2anim = true 
         end
     end
@@ -37,14 +37,14 @@ function staticanimatorcounter(dt)
         end
     end
     if (player1anim) then 
-        print("Effect range: " .. effectRange[0])
+       --print("Effect range: " .. effectRange[0])
         effectRange[0] = effectRange[0] + dt*24
         if effectRange[0] > 7500/ballSpeed then 
             player1animend = true
         end
     end 
     if player1animend then 
-        print("DISEffect range: " .. diseffectRange[0])
+       --print("DISEffect range: " .. diseffectRange[0])
         diseffectRange[0] = diseffectRange[0] + dt*24
         if diseffectRange[0] > 50 then 
             effectRange[0] = 0
@@ -54,14 +54,14 @@ function staticanimatorcounter(dt)
         end 
     end
     if (player2anim) then 
-        print("Effect range: " .. effectRange[1])
+       --print("Effect range: " .. effectRange[1])
         effectRange[1] = effectRange[1] + dt*24
         if effectRange[1] > 7500/ballSpeed then 
             player2animend = true
         end
     end 
     if player2animend then 
-        print("DISEffect range: " .. diseffectRange[1])
+       --print("DISEffect range: " .. diseffectRange[1])
         diseffectRange[1] = diseffectRange[1] + dt*24
         if diseffectRange[1] > 50 then 
             effectRange[1] = 0

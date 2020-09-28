@@ -34,6 +34,7 @@ blockinput = false
 wall1width = 30
 nuclearanimation = 3
 easternum = 0
+qq = 0 
 ball_DIR = 0
 updaterate = 0.015
 RED = 255
@@ -187,6 +188,9 @@ function love.load()
                 if gameState == "start" then
                     resettinggenius()
                     gameState = "menu"
+                    ball[1].dx = 1
+                    ball_DIR = 1
+                    ball[1].dy = 1
                     globalState = "menu"
                     hardmanager()
                 elseif (gameState == "done") then
@@ -212,6 +216,9 @@ function love.load()
                     end
                 else
                     gameState = "menu"
+                    ball[1].dx = 1
+                    ball[1].dy = 1
+                    ball_DIR = 1
                     globalState = "menu"
                     if (love.math.random(0, 10) == 1) then
                         TEXT = "Nuclear Ching Chong"
@@ -648,7 +655,7 @@ function love.load()
             function()
                 speedSetter("reset")
                 gameState = "menu"
-        
+                
             end
         )
     )
@@ -809,7 +816,8 @@ function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
     
     staticanimatorcounter(dt)
-    musicController('norm', 1)
+    player1.goal = -1
+    player2.goal = -1
     if gameState == "chooseIP" then 
         checkCurrentServer(dt)
     end
@@ -818,11 +826,18 @@ function love.update(dt)
     end
     if globalState == "base" then
         basegame(dt)
+        
     end
     if globalState == "menu" then
         debugCheck(dt)
+        if gameState ~= "animation" then 
+            menuDemo(dt)
+        end 
     end
-    
+    if gameState ~= "animation" then 
+        musicController('norm', 1)
+        
+    end
     if globalState == "nettest" then 
         --print("Confcode: " .. confirmation)
         if confirmation == "N" then 
@@ -863,11 +878,11 @@ function love.textinput(t)
     end 
 end
 function nettest(dt)
-    print("nettest running")
+   --print("nettest running")
     if serverinit == false then 
         local socket = require "socket"
         local address, port = IP, 12345
-        print(address)
+       --print(address)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
@@ -896,6 +911,7 @@ function nettest(dt)
             '|' .. tostring(ballSpeed) .. 
             '|' .. tostring(paddle_SPEED) .. 
             '|' .. tostring(player1striken) ..
+            '|' .. tostring(areanuclear) ..
             "|HOST") 
             ts = 0
         end 
@@ -906,18 +922,18 @@ function nettest(dt)
     local datawaspassed = false 
     repeat 
         datanumtest = datanumtest + 1
-        print("LATENCY: " .. tostring(datanumtest))
+       --print("LATENCY: " .. tostring(datanumtest))
     data = udp:receive()
     if data then
         datawaspassed = true 
-        print("ReceivedINFO: " .. data)
+       --print("ReceivedINFO: " .. data)
         confirmation = "N"
         local p = split(data, '|')
-        if p[16] then 
-            if tonumber(p[17]) > 90 then 
+        if p[17] then 
+            if tonumber(p[18]) > 90 then 
                 confirmation = "L"
             end
-            if p[16] ~= "CLIENT" then 
+            if p[17] ~= "CLIENT" then 
                 confirmation = "U"
             end
         elseif p[1] == "RESPONSE" then 
@@ -931,10 +947,10 @@ function nettest(dt)
             confirmation = "U"
         end
 
-        if p[16] then 
+        if p[17] then 
         if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
             ball[1].disabled = false 
-            print("illegal disabling")
+           --print("illegal disabling")
         end
         if gameState ~= "1serve" then 
         if (ball[1].x > VIRTUAL_WIDTH/2) then 
@@ -953,10 +969,11 @@ function nettest(dt)
             ball[1].dx, 
             ballSpeed, 
             paddle_SPEED,
-            player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-            print("ACCEPTED")
+            player2striken, 
+            areanuclear = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+           --print("ACCEPTED")
         else 
-        print("DECLINED")
+       --print("DECLINED")
         end
         else  
             if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
@@ -973,10 +990,11 @@ function nettest(dt)
                 gameState, 
                 ball[1].dx, 
                 ballSpeed, 
-                paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-                print("ACCEPTED")
+                paddle_SPEED, player2striken,
+                areanuclear = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+               --print("ACCEPTED")
             else 
-            print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
+           --print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
             lastSentKeyClient = p[1]
             player2striken = tonumber(p[15])
             player2.y = tonumber(p[4])
@@ -1028,6 +1046,7 @@ function clienttest(dt)
         '|' .. tostring(ballSpeed) .. 
         '|' .. tostring(paddle_SPEED) ..
         '|' .. tostring(player2striken) .. 
+        '|' .. tostring(areanuclear) ..
         "|CLIENT")
         ts = 0 
     end
@@ -1036,17 +1055,17 @@ function clienttest(dt)
     local datawaspassed = false 
     repeat 
         datanumtest = datanumtest + 1
-        print("LATENCY: " .. tostring(datanumtest))
+       --print("LATENCY: " .. tostring(datanumtest))
         data = udp:receive()
         
     if data then
-        print("RECEIVED DATA: " .. data)
+       --print("RECEIVED DATA: " .. data)
         datawaspassed = true 
-        print("SENT TO SERVER:" ..  lastSentKey)
+       --print("SENT TO SERVER:" ..  lastSentKey)
         confirmation = "N"
         local p = split(data, '|')
-        if p[16] then 
-            if p[16] ~= "HOST" then 
+        if p[17] then 
+            if p[18] ~= "HOST" then 
                 confirmation = "U"
             end
             if tonumber(p[17]) > 90 then 
@@ -1056,19 +1075,19 @@ function clienttest(dt)
             local die = tonumber(p[2])
             if (ball[i].x <= VIRTUAL_WIDTH/2) then
                 if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
-                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken  = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-                print("ACCEPTED")
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken, areanuclear  = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+               --print("ACCEPTED")
                 else 
-                print("DECLINED")
+               --print("DECLINED")
                 end
             else 
                 if tonumber(p[9]) <= VIRTUAL_WIDTH/2 then 
-                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-                print("REROUTED")
+                lastSentKeyClient, ball[i].dy, player1.y, player1score, player2score, player1nukescore, player2nukescore, ball[i].x, ball[i].y, gameState, ball[i].dx, ballSpeed, paddle_SPEED, player1striken, areanuclear = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+               --print("REROUTED")
                 else lastSentKeyClient = p[1] 
                 player1.y = tonumber(p[4])
                 player1striken = tonumber(p[15])
-                print("ENFORCED")
+               --print("ENFORCED")
                 end
             end 
             end
@@ -1076,7 +1095,7 @@ function clienttest(dt)
             confirmation = "U"
         end 
     end
-    print("GOT: " .. lastSentKeyClient)
+   --print("GOT: " .. lastSentKeyClient)
     until not data 
     if not datawaspassed then  
         datawaspassedtimer = datawaspassedtimer + 1 
@@ -1279,6 +1298,8 @@ function love.keypressed(key)
         if gameState == "start" then
             resettinggenius()
             gameState = "menu"
+            ball[1].dx = 1
+            ball[1].dy = 1
             globalState = "menu"
             hardmanager()
         elseif (gameState == "done") then
@@ -1304,6 +1325,8 @@ function love.keypressed(key)
             end
         else
             gameState = "menu"
+            ball[1].dx = 1
+            ball[1].dy = 1
             globalState = "menu"
             if (love.math.random(0, 20) == 1) then
                 TEXT = "Nuclear Ching Chong"
@@ -1599,7 +1622,10 @@ function love.draw(dt)
             love.graphics.printf("INTERNAL SERVER WAITING", 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
             love.graphics.printf(myip, 0, VIRTUAL_HEIGHT / 2 + 120, VIRTUAL_WIDTH, "center")
         end
-        
+        if isAndroid then 
+            androidDraw()
+            love.keyboard.mouseisReleased = false
+        end
     simpleScale.unSet()
 end
 
@@ -1662,6 +1688,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         end
         if ((globalState ~= "clienttest" and love.keyboard.isDown("q")) or (globalState == "clienttest" and lastSentKeyP1 == "q") or doubleclick1) then
             TEXT = "Lets Begin!"
+            doubleclick1 = false 
             ball_DIR = 1
             if maxBalls == 1 then 
                 ball[1]:reset(1, 1)
@@ -1684,6 +1711,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         end
         if (AGAINST_AI == 1) then
             TEXT = ""
+            doubleclick2 = false 
             ball_DIR = -1
             if maxBalls == 1 then 
                 ball[2]:reset(i, 2)
@@ -1698,6 +1726,7 @@ function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SE
         end
         if (((globalState == "nettest" and lastSentKeyClient == "p") or ((globalState ~= "nettest") and love.keyboard.isDown("p")) or doubleclick2)and AGAINST_AI == 0) then
             TEXT = "Lets Begin"
+            doubleclick2 = false 
             ball_DIR = -1
             if maxBalls == 1 then 
                 ball[1]:reset(1, 2)
@@ -1757,6 +1786,9 @@ function resettinggenius()
     ts = 0 
     originalSpeed = 200
     gameState = "menu"
+    ball[1].dx = 1
+    ball_DIR = 1
+    ball[1].dy = 1
     globalState = "menu"
     gameMode = "normal"
     player1.height = 100
@@ -1795,7 +1827,7 @@ end
 function ballsAlive()
     for i = 1, maxBalls do 
         if ball[i].disabled == false then 
-            print("Ball " .. i .. " is not disabled")
+           --print("Ball " .. i .. " is not disabled")
         return true 
         end
     end 
@@ -1815,32 +1847,32 @@ function checkCurrentServer(dt)
     end 
     if GetIPType(IP) == 1 then 
     if dserverinit == false then 
-        print("Switching IP")
+       --print("Switching IP")
         socket = require "socket"
         address, port = IP, 12345
-        print(address)
+       --print(address)
         udp = socket.udp()
         udp:setpeername(address, port)
         udp:settimeout(0)
         dserverinit = true 
     end 
-    if IP ~= address then dserverinit = false print(IP .. " doesnt equal " .. address)
+    if IP ~= address then dserverinit = false--print(IP .. " doesnt equal " .. address)
     else 
     ts = ts + dt
     --print(ts)
     if ts > checkrate then 
         status = "offline"
-        print("sent ping")
+       --print("sent ping")
         udp:send("HELLO")
     local data
     data = udp:receive()
     if data then 
-        print("got answer!")
+       --print("got answer!")
         local p = split(data, '|')
         status = p[1]
-        print("answer is " .. status)
+       --print("answer is " .. status)
     else 
-        print("no response!")
+       --print("no response!")
     end
     ts = 0 
     end 
@@ -1859,7 +1891,7 @@ local p2ping = 0
 local requesterip 
 local requresterport
 function selfHost(dt)
-    print("Server running")
+   --print("Server running")
     if not hostinit then 
         local socket = require('socket')
         udp = socket.udp()
@@ -1884,11 +1916,11 @@ end
     if data then
 
       if data == "HELLO" then
-        print("getting pinged")
+       --print("getting pinged")
         requesterip = msg_or_ip
         requesterport = port_or_nil
       else
-        print(string.sub(data,1,1) .. "Playerlist: " .. player1ip .. " " .. player2ip)
+       --print(string.sub(data,1,1) .. "Playerlist: " .. player1ip .. " " .. player2ip)
         if player2ip == msg_or_ip then
           p2data = data .. '|' .. p2ping
           p2ping = 0
@@ -1898,9 +1930,9 @@ end
             p2data = data .. '|' ..  p2ping
             p2ping = 0
             player2port = port_or_nil
-            print("CONNECTED: PLAYER 2 FROM: " .. player2ip)
+           --print("CONNECTED: PLAYER 2 FROM: " .. player2ip)
           elseif (player1ip ~= msg_or_ip and player2ip ~= msg_or_ip) then
-            print("Lobby Full!" .. player1ip .. player2ip)
+           --print("Lobby Full!" .. player1ip .. player2ip)
           end
         end
 
@@ -1913,7 +1945,7 @@ end
     if player2ip == "none" then 
         confirmation = "S"
     else 
-        print("Player2: " .. player2ip)
+       --print("Player2: " .. player2ip)
       p2ping = p2ping + 1
       if p2ping > 100 then
             for i = 1, maxBalls do 
@@ -1934,11 +1966,12 @@ end
                     '|' .. tostring(ballSpeed) .. 
                     '|' .. tostring(paddle_SPEED) .. 
                     '|' .. tostring(player1striken) .. 
+                    '|' .. tostring(areanuclear) ..
                     "|HOST|".. p2ping, player2ip, player2port) 
                     ts = 0
                 end 
             end 
-        print("PLAYER 2 DISCONNECTED")
+       --print("PLAYER 2 DISCONNECTED")
         p2data = nil
         player2ip = "none"
         player2port = nil
@@ -1963,24 +1996,25 @@ end
                 '|' .. tostring(ballSpeed) .. 
                 '|' .. tostring(paddle_SPEED) .. 
                 '|' .. tostring(player1striken) .. 
+                '|' .. tostring(areanuclear) ..
                 "|HOST|".. p2ping, player2ip, player2port) 
                 ts = 0
             end 
         end 
-      print("SENT TO " .. player2ip .. ":" .. player2port ..  " : " ..lastSentKey)
+     --print("SENT TO " .. player2ip .. ":" .. player2port ..  " : " ..lastSentKey)
     end
     local datanumtest = 0
     local datawaspassed = false 
     if p2data and player1port then
             datawaspassed = true 
-            print("ReceivedINFO: " .. p2data)
+           --print("ReceivedINFO: " .. p2data)
             confirmation = "N"
             local p = split(p2data, '|')
-            if p[16] then 
-                if tonumber(p[17]) > 90 then 
+            if p[17] then 
+                if tonumber(p[18]) > 90 then 
                     confirmation = "L"
                 end
-                if p[16] ~= "CLIENT" then 
+                if p[17] ~= "CLIENT" then 
                     confirmation = "U"
                 end
             elseif p[1] == "RESPONSE" then 
@@ -1994,10 +2028,10 @@ end
                 confirmation = "U"
             end
     
-            if p[16] then 
+            if p[17] then 
             if ball[1].disabled and ball[1].x > 20 and ball[1].x < VIRTUAL_WIDTH - 20 then 
                 ball[1].disabled = false 
-                print("illegal disabling")
+               --print("illegal disabling")
             end
             if gameState ~= "1serve" then 
             if (ball[1].x > VIRTUAL_WIDTH/2) then 
@@ -2015,10 +2049,11 @@ end
                 gameState, 
                 ball[1].dx, 
                 ballSpeed, 
-                paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-                print("ACCEPTED")
+                paddle_SPEED, player2striken,
+                areanuclear = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+               --print("ACCEPTED")
             else 
-            print("DECLINED")
+           --print("DECLINED")
             end
             else  
                 if tonumber(p[9]) > VIRTUAL_WIDTH/2 then 
@@ -2035,10 +2070,11 @@ end
                     gameState, 
                     ball[1].dx, 
                     ballSpeed, 
-                    paddle_SPEED, player2striken = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15])
-                    print("ACCEPTED")
+                    paddle_SPEED, player2striken, 
+                    areanuclear = p[1], die, tonumber(p[4]), tonumber(p[5]), tonumber(p[6]), tonumber(p[7]), tonumber(p[8]), tonumber(p[9]), tonumber(p[10]), p[11], tonumber(p[12]), tonumber(p[13]), tonumber(p[14]), tonumber(p[15]), tonumber(p[16])
+                   --print("ACCEPTED")
                 else 
-                print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
+               --print("ENFORCED" .. ball[1].x .. " " .. ball[1].dx)
                 lastSentKeyClient = p[1]
                 player2.y = tonumber(p[4])
                 player2striken = tonumber(p[15])
@@ -2046,20 +2082,20 @@ end
             end
             end
             end
-      print("SENT TO " .. player1ip .. ":" .. player1port .. " : " .. string.sub(p2data,1,1))
+     --print("SENT TO " .. player1ip .. ":" .. player1port .. " : " .. string.sub(p2data,1,1))
       --print("1::" .. p1data)
       --print("2::" .. p2data)
       --print("SENT1: " .. player2ip .. " " .. player2port .. " " .. p1data)
       --print("SENT2: " .. player1ip .. " " .. player1port .. " " .. p2data)
     end
     if requesterip then
-        print("getting pnged!")
+       --print("getting pnged!")
         if player2ip == "none" then
           udp:sendto("clienttest", requesterip, requesterport)
-          print("clienttest av to: " .. requesterip)
+         --print("clienttest av to: " .. requesterip)
         else
           udp:sendto("full", requesterip, requesterport)
-          print("full to: " .. msg_or_ip)
+         --print("full to: " .. msg_or_ip)
         end
         requesterip, requesterport = nil
     end
@@ -2111,6 +2147,9 @@ function love.touchreleased( id, x, y, dx, dy, pressure )
         if gameState == "start" then 
             resettinggenius()
             gameState = "menu"
+            ball[1].dx = 1
+            ball_DIR = 1
+            ball[1].dy = 1
             globalState = "menu"
             hardmanager()
 
@@ -2137,6 +2176,7 @@ function love.touchmoved( id, x, y, dx, dy, pressure )
             if touches[existsingID].x - touches[existsingID].originalX > 200 and 
             touches[existsingID].originalX > VIRTUAL_WIDTH/2 then 
                 hold2 = true 
+            
                 lastSentKey = p2control.counter 
             else
                 hold2 = false

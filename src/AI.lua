@@ -3,25 +3,41 @@ function AI(target, ballCnt, diff)
    --print("CLOSEST TARGET IS " .. currentTarget)
     if diff < 1200 then 
        --print ("Normal targeting ".. currentTarget .. " " .. target.x - ball[currentTarget].x .. " " .. ball[currentTarget].y - target.y)
-        if (ball[currentTarget].y - target.y >= target.height and target.x - ball[currentTarget].x < diff) then
+        if (ball[currentTarget].y - target.y >= target.height and math.abs(target.x - ball[currentTarget].x) < diff) then
             target.dy = AI_SPEED
-        elseif (target.y - ball[currentTarget].y >= -target.height/2 and target.x - ball[currentTarget].x < diff) then
+        elseif (target.y - ball[currentTarget].y >= -target.height/2 and math.abs(target.x - ball[currentTarget].x) < diff) then
             target.dy = -AI_SPEED
         else
             target.dy = 0
         end
     else 
        --print("Complex targeting")
-        
+            if target.x < 100 then 
             neededTarget = predictBall(ball[currentTarget], target.x)
+           --print(target.x .. " found " .. neededTarget)
             if neededTarget ~= -1 then 
            --print("Calculated target = " .. neededTarget)
-            if (target.y - neededTarget >= -target.height/2) then 
+            if (target.y + target.height/2 - neededTarget >= 15) then 
                 target.dy = -AI_SPEED
             elseif (neededTarget - target.y >= target.height*0.9) then 
                 target.dy = AI_SPEED
             else
                 target.dy = 0
+            end 
+            end 
+            else 
+                neededTarget1 = predictBall(ball[currentTarget], target.x)
+                --print(target.x .. " found " .. neededTarget)
+                 if neededTarget1 ~= -1 then 
+                --print("Calculated target = " .. neededTarget)
+                 if (target.y + target.height/2 - neededTarget1 >= 10) then 
+                     target.dy = -AI_SPEED
+                 elseif (neededTarget1 - (target.y+target.height/2) >= 10) then 
+                     target.dy = AI_SPEED
+                 else
+                     target.dy = 0
+                 end 
+                
             end 
         end
     end 
@@ -79,10 +95,13 @@ function evaluateClosestBall(target)
 end 
 function predictBall(target, px)
    --print("BALLSTATS:" .. target.x .. " " .. target.y)
-    if target.dx > 0 then 
+    if target.dx > 0 and px > 100 then 
         local ans = recursiveCalculations(px, target.x, target.y, target.dx, target.dy, 1)
         return ans
-    else 
+    elseif target.dx < 0 and px < 100 then 
+        local ans = recursiveCalculations(px, target.x, target.y, target.dx, target.dy, 1)
+        return ans
+    else
        --print("GO TO CENTER!!")
         return VIRTUAL_HEIGHT/2
     end
@@ -91,10 +110,12 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
     if (edy > 0) then 
     --print ("normal" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
         local time = (VIRTUAL_HEIGHT-40-ey) / (ballSpeed * edy)
-        local distance = (ballSpeed * edx) * time
-    --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
-        if distance > (px - ex) then 
-            local anstime = (px - ex) / (ballSpeed * edx) 
+        
+        local distance = math.abs(ballSpeed * edx) * time
+        print("DOWNWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
+        if distance > math.abs(px - ex) then 
+            print("QQ")
+            local anstime = math.abs(px - ex) / math.abs(ballSpeed * edx) 
             local bonus = (ballSpeed * edy) * anstime 
         --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex))
         -- if (ifspecial == 0) then  
@@ -106,9 +127,12 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
             --   return -1  
             --end
         else 
-            local emulatedx = ex + distance 
+            print("SS")
+            local emulatedx = ex + distance * edx 
             local emulatedy = VIRTUAL_HEIGHT-40
+            print("EMULATED: " .. emulatedx .. " " .. emulatedy)
             local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
+            print("GOT EMULATION RESULT AS " .. answer)
             --love.window.setTitle(tostring(answer) .. "recursive calc bottom")
             return answer 
         end  
@@ -117,16 +141,16 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
     else
     --print ("inverse" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
         local time = (ey) / math.abs((ballSpeed * edy))
-        local distance = (ballSpeed * edx) * time 
-    --print(distance .. " " .. edx .. " " .. time .. " " .. (px-ex))
+        local distance = math.abs(ballSpeed * edx) * time 
+        print("UPWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
 
         
     --print("Why th efuck ")
 
-        if distance > (px - ex) then 
-            local anstime = (px - ex) / (ballSpeed * edx) 
+        if distance > math.abs(px - ex) then 
+            local anstime = math.abs(px - ex) / math.abs(ballSpeed * edx) 
             local bonus = (ballSpeed * edy) * anstime
-        --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex)) 
+        print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. math.abs(px-ex)) 
 --         if (ifspecial == 0) then 
                 local answer = ey + bonus 
                 --love.window.setTitle(tostring(answer) .. "Basiccalc")
@@ -135,7 +159,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
     --         return -1 
         --   end
         else 
-            local emulatedx = ex + distance 
+            local emulatedx = ex + distance * edx 
             local emulatedy = 0
 ----print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (VIRTUAL_WIDTH-ex)) 
             local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)

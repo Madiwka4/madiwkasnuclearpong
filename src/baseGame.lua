@@ -43,7 +43,7 @@ function basegame(dt)
                 
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
                    --print("Calling animation")
-                   print("AREA NUCLEAR?" .. areanuclear)
+                  --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 1)
                 end
                 if gameMode == "practice" then
@@ -75,7 +75,7 @@ function basegame(dt)
                         sounds["nuclearhit"]:setPitch(1)
                         sounds["nuclearhit"]:play()
                     end
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                     if areanuclear == 0 then 
                     superanimator("tensehit", 1)
                     end
@@ -172,7 +172,7 @@ function basegame(dt)
                     (areanuclear == 0 and
                         (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
                  then
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
                 end
                 if (ballSpeed > 200) then
@@ -192,7 +192,7 @@ function basegame(dt)
                     potentialnuke2 = 0
                     player2nukescore = 0
                     potentialstrike2 = 0
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                     if areanuclear == 0 then 
                     superanimator("tensehit", 2)
                     end
@@ -315,7 +315,7 @@ function basegame(dt)
             --love.window.setTitle('Trying to update the ball')
             if timeIsSlow then
                 if ballSpeed > originalSpeed / 3 then
-                    paddle_SPEED = 30
+                    paddle_SPEED = 300
                     ballSpeed = ballSpeed / (1 + (dt * 2))
                 end
                 player1nukescore = player1nukescore - (dt * 50)
@@ -333,7 +333,7 @@ function basegame(dt)
                 end
                 player2nukescore = player2nukescore - (dt * 50)
                 if player2nukescore < 1 or ball[1].dx < 0 then
-                    paddle_SPEED = 30
+                    paddle_SPEED = 300
                     timeIsSlow2 = false
                     player2reverbav = false
                     ballSpeed = originalSpeed
@@ -390,7 +390,7 @@ function goalManager()
                     paddle_SPEED = ballSpeed 
                 end
         
-                AI_SPEED = difficultyl / 10
+                AI_SPEED = difficultyl 
                 for i = 1, maxBalls do
                     ball[i]:reset(i, 2)
                 end
@@ -511,8 +511,9 @@ function powerAvailability()
             end
         end
     end
-    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and (maxBalls > 1 or (ball[1].dx > 0 and ball[1].x < VIRTUAL_WIDTH/2)) then
+    if (player2nukescore >= 140) and timeIsSlow == false and timeIsSlow2 == false and (maxBalls > 1 or (ball[1].dx > 0 and ball[1].x > VIRTUAL_WIDTH/2)) then
         player2reverbav = 1
+       --print("Available counter, " .. globalState .. tostring(love.keyboard.isDown(p2control.counter)))
         if (globalState ~= "nettest" and (love.keyboard.isDown(p2control.counter) or hold2)) or lastSentKeyClient == p2control.counter then
             sounds["time"]:play()
             player2reverbav = false
@@ -667,6 +668,9 @@ function menuDraw()
             love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
         end
     end
+    player1:render()
+    player2:render()
+    ball[1]:render("controlled")
     if gameState == "touchcontrols" then
         if doubleclick1 or doubleclick2 then 
             gameState = "menu"
@@ -780,7 +784,7 @@ function menuDraw()
         love.keyboard.mouseisReleased = false
     end
     if gameState == "multiMode" then
-        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, playerCountButtons, sounds, "playercount")
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, playerCountButtons, sounds, "middle")
         love.keyboard.mouseisReleased = false
     end
     if gameState == "prdiff" then
@@ -792,6 +796,7 @@ function menuDraw()
         love.graphics.translate(VIRTUAL_WIDTH * 0.4, VIRTUAL_HEIGHT * 0.5)
         love.graphics.rotate(rotation)
         love.graphics.setFont(smallfont)
+        love.graphics.setColor(200/255, 200/255, 200/255, 1)
         if isAndroid then 
             love.graphics.print("Tap to Start", WINDOW_WIDTH / -10, VIRTUAL_HEIGHT / 8)
         else
@@ -819,9 +824,6 @@ function baseDraw()
         if gameState ~= 'animation' then
            --print("Drawing notanimtaion") 
             love.graphics.setFont(scorefont)
-            if isAndroid then 
-                androidDraw()
-            end
             menuDraw()
         end
     end
@@ -832,13 +834,9 @@ function baseDraw()
             nuclearDraw()
         end 
         if gameState == 'play' or gameState == '1serve' or gameState == '2serve' or gameState == 'done' then 
-           print("Drawing normally")
+          --print("Drawing normally")
             normalDraw()
         end 
-        if isAndroid then 
-            androidDraw()
-            love.keyboard.mouseisReleased = false
-        end
     end 
 
 
@@ -1089,13 +1087,13 @@ function clientsBaseGame(dt)
     
     if (lastSentKeyP1 == p1control.up) then
         player1.dy = (paddle_SPEED + p2bonus) * -1
-        print("moving player1 up")
+       --print("moving player1 up")
     elseif (lastSentKeyP1 == p1control.down) then
         player1.dy = paddle_SPEED + p2bonus
-        print("moving player1 down")
+       --print("moving player1 down")
     else
         player1.dy = 0
-       -- print("stopping player")
+       ----print("stopping player")
     end
     if ((love.keyboard.isDown(p2control.up) or sectortouched(1))) then
         player2.dy = (paddle_SPEED + p2bonus) * -1
@@ -1117,7 +1115,7 @@ function clientsBaseGame(dt)
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
                    --print("Calling animation")
                     superanimator("tensehit", 1)
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                 end
                 if gameMode == "practice" then
                     player1score = player1score + 1
@@ -1188,7 +1186,7 @@ function clientsBaseGame(dt)
                     (areanuclear == 0 and
                         (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
                  then
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
                 end
                 if (ballSpeed > 200) then
@@ -1208,7 +1206,7 @@ function clientsBaseGame(dt)
                     potentialnuke2 = 0
                     player2nukescore = 0
                     potentialstrike2 = 0
-                    print("AREA NUCLEAR?" .. areanuclear)
+                   --print("AREA NUCLEAR?" .. areanuclear)
                     if areanuclear == 0 then 
                     superanimator("tensehit", 2)
                     end
@@ -1410,3 +1408,110 @@ function GetIPType(ip)
     -- if we get here, assume we've been given a random string
     return 3
 end
+
+function menuDemo(dt)
+    paddle_SPEED = 200
+    ballSpeed = 200
+    if ball[1].dx > 0 then
+    AI(player2, maxBalls, 1300)
+    player1.goal = 360
+    elseif ball[1].dx < 0 then 
+    AI(player1, maxBalls, 1300)
+    player2.goal = 360
+    end 
+    print(neededTarget, neededTarget1)
+   --print("menu demo active")
+    ball[1]:update(dt)
+    player1:update(dt)
+    player2:update(dt)    
+    if ball[1].x < player1.x+15 then 
+        player1.y = ball[1].y-player1.height  
+    end 
+    if ball[1].x > player2.x-15 then 
+        player2.y = ball[1].y-player2.height 
+    end 
+    if ball[1].x >= player2.x-7 then
+        select = math.random(1, 2)
+    if ball[1].dy < 0 then
+        select = math.random(1, 5)
+        if select == 1 then
+            ball[1].dy = -1
+        elseif select == 2 then
+            ball[1].dy = -1.2
+        elseif select == 3 then
+            ball[1].dy = -1.5
+        elseif select == 4 then
+            ball[1].dy = -1.8
+        elseif select == 5 then
+            ball[1].dy = -2
+        end
+    else
+        select = math.random(1, 5)
+        if select == 1 then
+            ball[1].dy = 1
+        elseif select == 2 then
+            ball[1].dy = 1.2
+        elseif select == 3 then
+            ball[1].dy = 1.5
+        elseif select == 4 then
+            ball[1].dy = 1.8
+        elseif select == 5 then
+            ball[1].dy = 2
+        end
+    end
+        ball[1].x = player2.x-8
+        ball[1].dx = -ball[1].dx
+        ball[1].dy = -ball[1].dy 
+    end 
+    if ball[1].x <= player1.x+7 then
+        select = math.random(1, 2)
+    if ball[1].dy < 0 then
+        select = math.random(1, 5)
+        if select == 1 then
+            ball[1].dy = -1
+        elseif select == 2 then
+            ball[1].dy = -1.2
+        elseif select == 3 then
+            ball[1].dy = -1.5
+        elseif select == 4 then
+            ball[1].dy = -1.8
+        elseif select == 5 then
+            ball[1].dy = -2
+        end
+    else
+        select = math.random(1, 5)
+        if select == 1 then
+            ball[1].dy = 1
+        elseif select == 2 then
+            ball[1].dy = 1.2
+        elseif select == 3 then
+            ball[1].dy = 1.5
+        elseif select == 4 then
+            ball[1].dy = 1.8
+        elseif select == 5 then
+            ball[1].dy = 2
+        end
+    end
+        ball[1].x = player1.x+8
+        ball[1].dx = -ball[1].dx
+        ball[1].dy = -ball[1].dy
+    end
+    
+    if ball[1].y <= 0 then
+        soundtype = love.math.random(1, 5)
+        sounds["wallhit"]:setPitch(ballSpeed / 250)
+        sounds["wallhit"]:play()
+        ball[1].y = 0
+        ball[1].dy = -ball[1].dy
+    end
+
+    -- -4 to account for the ball's size
+    if ball[1].y >= VIRTUAL_HEIGHT - 40 then
+        soundtype = love.math.random(1, 5)
+        sounds["wallhit"]:setPitch(ballSpeed / 250)
+        sounds["wallhit"]:play()
+        ball[1].y = VIRTUAL_HEIGHT - 40
+        ball[1].dy = -ball[1].dy
+       
+    end
+end 

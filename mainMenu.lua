@@ -105,8 +105,13 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
             if (hot == i) then 
                 color = {10, 10, 0, 255}
             end
-                        button.now = love.keyboard.mouseWasReleased()
-            if button.now and not button.last and hot == i then
+            --print(love.keyboard.mouseisReleased)
+
+                        button.now = love.keyboard.mouseisReleased
+                        if location == "android" then 
+                            button.now = love.mouse.isDown(1)
+                        end
+            if button.now and hot == i then
                 love.graphics.setColor(0,0,0,1)
                 love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
               sounds['wallhit']:play()  
@@ -183,6 +188,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     end
                 end            
             end
+            love.keyboard.mouseisReleased = false
         end
 function mainMenu:addButton(text, fn)
     return {

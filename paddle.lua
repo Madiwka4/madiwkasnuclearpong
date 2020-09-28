@@ -14,9 +14,20 @@ function paddle:init(x, y, width, height, player)
 	self.velocity = 0
 	self.shadowbonus = 0
 	self.player = player
+	self.goal = -1
 end
 
 function paddle:update(dt)
+	if self.goal ~= -1 then 
+		if self.y+self.height/2 - self.goal > 10 then 
+			self.dy = -paddle_SPEED
+		elseif self.goal - (self.y+self.height/2) > 10  then 
+			self.dy = paddle_SPEED
+		else 
+			self.dy = 0 
+	end
+
+	end 
 	--love.window.setTitle(tostring(player1.velocity * dt) .. " " ..  tostring(player1.dy) .. " " ..  tostring(dt) )
 	if areanuclear == 0 then 
 		self.RED = 1
@@ -65,6 +76,7 @@ function paddle:update(dt)
 		self.yx = self.yx - math.abs(paddle_SPEED/1.7) * 7 * dt
 	end
 end
+
 
 
 end
