@@ -18,4 +18,4 @@ To play the game on Linux, just launch the ./debuggame.sh and enjoy the game!
 To play on Linux like a normie, you can <a href = "https://madi-wka.club/NuclearPongLinux.tar.gz">Download</a> the latest release (may be outdated compared to the source version), or you can download the LOVE file from the releases tab.
 To play on Windows, download a Windows executable from the releases tab! 
 # Changes
-<p>0.7.7 is here! Wiht this update, online mode is improved! The default IP is my server, but you can launch the server from anywhere! The code for the server is <a href = "https://git.madi-wka.club/Madiwka/NuclearServer">here</a>, and you can launch it from anywhere!. </p>
+<p>0.7.8 is here! With this new update, a ton of graphical bugs are fixed, and the menu has been revamped! The android version got a treat as well: the controls are now not just two buttons on each side of the screen, but they instead track your finger and try to place the paddle under it! 
