@@ -112,9 +112,9 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
         local time = (VIRTUAL_HEIGHT-40-ey) / (ballSpeed * edy)
         
         local distance = math.abs(ballSpeed * edx) * time
-        print("DOWNWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
+        --print("DOWNWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
         if distance > math.abs(px - ex) then 
-            print("QQ")
+            --print("QQ")
             local anstime = math.abs(px - ex) / math.abs(ballSpeed * edx) 
             local bonus = (ballSpeed * edy) * anstime 
         --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. (px-ex))
@@ -127,7 +127,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
             --   return -1  
             --end
         else 
-            print("SS")
+            --print("SS")
             local emulatedx = ex + distance * edx 
             local emulatedy = VIRTUAL_HEIGHT-40
             print("EMULATED: " .. emulatedx .. " " .. emulatedy)
@@ -142,7 +142,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
     --print ("inverse" .. ex .." " .. ey .. " " .. edx .. " " .. edy)
         local time = (ey) / math.abs((ballSpeed * edy))
         local distance = math.abs(ballSpeed * edx) * time 
-        print("UPWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
+        --print("UPWARD" .. distance .. " " .. edx .. " " .. time .. " " .. math.abs(px-ex))
 
         
     --print("Why th efuck ")
@@ -150,7 +150,7 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
         if distance > math.abs(px - ex) then 
             local anstime = math.abs(px - ex) / math.abs(ballSpeed * edx) 
             local bonus = (ballSpeed * edy) * anstime
-        print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. math.abs(px-ex)) 
+        --print("results: " .. bonus .. " " .. edx .. " " .. anstime .. " " .. math.abs(px-ex)) 
 --         if (ifspecial == 0) then 
                 local answer = ey + bonus 
                 --love.window.setTitle(tostring(answer) .. "Basiccalc")

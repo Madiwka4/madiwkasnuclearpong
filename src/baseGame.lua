@@ -356,7 +356,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.7 Chalkboard Update"
+        updateTEXT = "0.7.8 Chalkboard Update"
     end
     dangerChecker()
     elapsed = elapsed + dt  
@@ -714,6 +714,7 @@ function menuDraw()
             )
         )
         end 
+        if not isAndroid then 
         table.insert(
             IPselect,
             newButton(
@@ -726,6 +727,7 @@ function menuDraw()
                 end
             )
         )
+        end 
         table.insert(
             IPselect,
             newButton(
@@ -744,6 +746,7 @@ function menuDraw()
                 newButton(
                     "Connect as Host",
                     function()
+                        resettinggenius()
                         globalState = "nettest"
                         AGAINST_AI = 0 
                         gameState = "1serve"
@@ -758,6 +761,7 @@ function menuDraw()
                 newButton(
                     "Connect as Guest",
                     function()
+                        resettinggenius()
                         globalState = "clienttest"
                         AGAINST_AI = 0 
                         gameState = "1serve"
@@ -1431,6 +1435,8 @@ function menuDemo(dt)
         player2.y = ball[1].y-player2.height 
     end 
     if ball[1].x >= player2.x-7 then
+        sounds["beep"]:setPitch(ballSpeed / 250)
+        sounds["beep"]:play()
         select = math.random(1, 2)
     if ball[1].dy < 0 then
         select = math.random(1, 5)
@@ -1464,6 +1470,8 @@ function menuDemo(dt)
         ball[1].dy = -ball[1].dy 
     end 
     if ball[1].x <= player1.x+7 then
+        sounds["beep"]:setPitch(ballSpeed / 250)
+        sounds["beep"]:play()
         select = math.random(1, 2)
     if ball[1].dy < 0 then
         select = math.random(1, 5)

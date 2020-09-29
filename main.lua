@@ -399,13 +399,41 @@ function love.load()
     --    )
     --)
     table.insert(
-        settings,
+        buttons,
         newButton(
             "Toggle Fullscreen",
             function()
                 myscreen:toggle(VIRTUAL_HEIGHT, VIRTUAL_WIDTH)
                 DIFFERENCE_X = myscreen.c
                 DIFFERENCE_Y = myscreen.d
+            end
+        )
+    )
+    if isAndroid then 
+        table.insert(
+            settings,
+            newButton(
+                "Toggle Music",
+                function()
+                    if mute then 
+                    musicController("mute", 0)
+                    else 
+                        musicController("mute", 1)
+                    end 
+                end
+            )
+        )
+    end
+    table.insert(
+        settings,
+        newButton(
+            "Toggle Music",
+            function()
+                if mute then 
+                musicController("mute", 0)
+                else 
+                    musicController("mute", 1)
+                end 
             end
         )
     )
@@ -797,7 +825,7 @@ function startShake(duration, magnitude)
 end
 function displayFPS()
     --love.window.setTitle(love.timer.getFPS())
-    love.window.setTitle(globalState .. " " .. gameState .. " " .. paddle_SPEED .. " " .. p1bonus .. " " .. player1.dy)
+    --love.window.setTitle(globalState .. " " .. gameState .. " " .. paddle_SPEED .. " " .. p1bonus .. " " .. player1.dy)
     if love.keyboard.isDown("space") then
         player1nukescore = 200
         player1score = player1score + 0.2
@@ -816,13 +844,14 @@ function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
     
     staticanimatorcounter(dt)
-    player1.goal = -1
-    player2.goal = -1
+        player1.goal = -1
+        player2.goal = -1
     if gameState == "chooseIP" then 
         checkCurrentServer(dt)
     end
     if debug then
         displayFPS()
+        print(player2.y .. " " .. player2.goal .. " " .. player2.dy .. " " .. AI_SPEED .. " " .. paddle_SPEED)
     end
     if globalState == "base" then
         basegame(dt)
@@ -1006,7 +1035,7 @@ function nettest(dt)
 until not data
     if not datawaspassed then  
         datawaspassedtimer = datawaspassedtimer + 1 
-        if datawaspassedtimer > 10 then 
+        if datawaspassedtimer > 15 then 
         confirmation = "D"
         datawaspassedtimer = 0
         end 
@@ -1065,10 +1094,10 @@ function clienttest(dt)
         confirmation = "N"
         local p = split(data, '|')
         if p[17] then 
-            if p[18] ~= "HOST" then 
+            if p[17] ~= "HOST" then 
                 confirmation = "U"
             end
-            if tonumber(p[17]) > 90 then 
+            if tonumber(p[18]) > 90 then 
                 confirmation = "L"
             end 
             for i = 1, maxBalls do 
@@ -1099,7 +1128,7 @@ function clienttest(dt)
     until not data 
     if not datawaspassed then  
         datawaspassedtimer = datawaspassedtimer + 1 
-        if datawaspassedtimer > 10 then 
+        if datawaspassedtimer > 15 then 
         confirmation = "D"
         datawaspassedtimer = 0
         end 
@@ -1870,9 +1899,9 @@ function checkCurrentServer(dt)
        --print("got answer!")
         local p = split(data, '|')
         status = p[1]
-       --print("answer is " .. status)
+       print("answer is " .. status)
     else 
-       --print("no response!")
+       print("no response!")
     end
     ts = 0 
     end 
@@ -2200,16 +2229,16 @@ function table.empty (self)
 end
 function sectortouched(sector)
 for i, touch in ipairs(touches) do 
-    if sector == 1 and touch.x > VIRTUAL_WIDTH-100 and touch.y < VIRTUAL_HEIGHT/2 then 
+    if touch.x > VIRTUAL_WIDTH-100 and touch.y < player2.y then 
         lastSentKey = p2control.up 
         return true 
-    elseif sector == 2 and touch.x < 100 and touch.y < VIRTUAL_HEIGHT/2 then 
+    elseif sector == 2 and touch.x < 100 and touch.y < player1.y then 
         lastSentKey = p1control.up
         return true 
-    elseif sector == 3 and touch.x < 100 and touch.y > VIRTUAL_HEIGHT/2 then 
+    elseif sector == 3 and touch.x < 100 and touch.y > player1.y+player1.height*0.9 then 
         lastSentKey = p1control.down
         return true    
-    elseif sector == 4 and touch.x > VIRTUAL_WIDTH-100 and touch.y > VIRTUAL_HEIGHT/2 then 
+    elseif sector == 4 and touch.x > VIRTUAL_WIDTH-100 and touch.y > player2.y+player1.height*0.9 then 
         lastSentKey = p2control.down
         return true
     end 

@@ -1,5 +1,5 @@
 function musicController(orders, toggling)
-    if (orders == 'norm') then 
+    if (orders == 'norm' and not mute) then 
         if (globalState == 'menu') then 
             sounds['gayTheme']:stop()
             sounds['gayTheme2']:stop()
@@ -37,15 +37,15 @@ function musicController(orders, toggling)
             sounds['gayTheme3']:play()
             
          end
-    elseif orders ~= nil then  
-        sounds[orders]:setPitch(1)
-        sounds[orders]:setLooping(true)
-        sounds[orders]:setVolume(0.9)
-        sounds[orders]:play()
-        if (toggling == 1) then 
-            sounds[orders]:setVolume(0.9)
-        else
-            sounds[orders]:stop()
+    elseif orders == "mute" then 
+        if toggling == 1 then 
+        sounds['gayTheme']:stop()
+        sounds['gayTheme3']:stop()
+        sounds['gayTheme2']:stop()
+        sounds['updateMusic']:stop()
+            mute = true 
+        else 
+            mute = false
         end
     end
 end
