@@ -193,6 +193,7 @@ function love.load()
                 if globalState == "base" and gameState ~= "done"  then 
                 paused = true 
                 else 
+                    TEXT = "Nuclear Pong"
                     resettinggenius()
                     paused = false 
                     gameState = "menu"
