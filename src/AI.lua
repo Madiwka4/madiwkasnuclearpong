@@ -1,4 +1,5 @@
 function AI(target, ballCnt, diff)
+    print("AI RUNNING")
     currentTarget = evaluateClosestBall(target);
    --print("CLOSEST TARGET IS " .. currentTarget)
     if diff < 1200 then 
@@ -130,9 +131,9 @@ function recursiveCalculations(px, ex, ey, edx, edy, ifspecial)
             --print("SS")
             local emulatedx = ex + distance * edx 
             local emulatedy = VIRTUAL_HEIGHT-40
-            print("EMULATED: " .. emulatedx .. " " .. emulatedy)
+            --print("EMULATED: " .. emulatedx .. " " .. emulatedy)
             local answer = recursiveCalculations(px, emulatedx, emulatedy, edx, -edy, 0)
-            print("GOT EMULATION RESULT AS " .. answer)
+            --print("GOT EMULATION RESULT AS " .. answer)
             --love.window.setTitle(tostring(answer) .. "recursive calc bottom")
             return answer 
         end  

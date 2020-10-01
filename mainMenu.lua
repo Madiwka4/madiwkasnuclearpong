@@ -15,6 +15,8 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
              ev_by = (VIRTUAL_HEIGHT * 0.1) - (total_height * 0.5) + cursor_y
             local color = {255, 255, 255, 255}
             local mx, my = love.mouse.getPosition()
+            mx = mx   
+            my = my  
             mx = mx * DIFFERENCE_X
             my = my * DIFFERENCE_Y
             hot = (mx > ev_bx and mx < ev_bx + ev_button_width and my > ev_by and my < ev_by + ev_BUTTON_HEIGHT) and i
@@ -26,7 +28,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                         button.now = love.keyboard.mouseWasReleased()
 
             if button.now and not button.last and hot == i then
-
+                love.keyboard.mouseisReleased = false 
                 love.graphics.setColor(0,0,0,1)
                 love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
                 sounds['wallhit']:play()
@@ -99,6 +101,8 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                 color = {1,1,1,1}
             end
             local mx, my = love.mouse.getPosition()
+            mx = mx
+            my = my
             local mx = mx * DIFFERENCE_X
             local my = my * DIFFERENCE_Y
             local hot = (mx > ev_bx and mx < ev_bx + ev_button_width and my > ev_by and my < ev_by + ev_BUTTON_HEIGHT) and i
@@ -112,6 +116,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                             button.now = love.mouse.isDown(1)
                         end
             if button.now and hot == i then
+                love.keyboard.mouseisReleased = false 
                 love.graphics.setColor(0,0,0,1)
                 love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
               sounds['wallhit']:play()  
@@ -188,7 +193,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     end
                 end            
             end
-            love.keyboard.mouseisReleased = false
+            
         end
 function mainMenu:addButton(text, fn)
     return {
@@ -212,6 +217,8 @@ local bx = (VIRTUAL_WIDTH*0.5) - (button_width * 0.5)
 local by = (VIRTUAL_HEIGHT * 0.8) - (total_height * 0.5) + cursor_y
 local color = {255, 255, 255, 255}
 local mx, my = love.mouse.getPosition()
+mx = mx   
+my = my  
 mx = mx * DIFFERENCE_X
 my = my * DIFFERENCE_Y
 hot = (mx > bx and mx < bx + button_width and my > by and my < by + BUTTON_HEIGHT) and i
@@ -220,6 +227,7 @@ if (hot == i) then
 end
 button.now = love.keyboard.mouseWasReleased()
 if button.now and not button.last and hot == i then 
+    love.keyboard.mouseisReleased = false 
                     love.graphics.setColor(0,0,0,1)
     love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
     sounds['wallhit']:play()

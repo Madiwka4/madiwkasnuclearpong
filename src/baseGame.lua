@@ -41,7 +41,7 @@ function basegame(dt)
         for i = 1, maxBalls do
             if rules("p1hit", i) then
                 
-                if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
+                if (areanuclear == 0 and striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)) then
                    --print("Calling animation")
                   --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 1)
@@ -170,7 +170,7 @@ function basegame(dt)
                 shakeDuration = 1
                 if
                     (areanuclear == 0 and
-                        (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
+                        (striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)))
                  then
                    --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
@@ -356,7 +356,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.7.8 Chalkboard Update"
+        updateTEXT = "0.7.9 Chalkboard"
     end
     dangerChecker()
     elapsed = elapsed + dt  
@@ -394,7 +394,7 @@ function goalManager()
                 for i = 1, maxBalls do
                     ball[i]:reset(i, 2)
                 end
-                if (player2score == ptw and gameMode ~= "practice") then
+                if (player2score+1 >= ptw and gameMode ~= "practice") then
                     for i = 1, maxBalls do
                         ball[i]:reset(i)
                     end
@@ -436,12 +436,12 @@ function goalManager()
     
                 AI_SPEED = difficultyl 
                 
-                if (player1score == ptw) then
+                if (player1score+1 >= ptw) then
                     ball[i]:reset(i)
     
                     sounds["win"]:play()
                     gameState = "done"
-                    TEXT = "Player 1 Won!"
+                    TEXT = "Player 1 Won"
                 else
                     if globalState ~= "nettest" or (globalState == "nettest" and gameState == "2serve") then 
                     gameState = "2serve"
@@ -461,10 +461,11 @@ function goalManager()
 end
 
 function powerAvailability()
-    if (player1nukescore >= 20 and player1nukescore < 140) then
+    if (player1nukescore >= 20 and player1nukescore < 200) then
         potentialstrike1 = 1
         if (((globalState ~= "clienttest" and (love.keyboard.isDown(p1control.super) or doubleclick1 == true)) or (globalState == "clienttest" and lastSentKeyP1 == p1control.super)) ) then
             player1striken = 1
+            doubleclick1 = false 
             player1reverbav = 0
         end
     end
@@ -476,8 +477,9 @@ function powerAvailability()
     end
     if (player1nukescore >= 200) then
         potentialnuke1 = 1
-        if ((globalState == "clienttest" and (lastSentKeyP1 == p1control.super or doubleclick1 == true))or (globalState ~= "clienttest" and love.keyboard.isDown(p1control.super))) then
+        if ((globalState == "clienttest" and (lastSentKeyP1 == p1control.super or doubleclick1 == true))or (globalState ~= "clienttest" and (love.keyboard.isDown(p1control.super) or doubleclick1 == true))) then
             sounds["nuke"]:play()
+            doubleclick1 = false 
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
             end
@@ -502,12 +504,13 @@ function powerAvailability()
             potentialnuke1 = 0
         end
     end
-    if (player2nukescore >= 20 and player2nukescore <= 140) then
+    if (player2nukescore >= 20 and player2nukescore < 200) then
         potentialstrike2 = 1
         if (AGAINST_AI == 0) then
             if ((globalState ~= "nettest" and (love.keyboard.isDown(p2control.super) or doubleclick2)) or lastSentKeyClient == p2control.super ) then
                 player2striken = 1
                 player2reverbav = 0
+                doubleclick2 = false 
             end
         end
     end
@@ -529,6 +532,7 @@ function powerAvailability()
         potentialnuke2 = 1
         if (((globalState ~= "nettest" and (love.keyboard.isDown(p2control.super) or doubleclick2)) or lastSentKeyClient == p2control.super)) and AGAINST_AI == 0 then
             sounds["nuke"]:play()
+            doubleclick2 = false 
             if areanuclear == 1 then
                 maxspeed = maxspeed + 50
             end
@@ -589,6 +593,20 @@ function nuclearDraw()
     end
     player1:render()
     player2:render()
+end 
+
+function winDraw(who)
+
+    love.graphics.setColor(0, 0, 0, 1)
+    if who == 1 then 
+        
+    love.graphics.circle("fill", player2.x, player2.y, explosionRange * 100, 100)
+    print("cicrleexplostion at " .. explosionRange)
+    else 
+    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 100, 100)
+    end 
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")
 end 
 
 function normalDraw()
@@ -724,6 +742,7 @@ function menuDraw()
                     AGAINST_AI = 0 
                     gameState = "1serve"
                     ball[1]:reset(1, 1)
+                    player2.dy = 0 
                 end
             )
         )
@@ -751,6 +770,7 @@ function menuDraw()
                         AGAINST_AI = 0 
                         gameState = "1serve"
                         ball[1]:reset(1, 1)
+                        player2.dy = 0 
                     end
                 )
             )
@@ -766,6 +786,7 @@ function menuDraw()
                         AGAINST_AI = 0 
                         gameState = "1serve"
                         ball[1]:reset(1, 1)
+                        player2.dy = 0 
                     end
                 )
             )
@@ -837,25 +858,37 @@ function baseDraw()
         if gameState == 'nuclearExplosion' then 
             nuclearDraw()
         end 
+
         if gameState == 'play' or gameState == '1serve' or gameState == '2serve' or gameState == 'done' then 
           --print("Drawing normally")
             normalDraw()
         end 
+        if gameState == 'done' and player1score > player2score then 
+            winDraw(1)
+        elseif gameState == 'done' and player1score < player2score then 
+            winDraw(2)
+        end
     end 
-
-
+    if paused then 
+    mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, pauseButtons, sounds, "middle")
+    love.keyboard.mouseisReleased = false
+    end 
+    if gameState == "done" then 
+        mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, doneButtons, sounds, "middle")
+        love.keyboard.mouseisReleased = false
+    end
 end 
 function androidDraw()
 --HOME BUTTON HERE
 mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, androidButtons, sounds, "android")
 if showTouchControls then 
     love.graphics.setColor(15/255, 255/255, 15/255, 0.5)
-    love.graphics.rectangle("fill", 0, 0, 50, VIRTUAL_HEIGHT)
+    love.graphics.rectangle("fill", 0, 0, 100, VIRTUAL_HEIGHT)
     love.graphics.setColor(15/255, 255/255, 15/255, 0.5)
-    love.graphics.rectangle("fill", VIRTUAL_WIDTH-50, 0, 50, VIRTUAL_HEIGHT)
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH-100, 0, 50, VIRTUAL_HEIGHT)
     love.graphics.setColor(255/255, 15/255, 15/255, 0.5)
-    love.graphics.rectangle("fill", 50, 0, VIRTUAL_WIDTH/2-50, VIRTUAL_HEIGHT)
-    love.graphics.rectangle("fill", VIRTUAL_WIDTH/2, 0, VIRTUAL_WIDTH/2-50, VIRTUAL_HEIGHT)
+    love.graphics.rectangle("fill", 100, 0, VIRTUAL_WIDTH/2-100, VIRTUAL_HEIGHT)
+    love.graphics.rectangle("fill", VIRTUAL_WIDTH/2, 0, VIRTUAL_WIDTH/2-100, VIRTUAL_HEIGHT)
     love.graphics.setColor(0, 0, 0, 0.5)
     love.graphics.rectangle("fill", VIRTUAL_WIDTH/2-5, 0, 10, VIRTUAL_HEIGHT)
 end 
@@ -1061,14 +1094,14 @@ function rules(query, i)
         if gameMode == "reversegame" then  
             return ball[i]:collides(player1)
         elseif gameMode == "normal" then 
-            return ball[i].x < 0 and ball[i].disabled == false 
+            return ball[i].x < -10 and ball[i].disabled == false 
         end
     end  
     if query == "p2miss" then 
         if gameMode == "reversegame" then 
             return ball[i]:collides(player2) 
         elseif gameMode == "normal" then 
-            return ball[i].x > VIRTUAL_WIDTH-10 and ball[i].disabled == false 
+            return ball[i].x > VIRTUAL_WIDTH and ball[i].disabled == false 
         end
     end 
 end 
@@ -1116,7 +1149,7 @@ function clientsBaseGame(dt)
         for i = 1, maxBalls do
             if rules("p1hit", i) then
                 
-                if (areanuclear == 0 and striken == 1 and (player1score > ptw-2 or player2score > ptw-2)) then
+                if (areanuclear == 0 and striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)) then
                    --print("Calling animation")
                     superanimator("tensehit", 1)
                    --print("AREA NUCLEAR?" .. areanuclear)
@@ -1188,7 +1221,7 @@ function clientsBaseGame(dt)
                 shakeDuration = 1
                 if
                     (areanuclear == 0 and
-                        (striken == 1 and (player1score > ptw-2 or player2score > ptw-2)))
+                        (striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)))
                  then
                    --print("AREA NUCLEAR?" .. areanuclear)
                     superanimator("tensehit", 2)
@@ -1467,7 +1500,6 @@ function menuDemo(dt)
     end
         ball[1].x = player2.x-8
         ball[1].dx = -ball[1].dx
-        ball[1].dy = -ball[1].dy 
     end 
     if ball[1].x <= player1.x+7 then
         sounds["beep"]:setPitch(ballSpeed / 250)
@@ -1502,7 +1534,6 @@ function menuDemo(dt)
     end
         ball[1].x = player1.x+8
         ball[1].dx = -ball[1].dx
-        ball[1].dy = -ball[1].dy
     end
     
     if ball[1].y <= 0 then

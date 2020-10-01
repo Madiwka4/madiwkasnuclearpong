@@ -9,7 +9,7 @@ function musicController(orders, toggling)
             sounds['gayTheme']:setVolume(0)
             sounds['gayTheme2']:setVolume(0)
         
-        elseif ((gameState == 'play' or gameState == '1serve' or gameState == '2serve') and player1score <= 7 and player2score <= 7 and areanuclear == 0) then 
+        elseif ((gameState == 'play' or gameState == '1serve' or gameState == '2serve') and player1score <= ptw*0.5 and player2score <= ptw*0.5 and areanuclear == 0) then 
             sounds['updateMusic']:stop()
             sounds['gayTheme2']:stop()
             sounds['gayTheme3']:stop()
@@ -17,8 +17,8 @@ function musicController(orders, toggling)
             sounds['gayTheme']:setLooping(true)
             sounds['gayTheme']:setVolume(0.5)
             sounds['gayTheme']:play()
-         elseif gameState == 'play' and player1score > ptw-2 or player2score > ptw-2 and areanuclear == 0 then 
-            --print(ptw-2)
+         elseif gameState == 'play' and player1score > ptw*0.8 or player2score > ptw*0.8 and areanuclear == 0 then 
+            --print(ptw*0.8)
             sounds['gayTheme']:stop()
             sounds['gayTheme3']:stop()
             sounds['updateMusic']:stop()
@@ -26,7 +26,7 @@ function musicController(orders, toggling)
             sounds['gayTheme2']:setLooping(true)
             sounds['gayTheme2']:setVolume(0.5)
             sounds['gayTheme2']:play()          
-        elseif gameState == 'play' and player1score > ptw-5 or player2score > ptw-5 and areanuclear == 0 then 
+        elseif gameState == 'play' and player1score > ptw*0.5 or player2score > ptw*0.5 and areanuclear == 0 then 
             --print(ptw-4)
             sounds['gayTheme']:stop()
             sounds['gayTheme2']:stop()

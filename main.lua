@@ -15,8 +15,11 @@ doubleclick1 = false
 doubleclick2 = false 
 hold1 = false 
 hold2 = false 
-debug = true
+debug = false
+paused = false 
 androidButtons = {}
+pauseButtons = {}
+doneButtons = {}
 showTouchControls = false 
 --GLOBAL VARIABLES
 frameratecap = 1/60
@@ -72,6 +75,8 @@ nuckemodactive = 0
 maxspeed = 700
 DIFFERENCE_X = 1
 DIFFERENCE_Y = 1
+OFFSET_X = 0 
+OFFSET_Y = 0 
 paddle_SPEED = 200
 textamount = 15
 AI_STRIKEMOD = 1000
@@ -185,50 +190,17 @@ function love.load()
         newButton(
             "H",
             function()
-                if gameState == "start" then
+                if globalState == "base" and gameState ~= "done"  then 
+                paused = true 
+                else 
                     resettinggenius()
+                    paused = false 
                     gameState = "menu"
                     ball[1].dx = 1
                     ball_DIR = 1
                     ball[1].dy = 1
                     globalState = "menu"
                     hardmanager()
-                elseif (gameState == "done") then
-                    if (player1score > player2score) then
-                        gameState = "2serve"
-                        potentialnuke1 = 0
-                        potentialnuke2 = 0
-                        striken = 0
-                        if (nuckemodactive == 0) then
-                            areanuclear = 0
-                            nuclearanimation = 3
-                        end
-                        potentialstrike1 = 0
-                        potentialstrike2 = 0
-                        player1nukescore = 0
-                        player2nukescore = 0
-                    else
-                        gameState = "1serve"
-                        resettinggenius()
-                        for i = 1, maxBalls do
-                            ball[i]:reset(i, 1)
-                        end
-                    end
-                else
-                    gameState = "menu"
-                    ball[1].dx = 1
-                    ball[1].dy = 1
-                    ball_DIR = 1
-                    globalState = "menu"
-                    if (love.math.random(0, 10) == 1) then
-                        TEXT = "Nuclear Ching Chong"
-                    else
-                        TEXT = "Nuclear Pong"
-                    end
-                    resettinggenius()
-                    for i = 1, maxBalls do
-                        ball[i]:reset(i)
-                    end
                 end
             end
         )
@@ -244,6 +216,103 @@ function love.load()
             end
         )
     )
+    table.insert(
+        pauseButtons,
+        newButton(
+            "Resume",
+            function()
+                paused = false 
+                TEXT = "Let's Continue"
+            end
+        )
+    )
+    table.insert(
+        doneButtons,
+        newButton(
+            "Freeplay",
+            function()
+                if player1score > player2score then 
+                    gameState = "2serve"
+                else 
+                    gameState = "1serve"
+                end
+                    potentialnuke1 = 0
+                    potentialnuke2 = 0
+                    striken = 0
+                    if (nuckemodactive == 0) then
+                        areanuclear = 0
+                        nuclearanimation = 3
+                    end
+                    potentialstrike1 = 0
+                    potentialstrike2 = 0
+                    player1nukescore = 0
+                    player2nukescore = 0
+            end
+        )
+    )
+    table.insert(
+        doneButtons,
+        newButton(
+            "Menu",
+            function()
+                resettinggenius()
+                TEXT = "Nuclear Pong"
+                    paused = false 
+                    gameState = "menu"
+                    ball[1].dx = 1
+                    ball_DIR = 1
+                    ball[1].dy = 1
+                    globalState = "menu"
+                    hardmanager()
+            end
+        )
+    )
+    if not isAndroid then 
+        table.insert(
+            pauseButtons,
+            newButton(
+                "Toggle Fullscreen",
+                function()
+                    myscreen:toggle(VIRTUAL_HEIGHT, VIRTUAL_WIDTH)
+                    DIFFERENCE_X = myscreen.c
+                    DIFFERENCE_Y = myscreen.d
+                    OFFSET_X = myscreen.e 
+                    OFFSET_Y = myscreen.f 
+                end
+            )
+        )
+    end 
+    table.insert(
+        pauseButtons,
+        newButton(
+            "Toggle Music",
+            function()
+                if mute then 
+                musicController("mute", 0)
+                else 
+                    musicController("mute", 1)
+                end 
+            end
+        )
+    )
+    table.insert(
+        pauseButtons,
+        newButton(
+            "Menu",
+            function()
+                resettinggenius()
+                    paused = false 
+                    TEXT = "Nuclear Pong"
+                    gameState = "menu"
+                    ball[1].dx = 1
+                    ball_DIR = 1
+                    ball[1].dy = 1
+                    globalState = "menu"
+                    hardmanager()
+            end
+        )
+    )
+
     table.insert(
         editorpicks,
         newButton(
@@ -267,6 +336,7 @@ function love.load()
         newButton(
             "Singleplayer",
             function()
+                ptw = 10
                 gameState = "gameMode"
             end
         )
@@ -399,19 +469,21 @@ function love.load()
     --    )
     --)
     table.insert(
-        buttons,
+        settings,
         newButton(
             "Toggle Fullscreen",
             function()
                 myscreen:toggle(VIRTUAL_HEIGHT, VIRTUAL_WIDTH)
                 DIFFERENCE_X = myscreen.c
                 DIFFERENCE_Y = myscreen.d
+                OFFSET_X = myscreen.e 
+                OFFSET_Y = myscreen.f 
             end
         )
     )
     if isAndroid then 
         table.insert(
-            settings,
+            buttons,
             newButton(
                 "Toggle Music",
                 function()
@@ -802,11 +874,13 @@ function love.load()
     ball[3] = eball(VIRTUAL_WIDTH / 1.8, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     ball[4] = eball(VIRTUAL_WIDTH / 2.2, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     ball[5] = eball(VIRTUAL_WIDTH / 2.1, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
-    myscreen = fullScreener(RESOLUTION_SET, isFullscreen, DIFFERENCE_X, DIFFERENCE_Y)
+    myscreen = fullScreener(RESOLUTION_SET, isFullscreen, DIFFERENCE_X, DIFFERENCE_Y, OFFSET_X, OFFSET_Y)
     if isAndroid then 
         myscreen:toggle(VIRTUAL_HEIGHT, VIRTUAL_WIDTH)
         DIFFERENCE_X = myscreen.c
         DIFFERENCE_Y = myscreen.d
+        OFFSET_X = myscreen.e 
+        OFFSET_Y = myscreen.f
     end
     mymenu = mainMenu()
 
@@ -851,9 +925,9 @@ function love.update(dt)
     end
     if debug then
         displayFPS()
-        print(player2.y .. " " .. player2.goal .. " " .. player2.dy .. " " .. AI_SPEED .. " " .. paddle_SPEED)
-    end
-    if globalState == "base" then
+        print(player2.y .. " " .. player2.goal .. " " .. player2.dy .. " " .. AI_SPEED .. " " .. paddle_SPEED .. " " .. lastSentKeyClient)
+    end 
+    if globalState == "base" and not paused then
         basegame(dt)
         
     end
@@ -867,6 +941,7 @@ function love.update(dt)
         musicController('norm', 1)
         
     end
+     
     if globalState == "nettest" then 
         --print("Confcode: " .. confirmation)
         if confirmation == "N" then 
@@ -894,7 +969,6 @@ function love.update(dt)
         end 
         clienttest(dt)
     end
-   
 
 end
 serverinit = false 
@@ -1319,9 +1393,15 @@ function love.keypressed(key)
         end
     end
     if key == "escape" then
-        if not isAndroid then 
-            TEXT = "Escape Key"
-            love.event.quit()
+        if not isAndroid and globalState == "base" and gameState ~= "done" then 
+            if paused then 
+                paused = false 
+                TEXT = "Let's Continue"
+            else 
+            paused = true
+            TEXT = "PAUSED"
+            end  
+            
         end 
     elseif key == "enter" or key == "return" then
         if gameState == "start" then
@@ -1497,6 +1577,8 @@ function gameModeChanger()
             local by = (VIRTUAL_HEIGHT * 0.5) - (total_height * 0.5) + cursor_y
             local color = {255, 255, 255, 255}
             local mx, my = love.mouse.getPosition()
+            mx = mx   
+            my = my  
             mx = mx * DIFFERENCE_X
             my = my * DIFFERENCE_Y
             hot = (mx > bx and mx < bx + button_width and my > by and my < by + BUTTON_HEIGHT) and i
@@ -1538,6 +1620,8 @@ function gameModeChanger()
             end
             local color = {255, 255, 255, 255}
             local mx, my = love.mouse.getPosition()
+            mx = mx   
+            my = my  
             mx = mx * DIFFERENCE_X
             my = my * DIFFERENCE_Y
             hot = (mx > bx and mx < bx + button_width and my > by and my < by + BUTTON_HEIGHT) and i
@@ -1655,6 +1739,18 @@ function love.draw(dt)
             androidDraw()
             love.keyboard.mouseisReleased = false
         end
+        if debug then 
+        if touches then 
+        for i, touch in ipairs(touches) do 
+        love.graphics.printf(touch.x, 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
+        end 
+        if doubleclick1 then 
+            TEXT = "DOUBLECLICK1"
+            elseif doubleclick2 then TEXT = "DOUBLECLICK2"
+            else TEXT = "NO"
+            end
+        end
+    end 
     simpleScale.unSet()
 end
 
@@ -1787,6 +1883,8 @@ function resolutionChanger()
         if (isFullscreen == 1) then
             DIFFERENCE_X = 1
             DIFFERENCE_Y = 1
+            OFFSET_X = 0
+            OFFSET_Y = 0
             simpleScale.updateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, {fullscreen = false})
             isFullscreen = 0
         end
@@ -1798,6 +1896,8 @@ function resolutionChanger()
             local newHeight = love.graphics.getHeight()
             DIFFERENCE_X = VIRTUAL_WIDTH / newWidth
             DIFFERENCE_Y = VIRTUAL_HEIGHT / newHeight
+            OFFSET_X = math.fmod(newWidth, VIRTUAL_WIDTH) / 2 
+            OFFSET_Y = math.fmod(newHeight, VIRTUAL_HEIGHT) / 2
             isFullscreen = 1
         end
     end
@@ -1848,7 +1948,7 @@ function love.mousereleased(x, y, button)
     love.keyboard.mouseisReleased = true
     if (gameState == "editor") then
         if (#walls < 1000 and button == 1 and blockinput ~= true) then
-            table.insert(walls, newWall(x * DIFFERENCE_X, y * DIFFERENCE_Y, 10, wall1width))
+            table.insert(walls, newWall((x ) * DIFFERENCE_Y , (y ) * DIFFERENCE_Y , 10, wall1width))
         end
     end
 end
@@ -2135,16 +2235,21 @@ end
 local lastclick = 0
 local clickInterval = 0.4
 function love.touchpressed( id, x, y, dx, dy, pressure )
-    if isAndroid then 
+    if isAndroid then
+        if x < love.graphics.getWidth()-OFFSET_X/2 then  
+        actualX = (x - OFFSET_X/2) * DIFFERENCE_Y
+        else 
+            actualX = 1380
+        end
         local existsingID = touchExists(id)
         if existsingID ~= -1 then 
-            touches[existsingID].x = x * DIFFERENCE_X
-            touches[existsingID].y = y * DIFFERENCE_Y
+            touches[existsingID].x = actualX
+            touches[existsingID].y = (y) * DIFFERENCE_Y
         else 
-            table.insert(touches, newTouch(id, x*DIFFERENCE_X, y*DIFFERENCE_Y))
+            table.insert(touches, newTouch(id, actualX , (y)  * DIFFERENCE_Y))
             local time = love.timer.getTime()
-            if x * DIFFERENCE_X < VIRTUAL_WIDTH/2  then 
-            if time <= lastclick + clickInterval and x*DIFFERENCE_X > 100 then
+            if actualX < VIRTUAL_WIDTH/2  then 
+            if time <= lastclick + clickInterval and actualX> 100 then
                 doubleclick1 = true 
                 if gameState == "1serve" then 
                     lastSentKey = "q"
@@ -2155,8 +2260,9 @@ function love.touchpressed( id, x, y, dx, dy, pressure )
                 doubleclick1 = false 
                 lastclick = time
             end
+
             else 
-                if time <= lastclick + clickInterval and x*DIFFERENCE_X < VIRTUAL_WIDTH-100 then
+                if time <= lastclick + clickInterval and actualX < VIRTUAL_WIDTH-100 then
                     doubleclick2 = true 
                     if gameState == "2serve" then 
                         lastSentKey = "p"
@@ -2191,10 +2297,15 @@ function love.touchreleased( id, x, y, dx, dy, pressure )
 end 
 function love.touchmoved( id, x, y, dx, dy, pressure )
     if isAndroid then 
+        if x < love.graphics.getWidth()-OFFSET_X/2 then  
+            actualX = (x - OFFSET_X/2) * DIFFERENCE_Y
+            else 
+                actualX = 1380
+            end
         local existsingID = touchExists(id)
         if existsingID ~= -1 then 
-            touches[existsingID].x = x * DIFFERENCE_X
-            touches[existsingID].y = y * DIFFERENCE_Y
+            touches[existsingID].x = actualX
+            touches[existsingID].y = (y  ) * DIFFERENCE_Y 
             if touches[existsingID].originalX - touches[existsingID].x > 200 and 
             touches[existsingID].originalX < VIRTUAL_WIDTH/2 then 
                 hold1 = true 
@@ -2229,7 +2340,22 @@ function table.empty (self)
 end
 function sectortouched(sector)
 for i, touch in ipairs(touches) do 
-    if touch.x > VIRTUAL_WIDTH-100 and touch.y < player2.y then 
+    if (AGAINST_AI == 1) then 
+        if sector == 2 and touch.x < 100 and touch.y < player1.y then 
+            lastSentKey = p1control.up
+            return true 
+        elseif sector == 2 and touch.x > VIRTUAL_WIDTH/2+10 and touch.y < player1.y then 
+                lastSentKey = p1control.up
+                return true 
+        elseif sector == 3 and touch.x < 100 and touch.y > player1.y+player1.height*0.9 then 
+            lastSentKey = p1control.down
+            return true    
+        elseif sector == 3 and touch.x > VIRTUAL_WIDTH/2+10 and touch.y > player1.y+player1.height*0.9 then 
+            lastSentKey = p1control.down
+            return true  
+        end
+    else
+    if sector == 1 and touch.x > VIRTUAL_WIDTH-100 and touch.y < player2.y then 
         lastSentKey = p2control.up 
         return true 
     elseif sector == 2 and touch.x < 100 and touch.y < player1.y then 
@@ -2242,6 +2368,7 @@ for i, touch in ipairs(touches) do
         lastSentKey = p2control.down
         return true
     end 
+end 
 end
 return false 
 end 

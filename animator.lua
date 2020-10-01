@@ -36,6 +36,12 @@ function staticanimatorcounter(dt)
             explosionRange = 0
         end
     end
+    if gameState == "done" then 
+        if explosionRange < 40 then 
+        nuclearanimation = nuclearanimation - dt
+        explosionRange = explosionRange + dt*24
+        end
+    end
     if (player1anim) then 
        --print("Effect range: " .. effectRange[0])
         effectRange[0] = effectRange[0] + dt*24
