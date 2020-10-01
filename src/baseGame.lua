@@ -394,7 +394,7 @@ function goalManager()
                 for i = 1, maxBalls do
                     ball[i]:reset(i, 2)
                 end
-                if (player2score+1 >= ptw and gameMode ~= "practice") then
+                if (player2score+1 == ptw+maxBalls-1 and gameMode ~= "practice") then
                     for i = 1, maxBalls do
                         ball[i]:reset(i)
                     end
@@ -436,7 +436,7 @@ function goalManager()
     
                 AI_SPEED = difficultyl 
                 
-                if (player1score+1 >= ptw) then
+                if (player1score+1 == ptw+maxBalls-1) then
                     ball[i]:reset(i)
     
                     sounds["win"]:play()
@@ -599,11 +599,26 @@ function winDraw(who)
 
     love.graphics.setColor(0, 0, 0, 1)
     if who == 1 then 
-        
     love.graphics.circle("fill", player2.x, player2.y, explosionRange * 100, 100)
+    love.graphics.setColor(0.7, 0.1, 0.1, 1)
+    love.graphics.circle("fill", player2.x, player2.y, explosionRange * 90, 100)  
+    love.graphics.setColor(0.1, 0.7, 0.1, 1)
+    love.graphics.circle("fill", player2.x, player2.y, explosionRange * 80, 100)
+    love.graphics.setColor(0.1, 0.1, 0.7, 1)
+    love.graphics.circle("fill", player2.x, player2.y, explosionRange * 70, 100)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.circle("fill", player2.x, player2.y, explosionRange * 60, 100)
     print("cicrleexplostion at " .. explosionRange)
     else 
-    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 100, 100)
+        love.graphics.circle("fill", player1.x, player1.y, explosionRange * 100, 100)
+    love.graphics.setColor(0.7, 0.1, 0.1, 1)
+    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 90, 100)  
+    love.graphics.setColor(0.1, 0.7, 0.1, 1)
+    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 80, 100)
+    love.graphics.setColor(0.1, 0.1, 0.7, 1)
+    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 70, 100)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.circle("fill", player1.x, player1.y, explosionRange * 60, 100)
     end 
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")

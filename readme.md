@@ -18,4 +18,13 @@ To play the game on Linux, just launch the ./debuggame.sh and enjoy the game!
 To play on Linux like a normie, you can <a href = "https://madi-wka.club/NuclearPongLinux.tar.gz">Download</a> the latest release (may be outdated compared to the source version), or you can download the LOVE file from the releases tab.
 To play on Windows, download a Windows executable from the releases tab! 
 # Changes
-<p>0.7.8 is here! With this new update, a ton of graphical bugs are fixed, and the menu has been revamped! The android version got a treat as well: the controls are now not just two buttons on each side of the screen, but they instead track your finger and try to place the paddle under it! 
+<p>0.7.9 is here! Changelog:
+<ul>
+<li>Added pause menu (hit escape on PC and hit the H button on Android.</li>
+<li>Added win and lose animations</li>
+<li>Fixed musical bugs</li>
+<li>Fixed multiplayer second player lag that came with 0.7.8</li>
+<li>Fixed touch controls on android: controls are no longer dependant on the screen ratio</li>
+<li>Added different tracks for when you are losing or winning (singleplayer/online only)</li>
+</ul>
+</p>

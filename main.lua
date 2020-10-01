@@ -819,6 +819,7 @@ function love.load()
         ["gayTheme"] = love.audio.newSource("audio/theme2.mp3", "static"),
         ["gayTheme2"] = love.audio.newSource("audio/theme3.mp3", "static"),
         ["gayTheme3"] = love.audio.newSource("audio/theme4.mp3", "static"),
+        ["gayTheme4"] = love.audio.newSource("audio/theme5.mp3", "static"),
         ["beep"] = love.audio.newSource("audio/hit1.mp3", "static"),
         ["wallhit"] = love.audio.newSource("audio/hit2.wav", "static"),
         ["win"] = love.audio.newSource("win.wav", "static"),
