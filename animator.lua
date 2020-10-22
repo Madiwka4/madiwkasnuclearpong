@@ -95,3 +95,7 @@ function staticanimator()
         love.graphics.circle("fill", player2.x, player2.y , diseffectRange[1]*100, 100)
     end
 end
+function animateExplosion(x, y, v, color)
+    love.graphics.setColor(color)
+    love.graphics.circle("fill", x, y, explosionRange * v, 100)
+end 

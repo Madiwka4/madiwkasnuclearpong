@@ -11,7 +11,7 @@ function basegame(dt)
     end
     speedControl()
     balancer()
-    
+    effectControl()    
     if t < shakeDuration then
         t = t + dt
     end
@@ -40,7 +40,7 @@ function basegame(dt)
        --print(areanuclear .. striken .. player1score .. player2score)
         for i = 1, maxBalls do
             if rules("p1hit", i) then
-                
+                print("inserted")
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)) then
                    --print("Calling animation")
                   --print("AREA NUCLEAR?" .. areanuclear)
@@ -370,7 +370,7 @@ end
 
 function goalManager()
     for i = 1, maxBalls do
-        if (rules("p1miss", i)) then
+        if (rules("p1miss", i)) then 
             ball[i].disabled = true 
             ball[i].x = 2000
             
@@ -587,6 +587,8 @@ function nuclearDraw()
         nuclearanimation / 3,
         nuclearanimation / 3,
         nuclearanimation / 3
+
+
     for i = 1, maxBalls do
         love.graphics.setColor(nuclearanimation / 3, nuclearanimation / 3, nuclearanimation / 3, 1)
         ball[i]:render("controlled")
@@ -629,6 +631,10 @@ function normalDraw()
         love.graphics.clear(1, 1, 1, 1)
     else
         love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1) 
+    end
+    for i, explosion in ipairs(explosions) do 
+        explosion:render()
+        print("exploding")
     end
     staticanimator()
 
@@ -747,7 +753,6 @@ function menuDraw()
             )
         )
         end 
-        if not isAndroid then 
         table.insert(
             IPselect,
             newButton(
@@ -761,7 +766,6 @@ function menuDraw()
                 end
             )
         )
-        end 
         table.insert(
             IPselect,
             newButton(
@@ -848,6 +852,7 @@ function menuDraw()
 end
 function baseDraw()
     love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1) 
+
     if shakeDuration > t then 
             
         local dx = love.math.random(-shakeMagnitude, shakeMagnitude)
@@ -867,6 +872,7 @@ function baseDraw()
             menuDraw()
         end
     end
+
     if globalState == 'base' or globalState == 'reverse' or globalState == 'nettest' or globalState == 'clienttest' then 
 
         love.graphics.setFont(smallfont)
@@ -892,6 +898,7 @@ function baseDraw()
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, doneButtons, sounds, "middle")
         love.keyboard.mouseisReleased = false
     end
+
 end 
 function androidDraw()
 --HOME BUTTON HERE
@@ -1107,6 +1114,7 @@ function rules(query, i)
     end 
     if query == "p1miss" then 
         if gameMode == "reversegame" then  
+            
             return ball[i]:collides(player1)
         elseif gameMode == "normal" then 
             return ball[i].x < -10 and ball[i].disabled == false 
@@ -1132,7 +1140,7 @@ function clientsBaseGame(dt)
     end
     speedControl()
     balancer()
-    
+    effectControl()
     if t < shakeDuration then
         t = t + dt
     end
@@ -1163,7 +1171,7 @@ function clientsBaseGame(dt)
        --print(areanuclear .. striken .. player1score .. player2score)
         for i = 1, maxBalls do
             if rules("p1hit", i) then
-                
+
                 if (areanuclear == 0 and striken == 1 and (player1score > ptw*0.8 or player2score > ptw*0.8)) then
                    --print("Calling animation")
                     superanimator("tensehit", 1)
@@ -1471,7 +1479,7 @@ function menuDemo(dt)
     AI(player1, maxBalls, 1300)
     player2.goal = 360
     end 
-    print(neededTarget, neededTarget1)
+    --print(neededTarget, neededTarget1)
    --print("menu demo active")
     ball[1]:update(dt)
     player1:update(dt)
@@ -1567,5 +1575,20 @@ function menuDemo(dt)
         ball[1].y = VIRTUAL_HEIGHT - 40
         ball[1].dy = -ball[1].dy
        
+    end
+end 
+function effectControl()
+    if player1score > 0.8 * ptw or player2score > 0.8 * ptw then 
+        for i = 1, maxBalls do 
+            if math.abs(ball[i].x - VIRTUAL_WIDTH/2) < 10 and #explosions < 1 then 
+                table.insert(explosions, explosion(love.math.random(100, VIRTUAL_WIDTH-100), love.math.random(player1.y, player2.y), 100, {player1.y/2.81/255,player2.y/2.81/255,ball[1].y/2.81/255,0.4}))
+            end
+        end
+    end 
+    for i, explosion in ipairs(explosions) do 
+        if explosion.killed then 
+            table.remove(explosions, i)
+            print("buried the body")
+        end
     end
 end 

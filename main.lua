@@ -15,7 +15,7 @@ doubleclick1 = false
 doubleclick2 = false 
 hold1 = false 
 hold2 = false 
-debug = false
+debug = true
 paused = false 
 androidButtons = {}
 pauseButtons = {}
@@ -170,6 +170,8 @@ function controlChanger()
 end
 function love.load()
     love.keyboard.setKeyRepeat(true)
+    
+    tick.framerate = 60
     simpleScale.setWindow(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT)
     configfile = io.open("config.lua", "r")
     configsave = io.open("config.lua", "w")
@@ -871,6 +873,7 @@ function love.load()
     player3 = paddle(5000, 5000, 10, 100)
     player4 = paddle(5000, 5000, 10, 100)
     ball = {}
+    explosions = {}
     ball[1] = eball(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     ball[2] = eball(VIRTUAL_WIDTH / 1.9, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
     ball[3] = eball(VIRTUAL_WIDTH / 1.8, VIRTUAL_HEIGHT / 2 - 2, 16, 16)
@@ -900,7 +903,7 @@ function startShake(duration, magnitude)
     t, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
 end
 function displayFPS()
-    --love.window.setTitle(love.timer.getFPS())
+    love.window.setTitle(love.timer.getFPS())
     --love.window.setTitle(globalState .. " " .. gameState .. " " .. paddle_SPEED .. " " .. p1bonus .. " " .. player1.dy)
     if love.keyboard.isDown("space") then
         player1nukescore = 200
@@ -918,7 +921,9 @@ end
 
 function love.update(dt)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
-    
+    for i, explosion in ipairs(explosions) do 
+        explosion:update(dt)
+    end
     staticanimatorcounter(dt)
         player1.goal = -1
         player2.goal = -1

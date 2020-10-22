@@ -1,5 +1,4 @@
 function AI(target, ballCnt, diff)
-    print("AI RUNNING")
     currentTarget = evaluateClosestBall(target);
    --print("CLOSEST TARGET IS " .. currentTarget)
     if diff < 1200 then 
