@@ -71,7 +71,9 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
         local total_height = (ev_BUTTON_HEIGHT + margin) * #buttons
         local ev_bx, ev_by
         for i, button in ipairs(buttons) do 
+            print("Button")
             button.last = button.now
+            ev_bx = button.x
             if (location == 'control') then 
                 
                     if string.sub(button.text, 1, 1) == '2' then 
@@ -87,10 +89,12 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                 elseif button.text == 'NUCLEAR MODE' and easternum < 11 then 
                     ev_bx = -400
                     ev_by = -400
-                else
-                    ev_bx = locationx - (ev_button_width * 0.5)
+                elseif button.x > locationx - (ev_button_width * 0.5) then
+                    button.x = button.x - 15
+                    ev_by = locationy - (total_height * 0.5) + cursor_y 
+                else 
                     ev_by = locationy - (total_height * 0.5) + cursor_y
-            end
+                end
             if (button.text == 'Play') and location == 'playercount' then color = {0/255, 255/255, 0/255, 255} else
                 color = {10, 10, 0, 255}
             end
@@ -119,7 +123,10 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                 love.keyboard.mouseisReleased = false 
                 love.graphics.setColor(0,0,0,1)
                 love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-              sounds['wallhit']:play()  
+              sounds['wallhit']:play() 
+              for i, buttons in ipairs(buttons) do 
+                buttons.x = 1280 
+          end
              button.fn()
          end
             love.graphics.setColor(unpack(color))
@@ -156,7 +163,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                 cursor_y = cursor_y + (ev_BUTTON_HEIGHT + margin)
             else
                     if (button.text == '1v1') then 
-                        love.graphics.print(playertext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, by+textH*0.5) 
+                        love.graphics.print(playertext, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, by+textH*0.5) 
                     elseif button.text == 'snc' then 
                         if (nuckemodactive == 1) then
                             love.graphics.setColor(1,0,0,1)
@@ -165,28 +172,28 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                             love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
                             love.graphics.setColor(0,0,0,1) 
                         else
-                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.45 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print(synctext, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                         end
                     elseif (button.text == 'ballCount') then 
-                        love.graphics.print("Ball Count: " .. maxBalls, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
+                        love.graphics.print("Ball Count: " .. maxBalls, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                     elseif (button.text == "Ball Speed: ") then 
                         if (nuckemodactive == 1) then 
 
                             love.graphics.setColor(1,0,0,1)
-                            love.graphics.print("shaitan machina", smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print("shaitan machina", smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                             love.graphics.setColor(1,1,1,1)
-                            love.graphics.print("shaitan machina", smallfont, VIRTUAL_WIDTH*0.5 - textW*0.5, ev_by+textH*0.5)
+                            love.graphics.print("shaitan machina", smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                             love.graphics.setColor(0,0,0,1) 
 
                         else
-                            love.graphics.print(button.text .. ballSet, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.6, ev_by+textH*0.5)
+                            love.graphics.print(button.text .. ballSet, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                         end
                     elseif button.text == 'ptw' then 
-                        love.graphics.print("Points to Win: " .. ptw, smallfont,VIRTUAL_WIDTH*0.5 - textW * 2.8, ev_by+textH*0.5)
+                        love.graphics.print("Points to Win: " .. ptw, smallfont, ev_bx + ev_button_width*0.5 - textW * 2.8, ev_by+textH*0.5)
                     elseif (button.text ==  'Silverblade') then 
                         love.graphics.print("Difficulty: " .. prtext, smallfont, VIRTUAL_WIDTH*0.5 - textW , ev_by+textH*0.5) 
                     else
-                        love.graphics.print(button.text, smallfont, locationx - textW*0.5, ev_by+textH*0.5)
+                        love.graphics.print(button.text, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                     end
                         love.graphics.setColor(255, 255, 255, 255)
                         cursor_y = cursor_y + (ev_BUTTON_HEIGHT + margin)
@@ -197,6 +204,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
         end
 function mainMenu:addButton(text, fn)
     return {
+        x = 1290,
         text = text, 
         fn = fn,
         now = false,

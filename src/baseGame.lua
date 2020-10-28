@@ -749,7 +749,8 @@ function menuDraw()
                 IPnew,
                 function()
                     love.keyboard.setTextInput( true, 0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT/3)
-                end
+                end,
+                "stationary"
             )
         )
         end 
@@ -763,7 +764,8 @@ function menuDraw()
                     gameState = "1serve"
                     ball[1]:reset(1, 1)
                     player2.dy = 0 
-                end
+                end,
+                "stationary"
             )
         )
         table.insert(
@@ -773,7 +775,8 @@ function menuDraw()
                 function()
                     IP = IPnew
                     counter = 0
-                end
+                end,
+                "stationary"
             )
         )
         if status == "offline" then 
@@ -790,7 +793,8 @@ function menuDraw()
                         gameState = "1serve"
                         ball[1]:reset(1, 1)
                         player2.dy = 0 
-                    end
+                    end,
+                    "stationary"
                 )
             )
             
@@ -806,7 +810,8 @@ function menuDraw()
                         gameState = "1serve"
                         ball[1]:reset(1, 1)
                         player2.dy = 0 
-                    end
+                    end,
+                    "stationary"
                 )
             )
         elseif status == "full" then 

@@ -109,13 +109,24 @@ function newTouch(id, x, y)
         originalY = y 
     }
 end 
-function newButton(text, fn)
+function newButton(text, fn, sp)
+    if sp ~= nil then 
+        return {
+            x = (VIRTUAL_WIDTH * 0.5) - VIRTUAL_WIDTH * (1/3)*0.5,
+            text = text,
+            fn = fn,
+            now = false,
+            last = false
+        }
+    else
     return {
+        x = 1290,
         text = text,
         fn = fn,
         now = false,
         last = false
     }
+end
 end
 function love.keyboard.mouseWasReleased()
     return love.keyboard.mouseisReleased
@@ -195,6 +206,7 @@ function love.load()
                 if globalState == "base" and gameState ~= "done"  then 
                 paused = true 
                 else 
+                    resetButtonX(buttons)
                     TEXT = "Nuclear Pong"
                     resettinggenius()
                     paused = false 
@@ -2378,4 +2390,10 @@ for i, touch in ipairs(touches) do
 end 
 end
 return false 
+end 
+
+function resetButtonX(arr)
+    for i, buttons in ipairs(arr) do 
+        buttons.x = 1290 
+  end
 end 
