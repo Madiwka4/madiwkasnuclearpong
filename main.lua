@@ -15,13 +15,28 @@ doubleclick1 = false
 doubleclick2 = false 
 hold1 = false 
 hold2 = false 
-debug = true
+debug = false
 paused = false 
 androidButtons = {}
 pauseButtons = {}
 doneButtons = {}
 showTouchControls = false 
 --GLOBAL VARIABLES
+
+
+--0.9 VARIABLES
+background = love.graphics.newImage('img/background.jpg')
+bigship = love.graphics.newImage('img/large_red_01.png')
+backgroundScroll = 0
+
+background_scroll_speed = 10
+background_looping_point = 810
+
+--END HERE
+
+
+
+
 frameratecap = 1/60
 realtimer = 0
 myip = "unknown"
@@ -55,7 +70,7 @@ GREEN = 255
 IP = '45.76.95.31'
 IPnew = '45.76.95.31'
 BLUE = 255
-updateTEXT = "Chalkboard Update"
+updateTEXT = "Galaxy Update"
 maxBalls = 1
 playerCount = 1
 player1reverbav = 0
@@ -173,6 +188,7 @@ controlSettings = {}
 modeSelectorButtons = {}
 pracdiff = {}
 playerCountButtons = {}
+ships = {}
 function controlChanger()
     if (gameState == "assign") then
         love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
@@ -180,6 +196,7 @@ function controlChanger()
     end
 end
 function love.load()
+    love.graphics.setDefaultFilter('nearest', 'nearest')
     love.keyboard.setKeyRepeat(true)
     
     tick.framerate = 60
@@ -855,6 +872,7 @@ function love.load()
     --	resizable = true,
     --	vsync = true,
     --})
+    love.window.setVSync( 0 )
     player1score = 0
     player2score = 0
     areanuclear = 0
@@ -902,7 +920,8 @@ function love.load()
     mymenu = mainMenu()
 
     ballSpeed = 200
-
+    background_scroll_speed = ballSpeed / 20
+    background_scroll_speed = ballSpeed / 20
     ballDX = math.random(2) == 1 and 100 or -100
     ballDY = math.random(-50, 50)
 
@@ -928,10 +947,13 @@ end
 function speedControl()
     if (ballSpeed > maxspeed and gameState == "play") then
         ballSpeed = maxspeed
+        background_scroll_speed = ballSpeed / 20
     end
 end
-
+checking = 0
 function love.update(dt)
+    --checking = checking + 1
+    --print(checking)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
     for i, explosion in ipairs(explosions) do 
         explosion:update(dt)
@@ -944,7 +966,7 @@ function love.update(dt)
     end
     if debug then
         displayFPS()
-        print(player2.y .. " " .. player2.goal .. " " .. player2.dy .. " " .. AI_SPEED .. " " .. paddle_SPEED .. " " .. lastSentKeyClient)
+        --print(player2.y .. " " .. player2.goal .. " " .. player2.dy .. " " .. AI_SPEED .. " " .. paddle_SPEED .. " " .. lastSentKeyClient)
     end 
     if globalState == "base" and not paused then
         basegame(dt)
@@ -1485,6 +1507,7 @@ function speedSetter(requesttype)
             paddle_SPEED = paddle_SPEED + 5
         end
         ballSpeed = ballSet
+        background_scroll_speed = ballSpeed / 20
     end
     if (requesttype == "snc") then
         synctype = synctype + 1
@@ -1525,10 +1548,12 @@ function speedSetter(requesttype)
             synctext = "death is imminent"
         end
         ballSpeed = ballSet
+        background_scroll_speed = ballSpeed / 20
     end
     if (requesttype == "practice") then
         if (ballSpeed > 999) then
             ballSpeed = 200
+            background_scroll_speed = ballSpeed / 20
             ballSet = 200
         end
         if (ballSpeed > 799) then
@@ -1545,10 +1570,12 @@ function speedSetter(requesttype)
             maxBalls = 3
         end
         ballSpeed = ballSpeed + 200
+        background_scroll_speed = ballSpeed / 20
         ballSet = ballSet + 200
     end
     if (requesttype == "reset") then
         ballSpeed = 200
+        background_scroll_speed = ballSpeed / 20
         ballSet = 200
         synctype = 0
         prtext = "Easy"
@@ -1943,6 +1970,7 @@ function resettinggenius()
     player2.height = 100
     ballSet = 200
     ballSpeed = ballSet
+    background_scroll_speed = ballSpeed / 20
     player2.GREEN = 255
     player2.BLUE = 255
     player1.GREEN = 255
@@ -2397,3 +2425,4 @@ function resetButtonX(arr)
         buttons.x = 1290 
   end
 end 
+

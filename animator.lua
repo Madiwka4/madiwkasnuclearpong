@@ -17,6 +17,7 @@ function superanimator(type, param)
     end
 end
 function staticanimatorcounter(dt)
+    backgroundScroll = (backgroundScroll + background_scroll_speed * dt) % background_looping_point 
     if (gameState == 'animation') then
         time_1 = time_1 + dt
         light = 255 - time_1 * 85
@@ -50,7 +51,7 @@ function staticanimatorcounter(dt)
         end
     end 
     if player1animend then 
-       --print("DISEffect range: " .. diseffectRange[0])
+       print("DISEffect range: " .. diseffectRange[0])
         diseffectRange[0] = diseffectRange[0] + dt*24
         if diseffectRange[0] > 50 then 
             effectRange[0] = 0
@@ -67,7 +68,7 @@ function staticanimatorcounter(dt)
         end
     end 
     if player2animend then 
-       --print("DISEffect range: " .. diseffectRange[1])
+       print("DISEffect range: " .. diseffectRange[1])
         diseffectRange[1] = diseffectRange[1] + dt*24
         if diseffectRange[1] > 50 then 
             effectRange[1] = 0
@@ -78,22 +79,15 @@ function staticanimatorcounter(dt)
     end
 end
 function staticanimator()
-    if player1anim then 
-        love.graphics.setColor(140/255,70/255,70/255,1)
+    if player1anim or player1animend then 
+        love.graphics.setColor(140/255,70/255,70/255,(50-diseffectRange[0])/100)
         love.graphics.circle("fill", player1.x, player1.y , effectRange[0]*100, 100)
     end
-    if player1animend then 
-        love.graphics.setColor(40/255,40/255,40/255,1)
-        love.graphics.circle("fill", player1.x, player1.y , diseffectRange[0]*100, 100)
-    end
-    if player2anim then 
-        love.graphics.setColor(70/255,70/255,140/255,1)
+    if player2anim or player2animend then 
+        love.graphics.setColor(70/255,70/255,140/255,(50-diseffectRange[1])/100)
         love.graphics.circle("fill", player2.x, player2.y , effectRange[1]*100, 100)
     end
-    if player2animend then 
-        love.graphics.setColor(40/255,40/255,40/255,1)
-        love.graphics.circle("fill", player2.x, player2.y , diseffectRange[1]*100, 100)
-    end
+
 end
 function animateExplosion(x, y, v, color)
     love.graphics.setColor(color)

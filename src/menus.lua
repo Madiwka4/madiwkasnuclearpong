@@ -1,3 +1,0 @@
-function menumode() 
-    dangerChecker()
-end

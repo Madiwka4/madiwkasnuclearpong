@@ -71,7 +71,7 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
         local total_height = (ev_BUTTON_HEIGHT + margin) * #buttons
         local ev_bx, ev_by
         for i, button in ipairs(buttons) do 
-            print("Button")
+            --print("Button")
             button.last = button.now
             ev_bx = button.x
             if (location == 'control') then 

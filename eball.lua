@@ -14,8 +14,6 @@ function eball:init(x, y, width, height)
 end
 	
 function eball:collides(paddle)
-	if paddle.player == 2 and gameMode == 'practice' then return false
-	else 
     if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
         return false
     end
@@ -24,7 +22,6 @@ function eball:collides(paddle)
         return false
     end 
 	return true
-end
 end
 function eball:reset(ballnum, player)
 	if (gameMode == 'practice') then 
