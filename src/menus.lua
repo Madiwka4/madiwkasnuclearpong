@@ -1,0 +1,3 @@
+function menumode() 
+    dangerChecker()
+end

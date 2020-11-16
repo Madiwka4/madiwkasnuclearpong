@@ -5,6 +5,7 @@ ship = Class{}
 
 
 function ship:init()
+    self.y = 0
     self.direction = love.math.random(0, 2)
     if self.direction == 0 then 
         self.y = VIRTUAL_HEIGHT + 100
@@ -67,7 +68,7 @@ end
 
 function ship:render()
     if self.direction ~= 0 then 
-    love.graphics.draw(self.image, self.x, self.y+self.height, 0, 1, -1)
+        love.graphics.draw(self.image, self.x, self.y + self.height, 0, 1, -1)
     else
         love.graphics.draw(self.image, self.x, self.y)
     end

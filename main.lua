@@ -25,6 +25,7 @@ showTouchControls = false
 
 
 --0.9 VARIABLES
+wallsLoadError = false 
 background = love.graphics.newImage('img/background.jpg')
 bigship = love.graphics.newImage('img/large_red_01.png')
 backgroundScroll = 0
@@ -196,6 +197,10 @@ function controlChanger()
     end
 end
 function love.load()
+    walls = {}
+    love.filesystem.createDirectory( "pong" )
+    print (love.filesystem.getSaveDirectory())
+    print (love.filesystem.getIdentity(  ))
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.keyboard.setKeyRepeat(true)
     
@@ -211,7 +216,10 @@ function love.load()
     testwalls = love.filesystem.load("save.lua")()
     if testwalls ~= nil then
         walls = love.filesystem.load("save.lua")()
-    end
+        print("Save file found")
+    else
+        print("No save file found!")
+    end 
 
     light = 0
     image = love.graphics.newImage("Madi.png")
@@ -360,6 +368,10 @@ function love.load()
             "L",
             function()
                 walls = love.filesystem.load("save.lua")()
+                if walls == nil then 
+                    walls = {}
+                    wallsLoadError = true 
+                end
             end
         )
     )
@@ -1797,6 +1809,10 @@ function love.draw(dt)
             end
         end
     end 
+    if wallsLoadError then 
+        love.graphics.setColor(1,0,0,1)
+        love.graphics.printf("Error loading map!", 0,0,VIRTUAL_WIDTH, "left")
+    end
     simpleScale.unSet()
 end
 
