@@ -1,7 +1,5 @@
 local counter = 0
-local ship_timer = 0
 function basegame(dt)
-    shipManager(dt)
     if gameMode == "reversegame" then 
         reversegame(dt)
     end 
@@ -644,9 +642,6 @@ function normalDraw()
     else
         love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1)
         love.graphics.draw(background, 0, -backgroundScroll) 
-        for k, ship in pairs(ships) do 
-            ship:render()
-        end 
     end
     if gameState == "assign" then
         love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
@@ -770,7 +765,8 @@ function menuDraw()
                 function()
                     love.keyboard.setTextInput( true, 0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT/3)
                 end,
-                "stationary"
+                true,
+                1
             )
         )
         end 
@@ -785,7 +781,7 @@ function menuDraw()
                     ball[1]:reset(1, 1)
                     player2.dy = 0 
                 end,
-                "stationary"
+                true, 1
             )
         )
         table.insert(
@@ -796,7 +792,7 @@ function menuDraw()
                     IP = IPnew
                     counter = 0
                 end,
-                "stationary"
+                true, 1
             )
         )
         if status == "offline" then 
@@ -814,7 +810,7 @@ function menuDraw()
                         ball[1]:reset(1, 1)
                         player2.dy = 0 
                     end,
-                    "stationary"
+                    false, 1
                 )
             )
             
@@ -831,7 +827,7 @@ function menuDraw()
                         ball[1]:reset(1, 1)
                         player2.dy = 0 
                     end,
-                    "stationary"
+                    false, 1
                 )
             )
         elseif status == "full" then 
@@ -1160,7 +1156,6 @@ function rules(query, i)
     end 
 end 
 function clientsBaseGame(dt)
-    shipManager(dt)
     if gameMode == "reverse" then 
         reversegame(dt)
     end 
@@ -1531,6 +1526,41 @@ function menuDemo(dt)
     if ball[1].x > player2.x-15 then 
         player2.y = ball[1].y-player2.height 
     end 
+    if (MAP_TYPE == 2) then 
+        for i, wall in ipairs(walls) do
+            if
+                (ball[1].y > wall.wally and ball[1].y < wall.wally + wall.wallheight and
+                    ball[1].x > wall.wallx - ballSpeed / 200 and
+                    ball[1].x < wall.wallx + 10 + ballSpeed / 200)
+            then
+                controllerSer()
+                soundtype = love.math.random(1, 5)
+                sounds["wallhit"]:setPitch(ballSpeed / 250)
+                sounds["wallhit"]:play()
+                if (ball[1].dx > 0) then
+                    ball[1].x = ball[1].x - 1
+                else
+                    ball[1].x = ball[1].x + 1
+                end
+                ball[1].dx = -ball[1].dx
+            elseif
+                (ball[1].y > wall.wally - 15 and ball[1].y < wall.wally + wall.wallheight + 10 and
+                    ball[1].x > wall.wallx and
+                    ball[1].x < wall.wallx + 10)
+            then
+                controllerSer()
+                soundtype = love.math.random(1, 5)
+                sounds["wallhit"]:setPitch(ballSpeed / 250)
+                sounds["wallhit"]:play()
+                if (ball[1].dy > 0) then
+                    ball[1].y = ball[1].y - 1
+                else
+                    ball[1].y = ball[1].y + 1
+                end
+                ball[1].dy = -ball[1].dy
+            end
+        end
+    end
     if ball[1].x >= player2.x-7 then
         sounds["beep"]:setPitch(ballSpeed / 250)
         sounds["beep"]:play()
@@ -1633,7 +1663,8 @@ function effectControl()
         end
     end
 end 
-local ship_goal = love.math.random(2, 20)
+--[[ 
+THE SHIP FUNCTIONALITY HAS BEEN SCRAPPED AND WONT! BE COMING BACK.
 function shipManager(dt)
     ship_timer = ship_timer + dt 
     if ship_timer > ship_goal then 
@@ -1652,3 +1683,4 @@ function shipManager(dt)
         end
     end
 end 
+]]

@@ -73,7 +73,11 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
         for i, button in ipairs(buttons) do 
             --print("Button")
             button.last = button.now
-            ev_bx = button.x
+            if button.x ~= -1 then 
+                ev_bx = button.x
+            else 
+                ev_bx = locationx - (ev_button_width * 0.5)
+            end
             if (location == 'control') then 
                 
                     if string.sub(button.text, 1, 1) == '2' then 
@@ -90,7 +94,9 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     ev_bx = -400
                     ev_by = -400
                 elseif button.x > locationx - (ev_button_width * 0.5) then
+                    --print("moving from" .. button.x)
                     button.x = button.x - 15
+                    --print("moving!" .. button.x)
                     ev_by = locationy - (total_height * 0.5) + cursor_y 
                 else 
                     ev_by = locationy - (total_height * 0.5) + cursor_y
@@ -124,13 +130,20 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                 love.graphics.setColor(0,0,0,1)
                 love.graphics.rectangle("fill", 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
               sounds['wallhit']:play() 
-              for i, buttons in ipairs(buttons) do 
-                buttons.x = 1280 
-          end
+              if button.skipAnim then 
+                print("skipped anim")
+              else 
+              for j, buttons in ipairs(buttons) do 
+                buttons.x = 1300 
+                print("making" .. j)
+              end
+              end
              button.fn()
+             break
          end
             love.graphics.setColor(unpack(color))
             love.graphics.rectangle("fill", ev_bx,ev_by, ev_button_width, ev_BUTTON_HEIGHT)
+            print(ev_bx .. " " .. i)
             love.graphics.setColor(0, 0, 0, 255)
             local textW = smallfont:getWidth(button.text)
             local textH = smallfont:getHeight(button.text)
@@ -166,15 +179,19 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                         love.graphics.print(playertext, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, by+textH*0.5) 
                     elseif button.text == 'snc' then 
                         if (nuckemodactive == 1) then
+                            textW = smallfont:getWidth(synctext)
                             love.graphics.setColor(1,0,0,1)
-                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
+                            love.graphics.print(synctext, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                             love.graphics.setColor(1,1,1,1)
-                            love.graphics.print(synctext, smallfont, VIRTUAL_WIDTH*0.5 - textW*0.7, ev_by+textH*0.5)
+                            love.graphics.print(synctext, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                             love.graphics.setColor(0,0,0,1) 
                         else
+                            textW = smallfont:getWidth(synctext)
                             love.graphics.print(synctext, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                         end
                     elseif (button.text == 'ballCount') then 
+                        local tempstr = "Ball Count: " .. maxBalls
+                        textW = smallfont:getWidth(tempstr)
                         love.graphics.print("Ball Count: " .. maxBalls, smallfont,  ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                     elseif (button.text == "Ball Speed: ") then 
                         if (nuckemodactive == 1) then 
@@ -186,12 +203,17 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                             love.graphics.setColor(0,0,0,1) 
 
                         else
+                            textW = smallfont:getWidth(button.text .. ballSet)
                             love.graphics.print(button.text .. ballSet, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                         end
                     elseif button.text == 'ptw' then 
-                        love.graphics.print("Points to Win: " .. ptw, smallfont, ev_bx + ev_button_width*0.5 - textW * 2.8, ev_by+textH*0.5)
+                        local tempstr = "Points to Win: " .. ptw
+                        textW = smallfont:getWidth(tempstr)
+                        love.graphics.print("Points to Win: " .. ptw, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                     elseif (button.text ==  'Silverblade') then 
-                        love.graphics.print("Difficulty: " .. prtext, smallfont, VIRTUAL_WIDTH*0.5 - textW , ev_by+textH*0.5) 
+                        local tempstr = "Difficulty: " .. prtext
+                        textW = smallfont:getWidth(tempstr)
+                        love.graphics.print("Difficulty: " .. prtext, smallfont,ev_bx + ev_button_width*0.5 - textW*0.5 , ev_by+textH*0.5) 
                     else
                         love.graphics.print(button.text, smallfont, ev_bx + ev_button_width*0.5 - textW*0.5, ev_by+textH*0.5)
                     end
@@ -203,8 +225,15 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
             
         end
 function mainMenu:addButton(text, fn)
+    if isButtonAnimated == true then 
+        print("Button shall be animated!")
+        newButtonXVariable = 1290
+    else 
+        print("Button shall NOT be animated!")
+        newButtonXVariable = -1
+    end
     return {
-        x = 1290,
+        x = newButtonXVariable,
         text = text, 
         fn = fn,
         now = false,

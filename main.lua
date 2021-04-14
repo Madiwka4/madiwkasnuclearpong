@@ -25,9 +25,10 @@ showTouchControls = false
 
 
 --0.9 VARIABLES
+isButtonAnimated = false
+
 wallsLoadError = false 
 background = love.graphics.newImage('img/background.jpg')
-bigship = love.graphics.newImage('img/large_red_01.png')
 backgroundScroll = 0
 
 background_scroll_speed = 10
@@ -125,20 +126,22 @@ function newTouch(id, x, y)
         originalY = y 
     }
 end 
-function newButton(text, fn, sp)
-    if sp ~= nil then 
+function newButton(text, fn, sp, qp)
+    if qp ~= nil then 
         return {
             x = (VIRTUAL_WIDTH * 0.5) - VIRTUAL_WIDTH * (1/3)*0.5,
             text = text,
             fn = fn,
+            skipAnim = true,
             now = false,
             last = false
         }
     else
     return {
-        x = 1290,
+        x = 1300,
         text = text,
         fn = fn,
+        skipAnim = sp,
         now = false,
         last = false
     }
@@ -189,7 +192,6 @@ controlSettings = {}
 modeSelectorButtons = {}
 pracdiff = {}
 playerCountButtons = {}
-ships = {}
 function controlChanger()
     if (gameState == "assign") then
         love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
@@ -198,7 +200,8 @@ function controlChanger()
 end
 function love.load()
     walls = {}
-    love.filesystem.createDirectory( "pong" )
+    print(love.filesystem.createDirectory( "pong" ))
+    love.filesystem.setIdentity( "pong" )
     print (love.filesystem.getSaveDirectory())
     print (love.filesystem.getIdentity(  ))
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -242,7 +245,8 @@ function love.load()
                     globalState = "menu"
                     hardmanager()
                 end
-            end
+            end, 
+            false
         )
     )
     table.insert(
@@ -253,7 +257,8 @@ function love.load()
                 for k in pairs(walls) do
                     walls[k] = nil
                 end
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -263,7 +268,8 @@ function love.load()
             function()
                 paused = false 
                 TEXT = "Let's Continue"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -287,7 +293,8 @@ function love.load()
                     potentialstrike2 = 0
                     player1nukescore = 0
                     player2nukescore = 0
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -304,7 +311,8 @@ function love.load()
                     ball[1].dy = 1
                     globalState = "menu"
                     hardmanager()
-            end
+            end,
+            false
         )
     )
     if not isAndroid then 
@@ -318,7 +326,8 @@ function love.load()
                     DIFFERENCE_Y = myscreen.d
                     OFFSET_X = myscreen.e 
                     OFFSET_Y = myscreen.f 
-                end
+                end,
+                true
             )
         )
     end 
@@ -332,7 +341,8 @@ function love.load()
                 else 
                     musicController("mute", 1)
                 end 
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -349,7 +359,8 @@ function love.load()
                     ball[1].dy = 1
                     globalState = "menu"
                     hardmanager()
-            end
+            end,
+            false
         )
     )
 
@@ -358,8 +369,9 @@ function love.load()
         newButton(
             "S",
             function()
-                love.filesystem.write("save.lua", serialize(walls))
-            end
+                print(love.filesystem.write("save.lua", serialize(walls)))
+            end,
+            true
         )
     )
     table.insert(
@@ -372,7 +384,8 @@ function love.load()
                     walls = {}
                     wallsLoadError = true 
                 end
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -382,7 +395,8 @@ function love.load()
             function()
                 ptw = 10
                 gameState = "gameMode"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -395,7 +409,8 @@ function love.load()
                     love.keyboard.setTextInput( true, 0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT/3)
                 end
                 gameState = "chooseIP"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -407,7 +422,8 @@ function love.load()
                 AGAINST_AI = 0 
                 gameState = "1serve"
                 ball[1]:reset(1, 1)
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -419,7 +435,8 @@ function love.load()
                 AGAINST_AI = 0 
                 gameState = "1serve"
                 ball[1]:reset(1, 1)
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -428,7 +445,8 @@ function love.load()
             "Multiplayer",
             function()
                 gameState = "multiMode"
-            end
+            end,
+            false
         )
     )
     if not isAndroid then 
@@ -439,7 +457,8 @@ function love.load()
                 function()
                     AGAINST_AI = 0
                     gameState = "windowsettings"
-                end
+                end,
+                false
             )
         )
     else 
@@ -454,7 +473,8 @@ function love.load()
                         showTouchControls = true 
                     end 
                     gameState = "touchcontrols"
-                end
+                end,
+                true
             )
         )
     end 
@@ -464,7 +484,8 @@ function love.load()
             "Exit",
             function()
                 love.event.quit(0)
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -473,7 +494,8 @@ function love.load()
             "Easy",
             function()
                 hardmanager("easy")
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -482,7 +504,8 @@ function love.load()
             "Normal",
             function()
                 hardmanager("normal")
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -491,7 +514,8 @@ function love.load()
             "Hard",
             function()
                 hardmanager("hard")
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -500,7 +524,8 @@ function love.load()
             "Smart",
             function()
                 hardmanager("smart")
-            end
+            end,
+            false
         )
     )
     --table.insert(
@@ -522,7 +547,8 @@ function love.load()
                 DIFFERENCE_Y = myscreen.d
                 OFFSET_X = myscreen.e 
                 OFFSET_Y = myscreen.f 
-            end
+            end,
+            true
         )
     )
     if isAndroid then 
@@ -536,7 +562,8 @@ function love.load()
                     else 
                         musicController("mute", 1)
                     end 
-                end
+                end,
+                true
             )
         )
     end
@@ -550,7 +577,8 @@ function love.load()
                 else 
                     musicController("mute", 1)
                 end 
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -559,7 +587,8 @@ function love.load()
             "Editor",
             function()
                 gameState = "editor"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -568,7 +597,8 @@ function love.load()
             "Speed Settings",
             function()
                 gameState = "speedSettings"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -577,7 +607,8 @@ function love.load()
             "Control Settings",
             function()
                 gameState = "controlSettings"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -586,7 +617,8 @@ function love.load()
             "Back to Menu",
             function()
                 gameState = "menu"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -595,7 +627,8 @@ function love.load()
             "Back to Menu",
             function()
                 gameState = "windowsettings"
-            end
+            end,
+            false
         )
     )
     --table.insert(speedParameters, newButton("Ball Speed: ", function() speedSetter('ball') end))
@@ -605,7 +638,8 @@ function love.load()
             "Ball Speed: ",
             function()
                 speedSetter("ball")
-            end
+            end,
+            true
         )
     )
     --table.insert(speedParameters, newButton("snc", function() speedSetter('snc') end))
@@ -615,7 +649,8 @@ function love.load()
             "snc",
             function()
                 speedSetter("snc")
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -624,7 +659,8 @@ function love.load()
             "NUCLEAR MODE",
             function()
                 speedSetter("nuclearmod")
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -634,7 +670,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p1up"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -644,7 +681,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p1down"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -654,7 +692,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p1super"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -664,7 +703,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p1ct"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -674,7 +714,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p2up"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -684,7 +725,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p2down"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -694,7 +736,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p2super"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -704,7 +747,8 @@ function love.load()
             function()
                 gameState = "assign"
                 req = "p2ct"
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -714,7 +758,8 @@ function love.load()
             function()
                 p1control = {up = "a", down = "z", super = "s", counter = "x"}
                 p2control = {up = ";", down = ".", super = "l", counter = ","}
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -723,7 +768,8 @@ function love.load()
             "Return",
             function()
                 gameState = "windowsettings"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -732,7 +778,8 @@ function love.load()
             "Nuclear Pong",
             function()
                 gameState = "difficulty"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -741,7 +788,8 @@ function love.load()
             "Main Menu",
             function()
                 gameState = "menu"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -750,7 +798,8 @@ function love.load()
             "Silverblade",
             function()
                 speedSetter("practice")
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -760,7 +809,8 @@ function love.load()
             function()
                 speedSetter("reset")
                 gameState = "gameMode"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -770,7 +820,8 @@ function love.load()
             function()
                 gameMode = "practice"
                 hardmanager("practice")
-            end
+            end,
+            false
         )
     )
     --table.insert(playerCountButtons, newButton("1v1", function() speedSetter('pc') end))
@@ -780,7 +831,8 @@ function love.load()
             "ballCount",
             function()
                 speedSetter("ballz")
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -789,7 +841,8 @@ function love.load()
             "ballCount",
             function()
                 speedSetter("ballz")
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -800,7 +853,8 @@ function love.load()
                 speedSetter("reset")
                 gameState = "menu"
                 
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -809,7 +863,8 @@ function love.load()
             "ptw",
             function()
                 speedSetter("ptw")
-            end
+            end,
+            true
         )
     )
     table.insert(
@@ -820,7 +875,8 @@ function love.load()
                 AGAINST_AI = 0
                 gameState = "1serve"
                 globalState = "base"
-            end
+            end,
+            false
         )
     )
     table.insert(
@@ -831,7 +887,8 @@ function love.load()
                 gameState = "1serve"
                 gameMode = "reversegame"
                 globalState = "base"
-            end
+            end,
+            false
         )
     )
 
@@ -2438,7 +2495,7 @@ end
 
 function resetButtonX(arr)
     for i, buttons in ipairs(arr) do 
-        buttons.x = 1290 
+        buttons.x = 1300 
   end
 end 
 

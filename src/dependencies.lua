@@ -14,7 +14,6 @@ require 'src/menus'
 require 'src/AI'
 require 'src/reverseGame'
 require 'explosion'
-require 'ship'
 tick = require 'tick'
 utf8 = require("utf8")
 serialize = require 'ser'

@@ -1,11 +1,12 @@
 button = Class{}
 
-function button:init(x, y, width, height, color)
+function button:init(x, y, width, height, color, skipAnim)
     self.x = x 
     self.y = y
     self.w = width
     self.h = height
     self.color = color
+    self.skipAnim = skipAnim
 end
 
 function button:update(dt)
