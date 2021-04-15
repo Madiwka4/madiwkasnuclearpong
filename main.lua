@@ -26,7 +26,7 @@ showTouchControls = false
 
 --0.9 VARIABLES
 isButtonAnimated = false
-
+lowcpu = false
 wallsLoadError = false 
 background = love.graphics.newImage('img/background.jpg')
 backgroundScroll = 0
@@ -1020,10 +1020,19 @@ function speedControl()
     end
 end
 checking = 0
+local countinglowcpu = 0
 function love.update(dt)
     --checking = checking + 1
     --print(checking)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
+    if not lowcpu then 
+        if (love.timer.getFPS() < 50 and gameState ~= "animation") then 
+            countinglowcpu = countinglowcpu + 1
+            if countinglowcpu > 10 then 
+                lowcpu = true 
+            end
+        end
+    end
     for i, explosion in ipairs(explosions) do 
         explosion:update(dt)
     end
@@ -1039,7 +1048,6 @@ function love.update(dt)
     end 
     if globalState == "base" and not paused then
         basegame(dt)
-        
     end
     if globalState == "menu" then
         debugCheck(dt)

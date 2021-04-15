@@ -641,7 +641,11 @@ function normalDraw()
         love.graphics.clear(1, 1, 1, 1)
     else
         love.graphics.clear(40 / 255, 40 / 255, 40 / 255, 1)
-        love.graphics.draw(background, 0, -backgroundScroll) 
+        if (lowcpu) then 
+            --love.graphics.draw(background, 0,0)
+        else
+        love.graphics.draw(background, 0,-backgroundScroll)
+        end
     end
     if gameState == "assign" then
         love.graphics.clear(50 / 255, 50 / 255, 50 / 255, 255)
@@ -715,8 +719,7 @@ function menuDraw()
         love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, 0, 10, VIRTUAL_HEIGHT * 0.3)
         love.graphics.rectangle("fill", VIRTUAL_WIDTH * 0.5, VIRTUAL_HEIGHT * 0.7, 10, VIRTUAL_HEIGHT * 0.3)
         love.graphics.setColor(1, 1, 1, 1)
-    end 
-    if MAP_TYPE == 2 then 
+    elseif MAP_TYPE == 2 then 
         for i, wall in ipairs(walls) do
             love.graphics.setColor(1, 1, 1, 1)
             love.graphics.rectangle("fill", wall.wallx, wall.wally, 10, wall.wallheight)
@@ -734,28 +737,22 @@ function menuDraw()
         love.graphics.setFont(smallfont)
         love.graphics.printf("The green zones are for moving up and down, double tap the red zone for special attack or to start the serve.", 10, 150, VIRTUAL_WIDTH, "center")
         love.graphics.printf("Swipe from red to green for stopping time", 10, 450, VIRTUAL_WIDTH, "center")
-    end
-    if gameState == "windowsettings" then
+    elseif gameState == "windowsettings" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, settings, sounds, "right")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "editor" then
+    elseif gameState == "editor" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, editorpicks, sounds, "right")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "speedSettings" then
+    elseif gameState == "speedSettings" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, speedParameters, sounds, "middle")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "controlSettings" then
+    elseif gameState == "controlSettings" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, controlSettings, sounds, "control")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "gameMode" then
+    elseif gameState == "gameMode" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, modeSelectorButtons, sounds, "middle")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "chooseIP" then
+    elseif gameState == "chooseIP" then
         IPselect = {}
         if isAndroid then 
         table.insert(
@@ -839,24 +836,19 @@ function menuDraw()
         love.graphics.printf(IPnew, 0, VIRTUAL_HEIGHT / 4, VIRTUAL_WIDTH, "center")
         end 
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "menu" then
+    elseif gameState == "menu" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds, "middle")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "difficulty" then
+    elseif gameState == "difficulty" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, difbuttons, sounds, "middle")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "multiMode" then
+    elseif gameState == "multiMode" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, playerCountButtons, sounds, "middle")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == "prdiff" then
+    elseif gameState == "prdiff" then
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, pracdiff, sounds, "playercount")
         love.keyboard.mouseisReleased = false
-    end
-    if gameState == 'start' then 
+    elseif gameState == 'start' then 
         love.graphics.push()
         love.graphics.translate(VIRTUAL_WIDTH * 0.4, VIRTUAL_HEIGHT * 0.5)
         love.graphics.rotate(rotation)
@@ -873,7 +865,11 @@ function menuDraw()
 end
 function baseDraw()
     love.graphics.setColor(255, 255, 255, 1) 
+    if (lowcpu) then 
+       -- love.graphics.draw(background, 0,0)
+    else
     love.graphics.draw(background, 0,-backgroundScroll)
+    end
 
     if shakeDuration > t then 
             
