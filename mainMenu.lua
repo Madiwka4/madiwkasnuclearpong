@@ -1,7 +1,7 @@
 mainMenu = Class{}
 function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds, location)
         if (gameState == 'editor')
-        then
+            then
          ev_button_width = VIRTUAL_WIDTH * (1/72)
         ev_BUTTON_HEIGHT = VIRTUAL_WIDTH * (1/72)
         local margin = 16
@@ -89,9 +89,6 @@ function mainMenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds
                     ev_bx = (VIRTUAL_WIDTH*0.5) - (ev_button_width * 0.5)
                     ev_by = locationy - (total_height * 0.5) + cursor_y
                 end
-            elseif button.text == 'NUCLEAR MODE' and easternum < 11 then 
-                ev_bx = -400
-                ev_by = -400
             elseif button.x > locationx - (ev_button_width * 0.5) then
                 --print("moving from" .. button.x)
                 if lowcpu then 
