@@ -644,7 +644,7 @@ function normalDraw()
         if (lowcpu) then 
             --love.graphics.draw(background, 0,0)
         else
-        love.graphics.draw(background, 0,-backgroundScroll)
+        --love.graphics.draw(background, 0,-backgroundScroll)
         end
     end
     if gameState == "assign" then
@@ -710,6 +710,7 @@ function practiceDraw()
     love.graphics.print(tostring(math.floor(player1score)), VIRTUAL_WIDTH / 2 - 500, VIRTUAL_HEIGHT / 12)
 end
 function menuDraw()
+    love.graphics.clear(30/255,30/255,30/255,1)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.printf(TEXT, 0, 20, VIRTUAL_WIDTH, "center")
     love.graphics.setFont(smallfont)
@@ -864,11 +865,12 @@ function menuDraw()
     end
 end
 function baseDraw()
+    love.graphics.clear(30/255,30/255,30/255,1)
     love.graphics.setColor(255, 255, 255, 1) 
     if (lowcpu) then 
        -- love.graphics.draw(background, 0,0)
     else
-    love.graphics.draw(background, 0,-backgroundScroll)
+    --love.graphics.draw(background, 0,-backgroundScroll)
     end
 
     if shakeDuration > t then 
@@ -950,7 +952,8 @@ function renderEditor()
 end
 
 function intro()
-    love.graphics.draw(background, 0,0)
+    --love.graphics.draw(background, 0,0)
+
     love.graphics.setColor(255, 255, 255, light / 255)
     love.graphics.draw(image, 0, 0)
 end
