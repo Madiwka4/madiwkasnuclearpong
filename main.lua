@@ -1,7 +1,10 @@
 --CALLING OTHER LUA FILES
 
+<<<<<<< HEAD
 love.filesystem.setIdentity( "pong" )
 love.filesystem.createDirectory( "a" )
+=======
+>>>>>>> 66f507d752eff25dc46468da097e4d08624fced6
 require "src/dependencies"
 
 
@@ -19,7 +22,7 @@ doubleclick1 = false
 doubleclick2 = false 
 hold1 = false 
 hold2 = false 
-debug = false
+debug = true
 paused = false 
 androidButtons = {}
 pauseButtons = {}
@@ -29,8 +32,11 @@ showTouchControls = false
 
 
 --0.9 VARIABLES
+globalMessage = "none"
+globalAnimation = "none"
+globalMessageTime = 0
 isButtonAnimated = false
-
+lowcpu = false
 wallsLoadError = false 
 background = love.graphics.newImage('img/background.jpg')
 backgroundScroll = 0
@@ -1024,10 +1030,26 @@ function speedControl()
     end
 end
 checking = 0
+local countinglowcpu = 0
 function love.update(dt)
     --checking = checking + 1
     --print(checking)
     --print("IMPORTANT!!!!!" .. globalState .. gameState)
+    if globalMessage ~= "none" then 
+        globalMessageTime = globalMessageTime + dt 
+        if globalMessageTime > 10 then
+            globalMessage = "none"
+        end 
+    end
+    if not lowcpu then 
+        if (love.timer.getFPS() < 50 and gameState ~= "animation") then 
+            countinglowcpu = countinglowcpu + 1
+            if countinglowcpu > 30 then 
+                lowcpu = true 
+                globalMessage = "[color=#00ff00][bounce]Low-end mode enabled[/bounce][/color]"
+            end
+        end
+    end
     for i, explosion in ipairs(explosions) do 
         explosion:update(dt)
     end
@@ -1043,7 +1065,6 @@ function love.update(dt)
     end 
     if globalState == "base" and not paused then
         basegame(dt)
-        
     end
     if globalState == "menu" then
         debugCheck(dt)
@@ -1055,7 +1076,6 @@ function love.update(dt)
         musicController('norm', 1)
         
     end
-     
     if globalState == "nettest" then 
         --print("Confcode: " .. confirmation)
         if confirmation == "N" then 
@@ -1863,13 +1883,9 @@ function love.draw(dt)
         for i, touch in ipairs(touches) do 
         love.graphics.printf(touch.x, 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, "center")
         end 
-        if doubleclick1 then 
-            TEXT = "DOUBLECLICK1"
-            elseif doubleclick2 then TEXT = "DOUBLECLICK2"
-            else TEXT = "NO"
-            end
         end
     end 
+    showMessage()
     if wallsLoadError then 
         love.graphics.setColor(1,0,0,1)
         love.graphics.printf("Error loading map!", 0,0,VIRTUAL_WIDTH, "left")
@@ -2496,7 +2512,13 @@ end
 end
 return false 
 end 
+function showMessage()
+    print (globalMessage)
+    if globalMessage ~= "none" then 
+        love.graphics.printf("Low CPU mode active", 0, VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT/2, "center")
+    end 
 
+end 
 function resetButtonX(arr)
     for i, buttons in ipairs(arr) do 
         buttons.x = 1300 

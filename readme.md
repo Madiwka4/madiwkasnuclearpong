@@ -25,6 +25,7 @@ To play on Windows, download a Windows executable from the releases tab!
 <li>Fixed button animations</li>
 <li>Fixed demo and editor not working together</li>
 <li>Removed a lot of clutter</li>
+<li>Added LowPOWER mode to improve FPS on low-end devices</li>
 </ul>
 ToDo:
 <ul>
