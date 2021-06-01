@@ -1,6 +1,10 @@
 --CALLING OTHER LUA FILES
+
+love.filesystem.setIdentity( "pong" )
+love.filesystem.createDirectory( "a" )
 require "src/dependencies"
-io.stdout:setvbuf("no")
+
+
 --CANCELLED ATTEMPETED SHADING (NOT WORKING)
 local shader_code =
     [[
@@ -200,8 +204,8 @@ function controlChanger()
 end
 function love.load()
     walls = {}
-    print(love.filesystem.createDirectory( "pong" ))
-    love.filesystem.setIdentity( "pong" )
+    
+    
     print (love.filesystem.getSaveDirectory())
     print (love.filesystem.getIdentity(  ))
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -216,9 +220,9 @@ function love.load()
    --print("Debug active")
     --load
 
-    testwalls = love.filesystem.load("save.lua")()
+    testwalls = love.filesystem.load("save")
     if testwalls ~= nil then
-        walls = love.filesystem.load("save.lua")()
+        walls = love.filesystem.load("save")
         print("Save file found")
     else
         print("No save file found!")

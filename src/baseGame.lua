@@ -1649,13 +1649,6 @@ function menuDemo(dt)
     end
 end 
 function effectControl()
-    if player1score > 0.8 * ptw or player2score > 0.8 * ptw then 
-        for i = 1, maxBalls do 
-            if math.abs(ball[i].x - VIRTUAL_WIDTH/2) < 10 and #explosions < 1 then 
-                table.insert(explosions, explosion(love.math.random(100, VIRTUAL_WIDTH-100), love.math.random(player1.y, player2.y), 100, {player1.y/2.81/255,player2.y/2.81/255,ball[1].y/2.81/255,0.4}))
-            end
-        end
-    end 
     for i, explosion in ipairs(explosions) do 
         if explosion.killed then 
             table.remove(explosions, i)
