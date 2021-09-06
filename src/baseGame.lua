@@ -365,7 +365,7 @@ end
 function debugCheck(dt)
     
     if (gameState == "menu") then
-        updateTEXT = "0.8 Galaxy"
+        updateTEXT = "0.9 Pacific"
     end
     dangerChecker()
     elapsed = elapsed + dt  
@@ -838,6 +838,12 @@ function menuDraw()
         end 
         love.keyboard.mouseisReleased = false
     elseif gameState == "menu" then
+        presence = {
+            state = "Enjoying Pong",
+            details = "Main Menu",
+            largeImageKey = "pongnew",
+            largeImageText = "Nuclear Pong",
+        }
         mymenu:butt(gameState, VIRTUAL_WIDTH, VIRTUAL_HEIGHT, buttons, sounds, "middle")
         love.keyboard.mouseisReleased = false
     elseif gameState == "difficulty" then

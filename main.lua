@@ -1,13 +1,13 @@
 --CALLING OTHER LUA FILES
 
-<<<<<<< HEAD
-love.filesystem.setIdentity( "pong" )
-love.filesystem.createDirectory( "a" )
-=======
->>>>>>> 66f507d752eff25dc46468da097e4d08624fced6
+
 require "src/dependencies"
+local content = love.filesystem.read("src/libdiscord-rpc.so")
+print(content)
+love.filesystem.write("libdiscord-rpc.so", content)
+local discordRPC = require("src/discordRPC")
 
-
+local appId = require("applicationId")
 --CANCELLED ATTEMPETED SHADING (NOT WORKING)
 local shader_code =
     [[
@@ -32,6 +32,7 @@ showTouchControls = false
 
 
 --0.9 VARIABLES
+startTime = os.time(os.date("*t"))
 globalMessage = "none"
 globalAnimation = "none"
 globalMessageTime = 0
@@ -945,7 +946,16 @@ function love.load()
     smallfont = love.graphics.newFont("font.ttf", 25)
     scorefont = love.graphics.newFont("font.ttf", 60)
     love.graphics.setFont(smallfont)
+    discordRPC.initialize(appId, true)
+    local now = os.time(os.date("*t"))
+    presence = {
+        state = "Enjoying Pong",
+        details = "Main Menu",
+        largeImageKey = "pongnew",
+        largeImageText = "Nuclear Pong",
+    }
 
+    nextPresenceUpdate = 0
     --push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
     --	fullscreen = isFullscreen,
     --	resizable = true,
@@ -1041,6 +1051,11 @@ function love.update(dt)
             globalMessage = "none"
         end 
     end
+    if nextPresenceUpdate < love.timer.getTime() then
+        discordRPC.updatePresence(presence)
+        nextPresenceUpdate = love.timer.getTime() + 2.0
+    end
+    discordRPC.runCallbacks()
     if not lowcpu then 
         if (love.timer.getFPS() < 50 and gameState ~= "animation") then 
             countinglowcpu = countinglowcpu + 1
@@ -1415,6 +1430,7 @@ function hardmanager(diff)
         AGAINST_AI = 1
         gameState = "base"
     end
+    startTime = os.time(os.date("*t"))
 end
 
 function dangerChecker() --CHECK IF CONTROLS ARE DUPLICATING
@@ -1941,6 +1957,13 @@ end
 
 function serveBot() --THIS IS USED TO CHANGE TEXT/BALL DIRECTION ON DIFFERENT SERVES
    --print("servebot called")
+   presence = {
+       state = "Playing Pong",
+       details = player1score .. " : " .. player2score,
+       startTimestamp = startTime,
+       largeImageKey = "pongnew",
+       largeImageText = "Nuclear Pong",
+   }
     if (gameState == "1serve") then
         updateTEXT = ""
         if (gameMode ~= "practice") then
@@ -2513,7 +2536,7 @@ end
 return false 
 end 
 function showMessage()
-    print (globalMessage)
+    --print (globalMessage)
     if globalMessage ~= "none" then 
         love.graphics.printf("Low CPU mode active", 0, VIRTUAL_WIDTH/2, VIRTUAL_HEIGHT/2, "center")
     end 
