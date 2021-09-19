@@ -18,7 +18,7 @@ To play the game on Linux, just launch the ./debuggame.sh and enjoy the game!
 To play on Linux like a normie, you can <a href = "https://madi-wka.club/NuclearPongLinux.tar.gz">Download</a> the latest release (may be outdated compared to the source version), or you can download the LOVE file from the releases tab.
 To play on Windows, download a Windows executable from the releases tab! 
 # Changes
-<p>0.8 is here! Changelog:
+<p>0.9 is here! Changelog:
 <ul>
 <li>Changed the background. Fancy.</li>
 <li>Fixed button text alignment</li>
@@ -32,6 +32,8 @@ ToDo:
 <li>Fix very annoying error with the Editor saving on Linux</li>
 </ul>
 </p>
+
+
 
 
 

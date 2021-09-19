@@ -2,10 +2,12 @@
 
 
 require "src/dependencies"
-local content = love.filesystem.read("src/libdiscord-rpc.so")
-print(content)
-love.filesystem.write("libdiscord-rpc.so", content)
+--local content = love.filesystem.read("src/libdiscord-rpc.so")
+--print(content)
+--love.filesystem.write("libdiscord-rpc.so", content)
+if not isAndroid then 
 local discordRPC = require("src/discordRPC")
+end 
 
 local appId = require("applicationId")
 --CANCELLED ATTEMPETED SHADING (NOT WORKING)
@@ -946,6 +948,7 @@ function love.load()
     smallfont = love.graphics.newFont("font.ttf", 25)
     scorefont = love.graphics.newFont("font.ttf", 60)
     love.graphics.setFont(smallfont)
+    if not isAndroid then 
     discordRPC.initialize(appId, true)
     local now = os.time(os.date("*t"))
     presence = {
@@ -954,6 +957,7 @@ function love.load()
         largeImageKey = "pongnew",
         largeImageText = "Nuclear Pong",
     }
+end
 
     nextPresenceUpdate = 0
     --push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -1051,11 +1055,14 @@ function love.update(dt)
             globalMessage = "none"
         end 
     end
+    if not isAndroid then 
     if nextPresenceUpdate < love.timer.getTime() then
+        
         discordRPC.updatePresence(presence)
         nextPresenceUpdate = love.timer.getTime() + 2.0
     end
     discordRPC.runCallbacks()
+end
     if not lowcpu then 
         if (love.timer.getFPS() < 50 and gameState ~= "animation") then 
             countinglowcpu = countinglowcpu + 1
