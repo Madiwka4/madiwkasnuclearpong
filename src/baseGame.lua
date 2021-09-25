@@ -402,7 +402,7 @@ function goalManager()
                 for i = 1, maxBalls do
                     ball[i]:reset(i, 2)
                 end
-                if (player2score+1 == ptw+maxBalls-1 and gameMode ~= "practice") then
+                if (player2score+1 == ptw+maxBalls-1 and gameMode ~= "practice" and not freePlay ) then
                     for i = 1, maxBalls do
                         ball[i]:reset(i)
                     end
@@ -417,7 +417,7 @@ function goalManager()
                     end 
                 end 
             end 
-
+            sounds["score"]:play()
             player2score = player2score + 1
         end
         if (rules("p2miss", i)) then
@@ -444,7 +444,7 @@ function goalManager()
     
                 AI_SPEED = difficultyl 
                 
-                if (player1score+1 == ptw+maxBalls-1) then
+                if (player1score+1 == ptw+maxBalls-1 and not freePlay) then
                     ball[i]:reset(i)
     
                     sounds["win"]:play()
@@ -900,7 +900,15 @@ function baseDraw()
     end
 
     if globalState == 'base' or globalState == 'reverse' or globalState == 'nettest' or globalState == 'clienttest' then 
-
+        if globalState == "nettest" then 
+            presence = {
+                state = "Enjoying Pong",
+                details = "Main Menu",
+                largeImageKey = "pongnew",
+                largeImageText = "Nuclear Pong",
+                joinSecret = IP,
+            }
+        end 
         love.graphics.setFont(smallfont)
         if gameState == 'nuclearExplosion' then 
             nuclearDraw()

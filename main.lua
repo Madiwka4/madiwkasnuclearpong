@@ -6,7 +6,7 @@ require "src/dependencies"
 --print(content)
 --love.filesystem.write("libdiscord-rpc.so", content)
 if not isAndroid then 
-local discordRPC = require("src/discordRPC")
+ discordRPC = require("src/discordRPC")
 end 
 
 local appId = require("applicationId")
@@ -34,6 +34,7 @@ showTouchControls = false
 
 
 --0.9 VARIABLES
+freePlay = false
 startTime = os.time(os.date("*t"))
 globalMessage = "none"
 globalAnimation = "none"
@@ -295,6 +296,7 @@ function love.load()
                 else 
                     gameState = "1serve"
                 end
+                    freePlay = true
                     potentialnuke1 = 0
                     potentialnuke2 = 0
                     striken = 0
@@ -1027,7 +1029,7 @@ function startShake(duration, magnitude)
     t, shakeDuration, shakeMagnitude = 0, duration or 1, magnitude or 5
 end
 function displayFPS()
-    love.window.setTitle(love.timer.getFPS())
+    love.window.setTitle("Nuclear Pong")
     --love.window.setTitle(globalState .. " " .. gameState .. " " .. paddle_SPEED .. " " .. p1bonus .. " " .. player1.dy)
     if love.keyboard.isDown("space") then
         player1nukescore = 200
@@ -2073,6 +2075,7 @@ function resolutionChanger()
 end
 function resettinggenius()
     maxBalls = 1
+    freePlay = false 
     for i = 1, maxBalls do
         ball[i]:reset(i)
     end
@@ -2555,3 +2558,11 @@ function resetButtonX(arr)
   end
 end 
 
+function discordRPC.joinRequest(userId, username, discriminator, avatar)
+    print(string.format("Discord: join request (%s, %s, %s, %s)", userId, username, discriminator, avatar))
+    discordRPC.respond(userId, "yes")
+end
+
+function discordRPC.joinGame(joinSecret)
+    print(string.format("Discord: join (%s)", joinSecret))
+end
